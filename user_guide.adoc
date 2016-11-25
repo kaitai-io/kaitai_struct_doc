@@ -1,32 +1,26 @@
 = Kaitai Struct User Guide
 v0.5
-:toc:
+:toc: left
 
-[[installation-and-invocation]]
-Installation and invocation
----------------------------
-
-[[linux]]
-Linux
-~~~~~
+== Introduction
 
 TODO
 
-[[windows]]
-Windows
-~~~~~~~
+== Installation and invocation
+
+=== Linux
 
 TODO
 
-[[mac-os-x]]
-Mac OS X
-~~~~~~~~
+=== Windows
 
 TODO
 
-[[workflow-overview]]
-Workflow overview
------------------
+=== Mac OS X
+
+TODO
+
+== Workflow overview
 
 As you might have already read on the project's website, the main idea
 of Kaitai Struct is that you create a description of a binary data
@@ -35,16 +29,12 @@ then you compile it with KS compiler into target programming language
 
 TODO
 
-[[kaitai-struct-language]]
-Kaitai Struct language
-----------------------
+== Kaitai Struct language
 
 With the workflow issues out of the way, let's concentrate on the Kaitai
 Struct language itself.
 
-[[fixed-size-structures]]
-Fixed-size structures
-~~~~~~~~~~~~~~~~~~~~~
+=== Fixed-size structures
 
 Probably the simplest thing KS can do is reading fixed-size structures.
 You might know them as C struct definitions - consider something like
@@ -151,9 +141,7 @@ folded style strings for longer documentation that spans multiple lines:
       on the value of opcode.
 ----
 
-[[checking-for-magic-signatures]]
-Checking for "magic" signatures
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Checking for "magic" signatures
 
 Many file formats use some sort of safeguard measure against using
 completely different file type in place of the required file type. The
@@ -225,9 +213,7 @@ definitely not recommended in real-life specs):
 Note that there's no need to specify `type` or `size` for fixed contents
 data - it all comes naturally from the `contents`.
 
-[[variable-length-structures]]
-Variable-length structures
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Variable-length structures
 
 Many protocols and file formats tend to conserve bytes, especially for
 strings. Sure, it's stupid to have a fixed 512-byte buffer for a string
@@ -287,9 +273,7 @@ seq:
     size-eos: true
 ----
 
-[[enums-named-integer-constants]]
-Enums (named integer constants)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Enums (named integer constants)
 
 The nature of binary format encoding dictates use that in many cases
 we'll be using some kind of integer constants to encode certain
@@ -328,9 +312,7 @@ represented by that enum, instead of just being a raw integer. Note that
 such attributes must have some sort of integer type in the first place
 (i.e. `type: u*` or `type: s*`).
 
-[[substructures-subtypes]]
-Substructures (subtypes)
-~~~~~~~~~~~~~~~~~~~~~~~~
+=== Substructures (subtypes)
 
 What do we do if we need to use many of the strings in such a format?
 Writing so many repetitive `my_len`- / `my_str`-style pairs would be so
@@ -369,9 +351,7 @@ Of course, one can actually have more levels of subtypes:
 
 TODO
 
-[[accessing-attributes-in-other-types]]
-Accessing attributes in other types
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Accessing attributes in other types
 
 Expression language (used, for example, in `size` key) allows you to
 refer not only attributes in current type, but also in other types.
@@ -403,9 +383,7 @@ hierarchy - i.e. `size: header.subheader_1.subsubheader_1_2.field_4`.
 But sometimes we need just the opposite: how do we access upper-level
 elements from lower-level types? KS provides two options here:
 
-[[parent]]
-_parent
-^^^^^^^
+==== `_parent`
 
 One can use special pseudo-attribute `_parent` to access parent
 structure:
@@ -415,9 +393,7 @@ structure:
 TODO
 ----
 
-[[root]]
-_root
-^^^^^
+==== `_root`
 
 In some cases, it would be way too impractical to write tons of
 `_parent._parent._parent._parent...` or just plain impossible (if you're
@@ -444,9 +420,7 @@ types:
         type: u4
 ----
 
-[[conditionals]]
-Conditionals
-~~~~~~~~~~~~
+=== Conditionals
 
 Some protocols and file formats have optional fields, which only exist
 on some conditions. For example, one can have some byte first that
@@ -491,9 +465,7 @@ enums:
 There are other enum operations available, we'll cover them in
 expression language guide later.
 
-[[repetitions]]
-Repetitions
-~~~~~~~~~~~
+=== Repetitions
 
 Most real-life file formats do not contain only one copy of some
 element, but might contain several copies, i.e. they repeat the same
@@ -508,9 +480,7 @@ KS supports all these types of repetitions. In all cases, it will create
 a resizable array (or nearest equivalent available in target language)
 and populate it with elements.
 
-[[repeat-until-end-of-stream]]
-Repeat until end of stream
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+==== Repeat until end of stream
 
 This is the simplest kind of repetition, done by specifying
 `repeat: eos`. For example:
@@ -553,9 +523,7 @@ This one defines an array of records of type `filename`. Each individual
 `filename` consists of a 8-byte `name` and 3-byte `ext` strings in ASCII
 encoding.
 
-[[repeat-for-a-number-of-times]]
-Repeat for a number of times
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==== Repeat for a number of times
 
 One can repeat an element a certain number of times. For that, we'll
 need an expression that will give us number of iterations (which would
@@ -607,9 +575,7 @@ as many `matrix` elements as needed to fill a `width` × `height` matrix
 a regular 1D array, and you'll need to convert (x, y) coordinate to
 address in that 1D array manually).
 
-[[repeat-until-condition-is-met]]
-Repeat until condition is met
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==== Repeat until condition is met
 
 Some formats don't specify the number of elements in array, but instead
 just use some sort of special element as a terminator that signifies end
@@ -650,9 +616,7 @@ types:
         size: len
 ----
 
-[[typical-tlv-implementation-switching-types-on-an-expression]]
-Typical TLV implementation (switching types on an expression)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Typical TLV implementation (switching types on an expression)
 
 "TLV" stands for "type-length-value", and it's a very common staple in
 many formats. The basic idea is that we do modular and
@@ -740,9 +704,7 @@ allows you to work on TLV-like formats step-by-step, starting with
 support of only 1 or 2 types of records, and gradually adding more and
 more types.
 
-[[instances-data-beyond-the-sequence]]
-Instances: data beyond the sequence
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Instances: data beyond the sequence
 
 So far we've done all the data specifications in `seq` - thus they'll
 get parsed immediately from the beginning of the stream, one-by-one, in
@@ -812,9 +774,7 @@ Note that from the programming point of view (from the target
 programming languages and from internal Kaitai Struct's expression
 language), `seq` attributes and `instances` are exactly the same.
 
-[[calculated-value-instances]]
-Calculated ("value") instances
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Calculated ("value") instances
 
 Sometimes, it is useful to transform the data (using expression
 language) and store it as a named value. There's another sort of
@@ -834,9 +794,7 @@ instances:
 Value instance does no actual parsing, and thus do not require `pos`
 key, or `type` key (type will be derived automatically).
 
-[[bit-packed-integer-values]]
-Bit-packed integer values
-~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Bit-packed integer values
 
 Using calculated instances, it is easy to deal with bit-packed data. For
 example, IPv4 packet starts with a byte that packs both version and
@@ -870,15 +828,11 @@ the byte after you've already consumed several bits. Reading
 https://github.com/kaitai-io/kaitai_struct/issues/9[unaligned bit
 streams] is planned, but not yet implemented, as of v0.5.
 
-[[streams-and-substreams]]
-Streams and substreams
-~~~~~~~~~~~~~~~~~~~~~~
+=== Streams and substreams
 
 TODO
 
-[[processing-dealing-with-compressed-obfuscated-and-encrypted-data]]
-Processing: dealing with compressed, obfuscated and encrypted data
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Processing: dealing with compressed, obfuscated and encrypted data
 
 Some formats obscure the data fully or partially with techniques like
 compression, obfuscation or encryption. In this cases, incoming data
@@ -914,28 +868,20 @@ types.
 XOR obfuscation key read in the same format into some other field
 previously
 
-[[expression-language]]
-Expression language
--------------------
+== Expression language
 
 TODO
 
-[[common-pitfalls]]
-Common pitfalls
----------------
+== Common pitfalls
 
 This section illustrates problems that are encountered frequently by
 beginner Kaitai Struct users.
 
-[[specifying-size-creates-a-substream]]
-Specifying size creates a substream
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Specifying size creates a substream
 
 TODO
 
-[[applying-process-without-a-size]]
-Applying `process` without a size
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Applying `process` without a size
 
 In any cases, size of the data to process must be defined (either with
 `size: ...` or with `size-eos: true`), i.e. this is legal (without
