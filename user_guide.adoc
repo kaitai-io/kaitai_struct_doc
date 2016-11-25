@@ -872,9 +872,13 @@ previously
 == Expression language
 
 Expression language is a powerful internal tool inside Kaitai
-Struct. In a nutshell, it is a simple object-oriented language that
-gets translated/compiled (AKA "transpiled") into any supported target
-programming language.
+Struct. In a nutshell, it is a simple object-oriented, statically-type
+language that gets translated/compiled (AKA "transpiled") into any
+supported target programming language.
+
+The language is designed to follow the principle of least surprise, so
+it borrows tons of elements from other popular languages, like C,
+Java, C#, Ruby, Python, JavaScript, Scala, etc.
 
 === Basic data types
 
@@ -888,7 +892,7 @@ Expression language operates on the following primitive data types:
 
 |Integers
 |`type: uX`, `type: sX`
-|`1234`, `-789`, `0xfc08`
+|`1234`, `-789`, `0xfc08`, `0b1101`
 
 |Floating point numbers
 |`type: fX`
@@ -901,7 +905,63 @@ Expression language operates on the following primitive data types:
 |Strings
 |`type: str`, `type: strz`
 |`"foo bar"`
+
+|Enums
+|(`type: uX` or `type: sX`) and `enum: XXX`
+|`"foo bar"`
+
+|Streams
+|N/A
+|N/A
 |===
+
+*Integers* come from `uX` or `sX` type specification in sequence or
+instance attributes (i.e. `u1`, `u4le`, `s8`, etc), or can be
+specified literally. One can use:
+
+* normal decimal form (i.e. `123`)
+* hexadecimal form using `0x` prefix (i.e. `0xcafe` - both upper case and lower case letters are legal, i.e. `0XcAfE` or `0xCAfe` will do as well)
+* binary form using `0b` prefix (i.e. `0b00111011`)
+* octal form using `0o` prefix (i.e. `0o755`)
+
+*Floating point numbers* also follow the normal notation used in vast
+majority of languages: `123.456` will work, as well as expontential
+notation: `123.456e-55`. Use `123.0` to enforce floating point type to
+an otherwise integer literal.
+
+*Byte arrays* are defined in the attribute syntax when you don't
+specify anything as `type`, but specify `size` or `size-eos`
+instead. Byte array literals use typical array syntax like the one
+used in Python, Ruby and JavaScript: i.e. `[1, 2, 3]`. There is a
+little catch here: the same syntax is used for "true" arrays of
+objects (see below), so if you'll try to do stuff like `[1, 1000, 5]`
+(`1000` obviously won't fit in a byte), you won't get a byte array,
+you'll get array of integers instead.
+
+TODO: Strings
+
+TODO: Enums
+
+*Streams* are internal objects that track the byte stream that we
+parse and state of parsing (i.e. where's the pointer at). There is no
+way to declare a stream-type attribute directly by parsing
+instructions or specify it as a literal. Typical way to get stream
+objects is to query `_io` attribute from a user-defined object: that
+will give us a stream associated with this particular object.
+
+=== Composite data types
+
+There are two composite data types in the expression language
+(i.e. data types which include other types are components).
+
+==== User-defined types
+
+Basically, that's the types one defines using `.ksy` syntax -
+i.e. top-level structure and all substructures defined in `types` key.
+
+==== Arrays
+
+TODO
 
 === Operators
 
@@ -910,9 +970,61 @@ TODO
 === Methods
 
 Just about every value in expression language is an object (including
-literals), and it's possible to call methods on it.
+literals), and it's possible to call methods on it. The common syntax
+to use is `obj.method(param1, param2, ...)`, which can be abbreviated
+to `obj.method` if no parameters are required.
 
-TODO
+Note that then `obj` in question is a user-defined type, you can
+access all its attributes (both sequence and instances) using the same
+`obj.attr_name` syntax. Obviously, one can chain that to traverse a
+chain of substructures: `obj.foo.bar.baz` (given that `obj` is a
+user-defined type that has `foo` field, which points to user-defined
+type that has `bar` field, and so on).
+
+There are a few pre-defined methods that form kind of a "standard
+library" for expression language.
+
+==== User-defined types
+
+[cols="3*", options="header"]
+|===
+|Method name
+|Return type
+|Description
+
+|`_root`
+|User-defined type
+|Top-level user-defined structure in current file
+
+|`_parent`
+|User-defined type
+|Structure that produced this particular instance of user-defined type
+
+|`_io`
+|Stream
+|Stream associated with this object of user-defined type
+|===
+
+==== Streams
+
+[cols="3*", options="header"]
+|===
+|Method name
+|Return type
+|Description
+
+|`eof`
+|Boolean
+|`true` if we've reached end of the stream (no more data can be read from it), `false` otherwise
+
+|`size`
+|Integer
+|Total size of the stream in bytes
+
+|`pos`
+|Integer
+|Current position in the stream, in bytes from the beginning of the stream
+|===
 
 == Common pitfalls
 
