@@ -1,0 +1,961 @@
+[[installation-and-invocation]]
+Installation and invocation
+---------------------------
+
+[[linux]]
+Linux
+~~~~~
+
+TODO
+
+[[windows]]
+Windows
+~~~~~~~
+
+TODO
+
+[[mac-os-x]]
+Mac OS X
+~~~~~~~~
+
+TODO
+
+[[workflow-overview]]
+Workflow overview
+-----------------
+
+As you might have already read on the project's website, the main idea
+of Kaitai Struct is that you create a description of a binary data
+structure format using a formal language, save it as `.ksy` file, and
+then you compile it with KS compiler into target programming language
+
+TODO
+
+[[kaitai-struct-language]]
+Kaitai Struct language
+----------------------
+
+With the workflow issues out of the way, let's concentrate on the Kaitai
+Struct language itself.
+
+[[fixed-size-structures]]
+Fixed-size structures
+~~~~~~~~~~~~~~~~~~~~~
+
+Probably the simplest thing KS can do is reading fixed-size structures.
+You might know them as C struct definitions - consider something like
+this fictional database entry that keeps track of the dog show
+participants:
+
+[source,c]
+----
+struct {
+    char uuid[16];       /* 128-bit UUID */
+    char name[24];       /* Name of the animal */
+    uint16_t birth_year; /* Year of birth, used to calculate the age */
+    double weight;       /* Current weight in kg */
+    int32_t rating;      /* Rating, can be negative */
+} animal_record;
+----
+
+And here is how it would look in .ksy:
+
+[source,yaml]
+----
+meta:
+  id: animal_record
+  endian: be
+seq:
+  - id: uuid
+    size: 16
+  - id: name
+    type: str
+    size: 24
+    encoding: UTF-8
+  - id: birth_year
+    type: u2
+  - id: weight
+    type: f8
+  - id: rating
+    type: u4
+----
+
+It's the https://learnxinyminutes.com/docs/yaml/[YAML]-based format,
+plain and simple. Every .ksy file is a type description. Everything
+starts with a `meta` section: this is where we specify top-level info on
+the whole structure we describe. There are two important things here:
+
+* `id` specifies name of the structure
+* `endian` specifies default
+http://en.wikipedia.org/wiki/Endianness[endianness]:
+** `be` for big-endian (AKA "network byte order", AKA Motorola, etc)
+** `le` for little-endian (AKA Intel, AKA VAX, etc)
+
+With that out of the way, we use `seq` element with an array (ordered
+sequence of elements) in it to describe which attributes this structure
+consists of. Every attribute includes several keys, namely:
+
+* `id` is used to give attribute a name
+* `type` designates attribute type:
+** no type means that we're dealing with just a raw byte array; `size`
+is to be used to designate number of bytes in this array
+** `s1`, `s2`, `s4`, `u1`, `u2`, `s4`, etc for integers
+*** "s" means signed, "u" means unsigned
+*** number is the number of bytes
+*** if you need to specify non-default endianness, you can force it by
+appending `be` or `le` - i.e. `s4be`, `u8le`, etc
+** `f4` and `f8` for IEEE 754 floating point numbers; `4` and `8`,
+again, designate the number of bytes (single or double precision)
+** `str` is used for strings; that is almost the same as "no type", but
+string has a concept of encoding, which must be specified using
+`encoding`
+
+YAML-based syntax might look a little more verbose than C-like struct,
+but there are a few good reasons to use it. It is consistent, it is
+easily extendable, and it's easy to parse, so it's easy to make your own
+programs/scripts that work with .ksy specs.
+
+A very simple example is that we can add docstrings to every attribute,
+using syntax like that:
+
+[source,yaml]
+----
+  - id: rating
+    type: u4
+    doc: Rating, can be negative
+----
+
+These docstrings are just the comments in .ksy, they'll actually get
+exported into target language as well (for example, in Java they'll
+become JavaDoc, in Ruby they'll become RDoc/YARD, etc). This, in turn,
+is super helpful when editing the code in various IDEs that will
+generate reminder popups for intelligent completion, when you browse
+through class attributes:
+
+TODO: intellisense image
+
+Note that you can use https://learnxinyminutes.com/docs/yaml/[YAML]
+folded style strings for longer documentation that spans multiple lines:
+
+[source,yaml]
+----
+  - id: opcode
+    type: u1
+    doc: >
+      Operation code that defines which operation should be performed
+      by a virtual machine. Subsequent parameters for operation depend
+      on the value of opcode.
+----
+
+[[checking-for-magic-signatures]]
+Checking for "magic" signatures
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Many file formats use some sort of safeguard measure against using
+completely different file type in place of the required file type. The
+simple way to do so is to include some "magic" bytes (AKA "file
+signature"): for example, checking that first bytes of file are equal to
+their intended values provides at least some degree of protection
+against such blunders.
+
+To specify "magic" bytes (i.e. fixed content) in structures, KS includes
+a special `contents` key. For example, this is the beginning of a `seq`
+for Java .class file:
+
+[source,yaml]
+----
+seq:
+  - id: magic
+    contents: [0xca, 0xfe, 0xba, 0xbe]
+----
+
+This reads first 4 bytes and compare them to 4 bytes `CA FE BA BE`. If
+there would be any mismatch (or there would be less than 4 bytes read),
+that'll throw an exception and stop parsing at early stage, before any
+damage (pointless allocation of huge structures, waste of CPU cycles)
+would be done.
+
+Note that `contents` is very flexible and you can specify there:
+
+* An UTF-8 string - bytes from such a string would be used to check
+against
+* An array with:
+** integers in decimal representation
+** integers in hexadecimal representation, starting with 0x
+** UTF-8 strings
+
+In case of using an array, all elements' byte representations would be
+concatenated and expected in sequence. Few examples:
+
+[source,yaml]
+----
+  - id: magic1
+    contents: JFIF
+    # expects bytes: 4A 46 49 46
+  - id: magic2
+    # we can use YAML block-style arrays as well
+    contents:
+      - 0xca
+      - 0xfe
+      - 0xba
+      - 0xbe
+    # expects bytes: CA FE BA BE
+  - id: magic3
+    contents: [CAFE, 0, BABE]
+    # expects bytes: 43 41 47 45 00 42 41 42 45
+----
+
+More extreme examples to illustrate the idea (i.e. possible, but
+definitely not recommended in real-life specs):
+
+[source,yaml]
+----
+  - id: magic4
+    contents: [foo, 0, A, 0xa, 42]
+    # expects bytes: 66 6F 6F 00 41 0A 2A
+  - id: magic5
+    contents: [1, 0x55, '▒,3', 3]
+    # expects bytes: 01 55 E2 96 92 2C 33 03
+----
+
+Note that there's no need to specify `type` or `size` for fixed contents
+data - it all comes naturally from the `contents`.
+
+[[variable-length-structures]]
+Variable-length structures
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Many protocols and file formats tend to conserve bytes, especially for
+strings. Sure, it's stupid to have a fixed 512-byte buffer for a string
+that typically is 3-5 bytes long and only rarely can be up to 512 bytes.
+
+One of the most common methods used to mitigate this problem is to use
+some integer to designate length of the string, and store only
+designated number of bytes in the stream. Unfortunately, this yields
+variable-length structure, and it's impossible to describe such thing
+using C-style structs. However, it's not a problem for KS:
+
+[source,yaml]
+----
+seq:
+  - id: my_len
+    type: u4
+  - id: my_str
+    type: str
+    size: my_len
+    encoding: UTF-8
+----
+
+Note the `size` field: we use not a constant, but a reference to a field
+that we've just parsed from a stream. Actually, you can do much more
+than that - you can use a full-blown expression language in `size`
+field. For example, what if we're dealing with UTF-16 string and
+`my_len` value designates not a number of bytes, but number of byte
+pairs?
+
+[source,yaml]
+----
+seq:
+  - id: my_len
+    type: u4
+  - id: my_str
+    type: str
+    size: my_len * 2
+    encoding: UTF-16LE
+----
+
+One can just multiply `my_len` by 2 - and voila - here's our UTF-16
+string. Expression language is very powerful, we'll be talking more
+about it later.
+
+Last, but not least, we can specify a `size` that spans automatically to
+the end of the stream. For that one, we'll use slightly different
+syntax:
+
+[source,yaml]
+----
+seq:
+  - id: some_int
+    type: u4
+  - id: string_spanning_to_the_end_of_file
+    type: str
+    encoding: UTF-8
+    size-eos: true
+----
+
+[[enums-named-integer-constants]]
+Enums (named integer constants)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The nature of binary format encoding dictates use that in many cases
+we'll be using some kind of integer constants to encode certain
+entities. For example, a widely known IP packet uses 1-byte integer to
+encode protocol type for the payload: 6 would mean "TCP" (which gives us
+infamous TCP/IP), 17 would mean "UDP" (which yields UDP/IP), and 1 means
+"ICMP".
+
+It is possible to live with just raw integers, but most programming
+language actually provide a way to program using meaningful string names
+instead. This approach is usually dubbed "enums" and it's totally
+possible to generate a enum in KS:
+
+[source,yaml]
+----
+seq:
+  - id: protocol
+    type: u1
+    enum: ip_protocol
+enums:
+  ip_protocol:
+    1: icmp
+    6: tcp
+    17: udp
+----
+
+There are two things that should be done to declare a enum:
+
+1.  We add `enums` key on the type level (i.e. on the same level as
+`seq` and `meta`). Inside that key, we add a map, keys of it being names
+of enum (in this example, there's only one enum declared, `ip_protocol`)
+and values being yet another map, which maps integer values into
+identifiers.
+2.  We add `enum: ...` parameter to every attribute that's going to be
+represented by that enum, instead of just being a raw integer. Note that
+such attributes must have some sort of integer type in the first place
+(i.e. `type: u*` or `type: s*`).
+
+[[substructures-subtypes]]
+Substructures (subtypes)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+What do we do if we need to use many of the strings in such a format?
+Writing so many repetitive `my_len`- / `my_str`-style pairs would be so
+bothersome and error-prone. Fear not, we can define another type,
+defining it in the same file, and use it as a custom type in a stream:
+
+[source,yaml]
+----
+seq:
+  - id: track_title
+    type: str_with_len
+  - id: album_title
+    type: str_with_len
+  - id: artist_name
+    type: str_with_len
+types:
+  str_with_len:
+    seq:
+      - id: len
+        type: u4
+      - id: value
+        type: str
+        encoding: UTF-8
+        size: len
+----
+
+Here we define another type named `str_with_len`, which we reference
+just by doing `type: str_with_len`. The type itself is defined using
+`types:` key on top-level type. That's a map, inside it we can define as
+many subtypes as we want. We define just one, and inside it we just nest
+the exact same syntax as we use for the type description on the top
+level - i.e. the same `seq` designation. Note that there's no need for
+`meta` here, as type name is derive from `types` key name here.
+
+Of course, one can actually have more levels of subtypes:
+
+TODO
+
+[[accessing-attributes-in-other-types]]
+Accessing attributes in other types
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Expression language (used, for example, in `size` key) allows you to
+refer not only attributes in current type, but also in other types.
+Consider this example:
+
+[source,yaml]
+----
+seq:
+  - id: header
+    type: main_header
+  - id: body
+    size: header.body_len
+types:
+  main_header:
+    seq:
+      - id: magic
+        contents: MY-SUPER-FORMAT
+      - id: body_len
+        type: u4
+----
+
+If `body_len` attribute was in the same type as `body`, we could just
+use `size: body_len`. However, in this case we've decided to split the
+main header into separate subtype, so we'll have to access it using `.`
+operator - i.e. `size: header.body_len`.
+
+Obviously, one can chain attributes with `.` to dig deeper into type
+hierarchy - i.e. `size: header.subheader_1.subsubheader_1_2.field_4`.
+But sometimes we need just the opposite: how do we access upper-level
+elements from lower-level types? KS provides two options here:
+
+[[parent]]
+_parent
+^^^^^^^
+
+One can use special pseudo-attribute `_parent` to access parent
+structure:
+
+[source,yaml]
+----
+TODO
+----
+
+[[root]]
+_root
+^^^^^
+
+In some cases, it would be way too impractical to write tons of
+`_parent._parent._parent._parent...` or just plain impossible (if you're
+describing an type which might be used on several different levels, thus
+different number of `_parent` would be needed). In this case, we can use
+special pseudo-attribute `_root` to just start navigating from the very
+top-level type:
+
+TODO
+
+[source,yaml]
+----
+seq:
+  - id: header
+    type: main_header
+types:
+  main_header:
+    seq:
+      - id: magic
+        contents: MY-SUPER-FORMAT
+      - id: body_len
+        type: u4
+      - id: subbody_len
+        type: u4
+----
+
+[[conditionals]]
+Conditionals
+~~~~~~~~~~~~
+
+Some protocols and file formats have optional fields, which only exist
+on some conditions. For example, one can have some byte first that
+designates if some field exists (1) or not (0). In KS, you can do that
+using `if` key:
+
+....
+seq:
+  - id: has_crc32
+    type: u1
+  - id: crc32
+    type: u4
+    if: has_crc32 != 0
+....
+
+In this example, we again use expression language to specify a boolean
+expression in `if` key. If that expression is true, field is parsed and
+we'll get a result. If that expression is false, field will be skipped
+and we'll get a `null` or it's closest equivalent in our target
+programming language if we'll try to get it.
+
+At this point, you might wonder how that plays together with enums.
+After you mark some integer as "enum", it's no longer just an integer,
+so you can't compare it directly with the number. Instead you're
+expected to compare it to other enum values:
+
+....
+seq:
+  - id: my_animal
+    type: u1
+    enum: animal
+  - id: dog_tag
+    type: u4
+    # Comparing to enum literal
+    if: my_animal == animal::dog
+enums:
+  animal:
+    1: cat
+    2: dog
+....
+
+There are other enum operations available, we'll cover them in
+expression language guide later.
+
+[[repetitions]]
+Repetitions
+~~~~~~~~~~~
+
+Most real-life file formats do not contain only one copy of some
+element, but might contain several copies, i.e. they repeat the same
+pattern over and over. Repetition might be:
+
+* element repeated up to the very end of the stream
+* element repeated a pre-defined number of times
+* element repeated while some condition is satified (or until some
+condition won't become true)
+
+KS supports all these types of repetitions. In all cases, it will create
+a resizable array (or nearest equivalent available in target language)
+and populate it with elements.
+
+[[repeat-until-end-of-stream]]
+Repeat until end of stream
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This is the simplest kind of repetition, done by specifying
+`repeat: eos`. For example:
+
+[source,yaml]
+----
+seq:
+  - id: numbers
+    type: u4
+    repeat: eos
+----
+
+This yields an array of unsigned integers, each is 4 bytes long, which
+spans till the end. Note that if we've got a number of bytes left in the
+stream that's not divisible by 4 (for example, 7), we'll end up reading
+as much as possible, and then parsing procedure will throw an
+end-of-stream exception. Of course, you can do that with any type,
+including user-defined types (subtypes):
+
+[source,yaml]
+----
+seq:
+  - id: filenames
+    type: filename
+    repeat: eos
+types:
+  filename:
+    seq:
+      - id: name
+        type: str
+        size: 8
+        encoding: ASCII
+      - id: ext
+        type: str
+        size: 3
+        encoding: ASCII
+----
+
+This one defines an array of records of type `filename`. Each individual
+`filename` consists of a 8-byte `name` and 3-byte `ext` strings in ASCII
+encoding.
+
+[[repeat-for-a-number-of-times]]
+Repeat for a number of times
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+One can repeat an element a certain number of times. For that, we'll
+need an expression that will give us number of iterations (which would
+be exactly the number of items in resulting array). It could be a simple
+constant to read exactly 12 numbers:
+
+[source,yaml]
+----
+seq:
+  - id: numbers
+    type: u4
+    repeat: expr
+    repeat-expr: 12
+----
+
+Or we might reference some attribute here to have an array with length
+specified inside the format:
+
+[source,yaml]
+----
+seq:
+  - id: num_floats
+    type: u4
+  - id: floats
+    type: f8
+    repeat: expr
+    repeat-expr: num_floats
+----
+
+Or, using expression language, we can even do some more complex math on
+it:
+
+[source,yaml]
+----
+seq:
+  - id: width
+    type: u4
+  - id: height
+    type: u4
+  - id: matrix
+    type: f8
+    repeat: expr
+    repeat-expr: width * height
+----
+
+This one specifies `width` and `height` of the matrix first, then parses
+as many `matrix` elements as needed to fill a `width` × `height` matrix
+(although note that it won't be a true 2D matrix: it would still be just
+a regular 1D array, and you'll need to convert (x, y) coordinate to
+address in that 1D array manually).
+
+[[repeat-until-condition-is-met]]
+Repeat until condition is met
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Some formats don't specify the number of elements in array, but instead
+just use some sort of special element as a terminator that signifies end
+of data. KS can do that as well using `repeat-until` syntax, for
+example:
+
+[source,yaml]
+----
+seq:
+  - id: numbers
+    type: s4
+    repeat: until
+    repeat-until: _ == -1
+----
+
+This one reads 4-byte signed integer numbers until encountering `-1`. On
+encountering `-1`, the loop will stop and further sequence elements (if
+any) will be processed. Note that `-1` would still be added to array.
+
+Underscore (`_`) is used as a special variable name that refers to the
+element that we've just parsed. When parsing an array of user types, it
+is possible write a `repeat-until` expression that would reference some
+attribute inside that user type:
+
+[source,yaml]
+----
+seq:
+  - id: records
+    type: buffer_with_len
+    repeat: until
+    repeat-until: _.len == 0
+types:
+  buffer_with_len:
+    seq:
+      - id: len
+        type: u1
+      - id: value
+        size: len
+----
+
+[[typical-tlv-implementation-switching-types-on-an-expression]]
+Typical TLV implementation (switching types on an expression)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+"TLV" stands for "type-length-value", and it's a very common staple in
+many formats. The basic idea is that we do modular and
+reverse-compatible format. On the top level, it's very simple: we know
+that the whole format is just an array of records (`repeat: eos` or
+`repeat: expr`). Each record starts the same: there is some marker that
+specifies _type_ of the record and an integer that specifies record's
+__length__. After that, record's body follows, and the body format
+depends on the _type_ marker. One can easily specify that basic record
+outline in KS like that:
+
+[source,yaml]
+----
+seq:
+  - id: rec_type
+    type: u1
+  - id: len
+    type: u4
+  - id: body
+    size: len
+----
+
+However, how do we specify the format for `body` that depends on
+`rec_type`? One of the approaches if using conditionals, as we've seen
+before:
+
+[source,yaml]
+----
+seq:
+  - id: rec_type
+    type: u1
+  - id: len
+    type: u4
+  - id: body_1
+    type: rec_type_1
+    size: len
+    if: rec_type == 1
+  - id: body_2
+    type: rec_type_2
+    size: len
+    if: rec_type == 2
+  # ...
+  - id: body_unidentified
+    size: len
+    if: rec_type != 1 and rec_type != 2 # and ...
+----
+
+However, it's easy to see why it's not a very good solution:
+
+* We end up writing lots of repetitive lines
+* We create lots of `body_*` attributes in a type, while in reality only
+only `body` would exist - everything else would fail the `if` comparison
+and thus would be null
+* If we want to catch up the "else" branch, i.e. match everything not
+matched with our `if`s, we have to write an inverse of sum of `if`s
+manually. For anything more than 1 or 2 types it quickly becomes a mess.
+
+That is why KS offers an alternative solution. We can use switch type
+operation:
+
+[source,yaml]
+----
+seq:
+  - id: rec_type
+    type: u1
+  - id: len
+    type: u4
+  - id: body
+    size: len
+    type:
+      switch-on: rec_type
+      cases:
+        1: rec_type_1
+        2: rec_type_2
+----
+
+This is much more concise and easier to maintain, isn't it? And note
+that `size` is specified on attribute level, thus it applies to all
+possible type values, setting us a good hard limit. What's ever better -
+even if you're missing the match, as long as you have `size` specified,
+you would still parse `body` of a given size, but instead of
+interpreting it with some user type, it will be treated as having no
+`type`, thus yielding a raw byte array. This is super useful, as it
+allows you to work on TLV-like formats step-by-step, starting with
+support of only 1 or 2 types of records, and gradually adding more and
+more types.
+
+[[instances-data-beyond-the-sequence]]
+Instances: data beyond the sequence
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+So far we've done all the data specifications in `seq` - thus they'll
+get parsed immediately from the beginning of the stream, one-by-one, in
+strict sequence. But what if the data you want is located at some other
+position in the file, or comes not in sequence?
+
+"Instances" are the Kaitai Struct's answer for that. They're specified
+in a key `instances` on the same level as `seq`. Consider this example:
+
+[source,yaml]
+----
+meta:
+  id: big_file
+  endian: le
+instances:
+  some_integer:
+    pos: 0x400000
+    type: u4
+  a_string:
+    pos: 0x500fff
+    type: str
+    size: 0x11
+    encoding: ASCII
+----
+
+Inside `instances` we need to create a map: keys in that map would be
+attribute names, and values specify attribute in the very same manner as
+we would have done it in `seq`, but there is one important additional
+feature: using `pos: ...` one can specify a position to start parsing
+that attribute from (in bytes from the beginning of the stream). Just as
+in `size`, one may use expression language and reference other
+attributes in `pos`. This is used very often to allow accessing file
+body inside a container file when we have some file index data: file
+position in container and length:
+
+[source,yaml]
+----
+seq:
+  - id: file_name
+    type: str
+    size: 8 + 3
+    encoding: ASCII
+  - id: file_offset
+    type: u4
+  - id: file_size
+    type: u4
+instances:
+  body:
+    pos: file_offset
+    size: file_size
+----
+
+Another very important difference between `seq` attribute and
+`instances` attribute is that instances are lazy by default. What does
+it mean? Unless someone would call that `body` getter method
+programmatically, no actual parsing of `body` would be done. This is
+super useful for parsing larger files, such as images of filesystems. It
+is impractical for a filesystem user to load all the filesystem data
+into memory at once: one usually finds a file by its name (traversing
+file index somehow), and then can access file's `body` right away. If
+that's the first time this file is being accessed, `body` will be loaded
+(and parsed) into RAM. Second and all subsequent times will just return
+a cached copy from the RAM, avoiding any unnecessary re-loading /
+re-parsing, thus conserving both RAM and CPU time.
+
+Note that from the programming point of view (from the target
+programming languages and from internal Kaitai Struct's expression
+language), `seq` attributes and `instances` are exactly the same.
+
+[[calculated-value-instances]]
+Calculated ("value") instances
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sometimes, it is useful to transform the data (using expression
+language) and store it as a named value. There's another sort of
+instances for that - calculated (AKA "value") instances. They're very
+simple to use, there's only one key in it - `value` - that specifies
+expression to calculate:
+
+....
+seq:
+  - id: length_in_feet
+    type: f8
+instances:
+  length_in_m:
+    value: length_in_feet * 0.3048
+....
+
+Value instance does no actual parsing, and thus do not require `pos`
+key, or `type` key (type will be derived automatically).
+
+[[bit-packed-integer-values]]
+Bit-packed integer values
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Using calculated instances, it is easy to deal with bit-packed data. For
+example, IPv4 packet starts with a byte that packs both version and
+header length:
+
+....
+76543210
+vvvvllll
+  |   |
+  |   +- header length
+  +----- version
+....
+
+Here's how it can be parsed with KS:
+
+[source,yaml]
+----
+seq:
+  - id: packed_1
+    type: u1
+instances:
+  version:
+    value: packed_1 & 0b00001111
+  header_len:
+    value: packed_1 >> 4
+----
+
+Note that it's only possible to do with byte-aligned data, i.e. when you
+don't need to read the next "big" (>=1 byte) element from the middle of
+the byte after you've already consumed several bits. Reading
+https://github.com/kaitai-io/kaitai_struct/issues/9[unaligned bit
+streams] is planned, but not yet implemented, as of v0.5.
+
+[[streams-and-substreams]]
+Streams and substreams
+~~~~~~~~~~~~~~~~~~~~~~
+
+TODO
+
+[[processing-dealing-with-compressed-obfuscated-and-encrypted-data]]
+Processing: dealing with compressed, obfuscated and encrypted data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some formats obscure the data fully or partially with techniques like
+compression, obfuscation or encryption. In this cases, incoming data
+should be pre-processed before actual parsing would take place, or we'll
+just end up with the garbage getting parsed. All such pre-processing
+algorithms has one thing in common: they're done by some function that
+takes a stream of bytes and return the stream of bytes (note that number
+of incoming and resulting bytes might be different, especially in case
+of decompression). While it might be possible to do such transformation
+in declarative manner, it is usually impractical to do so.
+
+KS allows to plug-in some predefined "processing" algorithms that allow
+to do mentioned de-compression, de-obfuscation and de-cryption to get a
+clear stream, ready to be parsed. Consider parsing a file, in which the
+main body is obfuscated by applying XOR with 0xaa for every byte:
+
+[source,yaml]
+----
+seq:
+  - id: body_len
+    type: u4
+  - id: body
+    size: body_len
+    process: xor(0xaa)
+    type: some_body_type # defined normally later
+----
+
+Note that:
+
+* Applying `process: ...` in available only to raw byte arrays or user
+types.
+* One might use expression language inside `xor(...)`, thus referencing
+XOR obfuscation key read in the same format into some other field
+previously
+
+[[expression-language]]
+Expression language
+-------------------
+
+TODO
+
+[[common-pitfalls]]
+Common pitfalls
+---------------
+
+This section illustrates problems that are encountered frequently by
+beginner Kaitai Struct users.
+
+[[specifying-size-creates-a-substream]]
+Specifying size creates a substream
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TODO
+
+[[applying-process-without-a-size]]
+Applying `process` without a size
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In any cases, size of the data to process must be defined (either with
+`size: ...` or with `size-eos: true`), i.e. this is legal (without
+process - size takes will be determined by `some_body_type`, reading
+normally from a stream):
+
+[source,yaml]
+----
+seq:
+  - id: body
+    type: some_body_type
+----
+
+And this is not:
+
+[source,yaml]
+----
+seq:
+  - id: body
+    process: xor(0xaa)
+    type: some_body_type
+    # will not compile - lacks size
+----
+
+This is because most processing algorithms require to know size of data
+to process beforehand, and final size of `some_body_type` might be
+determined only in run-time, after parsing took place.
