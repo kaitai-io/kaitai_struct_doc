@@ -1,3 +1,7 @@
+= Kaitai Struct User Guide
+v0.5
+:toc:
+
 [[installation-and-invocation]]
 Installation and invocation
 ---------------------------
