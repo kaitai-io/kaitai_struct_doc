@@ -210,7 +210,7 @@ definitely not recommended in real-life specs):
     # expects bytes: 01 55 E2 96 92 2C 33 03
 ----
 
-Note that there's no need to specify `type` or `size` for fixed contents
+NOTE: There's no need to specify `type` or `size` for fixed contents
 data - it all comes naturally from the `contents`.
 
 === Variable-length structures
