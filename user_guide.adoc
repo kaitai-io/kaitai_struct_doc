@@ -72,7 +72,7 @@ seq:
   - id: weight
     type: f8
   - id: rating
-    type: u4
+    type: s4
 ----
 
 It's the https://learnxinyminutes.com/docs/yaml/[YAML]-based format,
@@ -116,7 +116,7 @@ using syntax like that:
 [source,yaml]
 ----
   - id: rating
-    type: u4
+    type: s4
     doc: Rating, can be negative
 ----
 
