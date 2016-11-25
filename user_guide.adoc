@@ -1,6 +1,7 @@
 = Kaitai Struct User Guide
 v0.5
 :toc: left
+:source-highlighter: coderay
 
 == Introduction
 
@@ -869,6 +870,47 @@ XOR obfuscation key read in the same format into some other field
 previously
 
 == Expression language
+
+Expression language is a powerful internal tool inside Kaitai
+Struct. In a nutshell, it is a simple object-oriented language that
+gets translated/compiled (AKA "transpiled") into any supported target
+programming language.
+
+=== Basic data types
+
+Expression language operates on the following primitive data types:
+
+[cols="3*", options="header"]
+|===
+|Type
+|Attribute specs
+|Literals
+
+|Integers
+|`type: uX`, `type: sX`
+|`1234`, `-789`, `0xfc08`
+
+|Floating point numbers
+|`type: fX`
+|`123.0`, `-456.78`, `4.1607804e+72`
+
+|Byte arrays
+|`size: XXX`, `size-eos: true`
+|`[0x20, 65, 66, 67]`
+
+|Strings
+|`type: str`, `type: strz`
+|`"foo bar"`
+|===
+
+=== Operators
+
+TODO
+
+=== Methods
+
+Just about every value in expression language is an object (including
+literals), and it's possible to call methods on it.
 
 TODO
 
