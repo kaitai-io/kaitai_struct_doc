@@ -5,6 +5,10 @@ v0.5
 
 == Introduction
 
+Kaitai Struct is a domain-specific language (DSL) that is designed
+with one particular task in mind: dealing with arbitrary binary
+formats.
+
 TODO
 
 == Installation and invocation
@@ -345,8 +349,10 @@ just by doing `type: str_with_len`. The type itself is defined using
 `types:` key on top-level type. That's a map, inside it we can define as
 many subtypes as we want. We define just one, and inside it we just nest
 the exact same syntax as we use for the type description on the top
-level - i.e. the same `seq` designation. Note that there's no need for
-`meta` here, as type name is derive from `types` key name here.
+level - i.e. the same `seq` designation.
+
+NOTE: There's no need for `meta` here, as type name is derived from
+`types` key name here.
 
 Of course, one can actually have more levels of subtypes:
 
@@ -908,7 +914,7 @@ Expression language operates on the following primitive data types:
 
 |Enums
 |(`type: uX` or `type: sX`) and `enum: XXX`
-|`"foo bar"`
+|`opcode::jmp`
 
 |Streams
 |N/A
@@ -938,7 +944,10 @@ objects (see below), so if you'll try to do stuff like `[1, 1000, 5]`
 (`1000` obviously won't fit in a byte), you won't get a byte array,
 you'll get array of integers instead.
 
-TODO: Strings
+*Strings* normally come from using `type: str` or `type: strz`.
+Literal strings can be specified using double quotes or single quotes.
+
+TODO: String escape sequences
 
 TODO: Enums
 
@@ -959,13 +968,101 @@ There are two composite data types in the expression language
 Basically, that's the types one defines using `.ksy` syntax -
 i.e. top-level structure and all substructures defined in `types` key.
 
+Normally, they are translated into classes (or their closest available
+equivalent - i.e. storage structure with members + access members) in
+target language.
+
 ==== Arrays
 
-TODO
+Array types are just what one might expect from all-purpose, generic
+array type. Arrays come from either using the repetition syntax
+(`repeat: ...`) in attribute specification, or by specifying a literal
+array. In any case, all KS arrays have underlying data type that they
+store, i.e. one can't put strings and integers into the same
+array. One can do arrays based on any primitive data type or composite
+data type.
+
+NOTE: "True" array types (described in this section) and "byte arrays"
+share the same literal syntax and lots of method API, but they are
+actually very different types. This is done on purpose, because many
+target languages use very different types for byte arrays and arrays
+of objects for performance reasons.
+
+One can use array literals syntax to declare an array (very similar to
+syntax used in JavaScript, Python and Ruby). Type will be derived
+automatically based on types of values inside brackets, for example:
+
+* `[123, 456, -789]` - array of integers
+* `[123.456, 1.234e+78]` - array of floats
+* `["foo", "bar"]` - array of strings
+* `[true, true, false]` - array of booleans
+* `[a0, a1, b0]` - given that `a0`, `a1` and `b0` are all the same
+  objects of user-defined type `some_type`, this would be array of
+  user-defined type `some_type`
+
+WARNING: Mixing multiple different types in a single array literal
+would trigger a compile-time error, for example, this is illegal: `[1,
+"foo"]`
 
 === Operators
 
-TODO
+Literals can be connected using operators to make meaningful
+expressions. Operators are type-dependent: for example, same `+`
+operator applied to two integers would mean arithmetic addition, and
+applied to two strings would mean string concatentation.
+
+==== Arithmetic operators
+
+Can be applied to integers and floats:
+
+* `a + b` - addition
+* `a - b` - subtraction
+* `a * b` - multiplication
+* `a / b` - division
+* `a % b` - modulo; note that it's not a remainder: `-5 % 3` is `1`,
+  not `-2`; the result is undefined for negative `b`.
+* `a ** b` - exponentiation (`a` in power of `b`)
+
+NOTE: If both operands are integer, result of arithmetic operation is
+integer, otherwise it is floating point number. For example, that
+means that `7 / 2` is `3`, and `7 / 2.0` is `3.5`.
+
+Can be applied to strings:
+
+* `a + b` - string concatenation
+
+==== Relational operators
+
+Can be applied to integers, floats and strings:
+
+* `a < b` - true if `a` is strictly less than `b`
+* `a <= b` - true if `a` is less or equal than `b`
+* `a > b` - true if `a` is strictly greater than `b`
+* `a >= b` - true if `a` is greater or equal than `b`
+
+Can be applied to integers, floats, strings, booleans and enums (does
+proper string value comparsion):
+
+* `a == b` - true if `a` is equal to `b`
+* `a != b` - true if `a` is not equal to `b`
+
+==== Bitwise operators
+
+Can be only applied to integers.
+
+* `a << b` - left bitwise shift
+* `a >> b` - right bitwise shift
+* `a & b` - bitwise AND
+* `a | b` - bitwise OR
+* `a ^ b` - bitwise XOR
+
+==== Logical (boolean) operators
+
+Can be only applied to boolean values.
+
+* `not x` - boolean NOT
+* `a and b` - boolean AND
+* `a or b` - boolean OR
 
 === Methods
 
@@ -984,7 +1081,45 @@ type that has `bar` field, and so on).
 There are a few pre-defined methods that form kind of a "standard
 library" for expression language.
 
+==== Integers
+
+[cols="3*", options="header"]
+|===
+|Method name
+|Return type
+|Description
+
+|to_s
+|String
+|Converts integer into a string using decimal representation
+
+|to_s(radix)
+|String
+|Converts integer into a string using specified `radix` (i.e. use `16` to get hexadecimal representation, use `8` to get octal, etc)
+|===
+
+==== Floating point numbers
+
+TODO
+
+==== Byte arrays
+
+TODO
+
+==== Strings
+
+TODO
+
+==== Enums
+
+TODO
+
 ==== User-defined types
+
+All user-defined types can be queried to get attributes (sequence
+attributes or instances) by their name. In addition to that, there are
+a few pre-defined internal methods (they all start with an underscore
+`_`, so they can't clash with regular attribute names):
 
 [cols="3*", options="header"]
 |===
@@ -1003,6 +1138,23 @@ library" for expression language.
 |`_io`
 |Stream
 |Stream associated with this object of user-defined type
+|===
+
+==== Array types
+
+[cols="3*", options="header"]
+|===
+|Method name
+|Return type
+|Description
+
+|`first`
+|Array base type
+|Gets first element of the array
+
+|`last`
+|Array base type
+|Gets last element of the array
 |===
 
 ==== Streams
