@@ -13,17 +13,76 @@ TODO
 
 == Installation and invocation
 
-=== Linux
+Kaitai Struct has somewhat diverse infrastructure around it, this
+chapter will
 
-TODO
+=== Web IDE
 
-=== Windows
+If you're going to try Kaitai Struct for the first time, then probably
+it's the easiest way to get started. Just open
+kt.pe/kaitai_struct_webide/[Kaitai Struct Web IDE] and you're ready to
+go:
 
-TODO
+=== Desktop / console version
 
-=== Mac OS X
+If you don't fancy using a hex dump in a browser, or played around
+with that and want to integrate Kaitai Struct into your project build
+process automation, you'd want a desktop / console solution. Of
+course, Kaitai Struct offers that as well.
 
-TODO
+==== Installation
+
+Please refer to http://kaitai.io/#download[official website] for
+installation instructions. After installation, you're expected to
+have:
+
+* `ksc` (or `kaitai-struct-compiler`) - command-line Kaitai Struct
+  compiler, a program that translates `.ksy` into parsing libraries in
+  a chosen target language.
+* `ksv` (or `kaitai-struct-visualizer`, optional) - console visualizer
+
+NOTE: `ksc` shorthand might be not available if your system doesn't
+support symbolic links - just use the full name then.
+
+If you're going to invoke `ksc` frequently, you'd probably want to add
+it to your executable searching `PATH`, so you don't have to type full
+path to it every time. You'd get that automatically on .deb package
+and Windows .msi install (provided you don't disable that option) -
+but it might take some extra manual setup if you use a generic .zip
+package.
+
+==== Invocation
+
+Invoking `ksc` is easy:
+
+[source,shell]
+----
+ksc [options] <file>...
+----
+
+Common options:
+
+* `<file>...` — source files (.ksy)
+* `-t <language> | --target <language>` — target languages (`cpp_stl`,
+  `csharp`, `java`, `javascript`, `perl`, `php`, `python`, `ruby`, `all`)
+  * `all` is a special case: it compiles all possible target
+    languages, creating language-specific directories (as per language
+    identifiers) inside output directory, and then creating output
+    module(s) for each language starting from there
+* `-d <directory> | --outdir <directory>` — output directory
+  (filenames will be auto-generated)
+
+Language-specific options:
+
+* `--dot-net-namespace <namespace>` — .NET namespace (C# only, default: Kaitai)
+* `--java-package <package>` — Java package (Java only, default: root package)a
+* `--php-namespace <namespace>` — PHP namespace (PHP only, default: root package)
+
+Misc options:
+
+* `--verbose` — verbose output
+* `--help` — display usage information and exit
+* `--version` — output version information and exit
 
 == Workflow overview
 
