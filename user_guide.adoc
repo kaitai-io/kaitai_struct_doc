@@ -14,14 +14,16 @@ TODO
 == Installation and invocation
 
 Kaitai Struct has somewhat diverse infrastructure around it, this
-chapter will
+chapter will give an overview of the options available.
 
 === Web IDE
 
 If you're going to try Kaitai Struct for the first time, then probably
 it's the easiest way to get started. Just open
-kt.pe/kaitai_struct_webide/[Kaitai Struct Web IDE] and you're ready to
-go:
+http://kt.pe/kaitai_struct_webide/[Kaitai Struct Web IDE] and you're
+ready to go:
+
+TODO: screenshot
 
 === Desktop / console version
 
@@ -65,7 +67,7 @@ Common options:
 * `<file>...` — source files (.ksy)
 * `-t <language> | --target <language>` — target languages (`cpp_stl`,
   `csharp`, `java`, `javascript`, `perl`, `php`, `python`, `ruby`, `all`)
-  * `all` is a special case: it compiles all possible target
+** `all` is a special case: it compiles all possible target
     languages, creating language-specific directories (as per language
     identifiers) inside output directory, and then creating output
     module(s) for each language starting from there
