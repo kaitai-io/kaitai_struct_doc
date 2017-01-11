@@ -23,7 +23,7 @@ it's the easiest way to get started. Just open
 http://kt.pe/kaitai_struct_webide/[Kaitai Struct Web IDE] and you're
 ready to go:
 
-TODO: screenshot
+image::img/webide_png_example.png[caption="Figure 1: ", title="Kaitai Struct Web IDE (sample PNG file + png.ksy loaded)", alt="Kaitai Struct Web IDE (sample PNG file + png.ksy loaded)", width="1335", height="811"]
 
 === Desktop / console version
 
@@ -192,9 +192,9 @@ is super helpful when editing the code in various IDEs that will
 generate reminder popups for intelligent completion, when you browse
 through class attributes:
 
-TODO: intellisense image
+image::img/completion_javadoc.png[caption="Figure 2: ", title="JavaDoc is generated automatically from `doc`", alt="JavaDoc is generated automatically from `doc`", width="1188", height="366"]
 
-Note that you can use https://learnxinyminutes.com/docs/yaml/[YAML]
+NOTE: You can use https://learnxinyminutes.com/docs/yaml/[YAML]
 folded style strings for longer documentation that spans multiple lines:
 
 [source,yaml]
