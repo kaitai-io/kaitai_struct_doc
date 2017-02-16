@@ -1,0 +1,12 @@
+# Use Ubuntu Trusty 14.04 image
+dist: trusty
+sudo: false
+
+language: ruby
+
+cache:
+  - apt
+
+script:
+  - make
+  - ./publish
