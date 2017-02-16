@@ -1,5 +1,5 @@
 = Kaitai Struct User Guide
-v0.5
+v0.6
 :toc: left
 :source-highlighter: coderay
 
@@ -9,7 +9,17 @@ Kaitai Struct is a domain-specific language (DSL) that is designed
 with one particular task in mind: dealing with arbitrary binary
 formats.
 
-TODO
+Parsing binary formats is hard, and that's a reason for that: such
+formats were designed to be machine-readable, not human-readable. Even
+when one's working with a clean, well-documented format, there are
+multiple pitfalls that await the developer: endianness issues,
+in-memory structure alignment, variable size structures, conditional
+fields, repetitions, fields that depend on other fields previously
+read, etc, etc, to name a few.
+
+Kaitai Struct tries to isolate the developer from all these details
+and allow to focus on the things that matter: the data structure
+itself, not particular ways to read or write it.
 
 == Installation and invocation
 
