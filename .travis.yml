@@ -10,7 +10,7 @@ cache:
   - apt
 
 before_install:
-  - gem install asciidoctor
+  - gem install asciidoctor coderay
 
 script:
   - make
