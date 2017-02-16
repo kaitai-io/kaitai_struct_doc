@@ -1,0 +1,130 @@
+= Kaitai Struct: PHP notes
+
+The [Kaitai Struct: runtime for PHP](https://github.com/kaitai-io/kaitai_struct_php_runtime) requires PHP >= 7.0 and can be used in two different ways:
+
+1) As part of Kaitai Struct (recommended approach)
+
+2) Independently as Composer's library (not recommended approach)
+
+The first approach is recommended as the second one is considered for internal usage in Kaitai Struct PHP Runtime and its API can be changed. The first approach is similar to how other runtimes are supposed to be used.
+
+## 1. Usage as part of Kaitai Struct (recommended approach)
+
+```sh
+mkdir kaitai-test
+cd kaitai-test
+
+#######################################################################################
+# Download Kaitai Struct Compiler, link can be found at http://kaitai.io/#download page
+
+curl -OL https://bintray.com/artifact/download/kaitai-io/universal/0.6/kaitai-struct-compiler-0.6.zip
+
+unzip kaitai-struct-compiler-0.6.zip
+
+cd kaitai-struct-compiler-0.6
+
+###############
+# Check version
+
+bin/kaitai-struct-compiler --version
+# Shows kaitai-struct-compiler 0.6
+
+################################################
+# Download and compile ELF file format - elf.ksy
+
+curl -OL https://raw.githubusercontent.com/kaitai-io/kaitai_struct_formats/master/executable/elf.ksy
+
+bin/kaitai-struct-compiler --target php --outdir my-elf-parser --php-namespace 'My\Parser' elf.ksy
+
+#################################
+# Check the result of compilation
+
+ls my-elf-parser
+# Shows Elf.php
+
+########################
+# Use the generated file
+
+cd my-elf-parser
+
+# Install PHP runtime
+cat <<'OUT' > composer.json
+{
+    "minimum-stability": "dev",
+    "require": {
+        "kaitai-io/kaitai_struct_php_runtime": "dev-master"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "git@github.com:kaitai-io/kaitai_struct_php_runtime.git"
+        }
+    ]
+}
+OUT
+composer install
+
+# E.g. of usage
+cat <<'OUT' > elf-parser.php
+<?php
+// Include Kaitai Struct PHP Runtime.
+require __DIR__ . '/vendor/autoload.php';
+// Include the generated classes.
+require __DIR__ . '/Elf.php';
+
+// Note: the same namespace is used as was used in command line (--php-namespace option).
+$elfFile = \My\Parser\Elf::fromFile('/usr/bin/bash');
+
+$entryPoint = $elfFile->header()->entryPoint();
+
+echo "Entry point 0x" . dechex($entryPoint) . " (as int: $entryPoint)";
+OUT
+
+php elf-parser.php
+# Shows "Entry point 0x41b6e0 (as int: 4306656)"
+```
+
+## 2. Independent usage as Composer's library  (not recommended approach)
+
+```sh
+# Create composer.json
+cat <<'OUT' > composer.json
+{
+    "minimum-stability": "dev",
+    "require": {
+        "kaitai-io/kaitai_struct_php_runtime": "dev-master"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "git@github.com:kaitai-io/kaitai_struct_php_runtime.git"
+        }
+    ]
+}
+OUT
+
+# Install the library
+composer install --prefer-source --no-dev
+
+# Usage example
+cat <<'OUT' > bash-ep.php
+<?php
+require __DIR__ . '/vendor/autoload.php';
+
+$binStream = new \Kaitai\Struct\Stream(fopen('/usr/bin/bash', 'rb'));
+$binStream->seek(5);
+$endianness = $binStream->readS1();
+$binStream->seek(24);
+if ($endianness === 1) {
+    // Read on little-endian machine
+    $entryPoint = $binStream->readU8le();
+} else {
+    // Read on bin-endian machine
+    $entryPoint = $binStream->readU8be();
+}
+echo "Entry point 0x" . dechex($entryPoint) . " (as int: $entryPoint)";
+OUT
+
+php bash-ep.php
+# Shows "Entry point 0x41b6e0 (as int: 4306656)"
+```

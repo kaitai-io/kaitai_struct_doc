@@ -1,33 +1,34 @@
 STYLESHEET=colony
 
 TARGETS=\
+	out/developers.html \
+	out/faq.html \
+	out/ksy_reference.html \
+	out/lang_cpp_stl.html \
+	out/lang_java.html \
+	out/lang_javascript.html \
+	out/lang_php.html \
+	out/lang_python.html \
+	out/new_language.html \
+	out/stream_api.html \
 	out/user_guide.html \
 	out/index.html
 
 all: $(TARGETS)
 	rm -rf out/img
 	cp -r img styles out
+	cp raw/coderay-asciidoctor.css out
 
 #out/%.html: raw/%.html tmpl/navbar.html tmpl/footer.html
 #	cat tmpl/navbar.html $< tmpl/footer.html >tmp.html
 #	mkdir -p out
 #	mv tmp.html $@
 
-out/index.html: raw/index.html tmpl/navbar.html tmpl/footer.html postprocess-html
-	./postprocess-html raw/index.html out/index.html
-#	cat tmpl/navbar.html raw/index.html tmpl/footer.html >tmp.html
-#	mkdir -p out
-#	mv tmp.html out/index.html
-
-out/user_guide.html: raw/user_guide.html tmpl/navbar.html tmpl/footer.html postprocess-html
-	./postprocess-html raw/user_guide.html out/user_guide.html
-#	cat tmpl/navbar.html raw/user_guide.html tmpl/footer.html >tmp.html
-#	mkdir -p out
-#	mv tmp.html out/user_guide.html
+out/%.html: raw/%.html tmpl/navbar.html postprocess-html
+	./postprocess-html $< $@
 
 raw/%.html: %.adoc styles/$(STYLESHEET).css raw/styles/$(STYLESHEET).css
 	TZ=UTC asciidoctor -a stylesheet=styles/$(STYLESHEET).css -a linkcss -D raw $<
-#	asciidoctor --no-header-footer -D raw $<
 
 raw/styles/$(STYLESHEET).css: styles/$(STYLESHEET).css
 	mkdir -p raw/styles

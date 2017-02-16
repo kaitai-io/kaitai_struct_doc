@@ -1,0 +1,422 @@
+= Kaitai Struct: KSY reference
+
+:toc: left
+:source-highlighter: coderay
+
+## Overview
+
+Kaitai Struct is a DSL (domain-specific language), designed to describe binary data structures in human- and machine-readable way. Description of certain structure ("format") can be written once and then translated using a [compiler] into a source code for supported programming languages — and then used from any program in that language.
+
+[compiler]: https://github.com/kaitai-io/kaitai_struct_compiler
+Kaitai Struct data structure (format) descriptions are written as simple [YAML] files and are usually saved using `.ksy` extension to differentiate them from the rest of `.yaml` files.
+
+Every `.ksy` file MUST be a map of strings (keys) to some values. File has only one unique key on top level, in all other respects "file" on the top level represents a class, a thus can use all the keys available for class definition.
+
+### meta
+
+`meta` key is a map of string to objects that defines various meta-information about the current file, assigns some default and processing directives.
+
+Example:
+
+```
+meta:
+  id: foo_arc
+  file-extension:
+    - fooarc
+    - fooarcz
+  endian: le
+  application: Foo Archiver v1.23  
+```
+
+#### id
+
+* Contents: a string that follows rules for all identifiers
+* Purpose: identifier for a primary structure described in top-level map
+* Influences: it would be converted to suit general formatting rules of a language and used as the name of class
+* Mandatory: yes
+
+#### file-extension
+
+* Contents: a string or an array of strings
+* Purpose: roughly identify which files can be parsed with this format by filename extension
+* Influences: may be used for navigation purposes by browsing applications
+* Mandatory: no
+
+#### endian
+
+* Contents: `le` (for little-endian) or `be` (for big-endian)
+* Purpose: sets a default [endianness] for this file
+* Influences: if set, [[primitive data types]] like `u4` would be treated as aliases to `u4le` / `u4be` (depending on the setting); if not set, attempt to use abbreviated types like `u4` (i.e. without full endianness qualifier) will yield compile-time error.
+* Mandatory: no
+
+#### application
+
+* Contents: a string
+* Purpose: free-form text string that describes application that's associated with this particular format, if it's a format used by single application
+* Influences: nothing
+* Mandatory: no
+
+[YAML]: http://yaml.org/
+[endianness]: https://en.wikipedia.org/wiki/Endianness**Type descriptions** takes central place in every `.ksy` file. Top-level map is a type description with additional `meta` key. Also, type descriptions might be included deeper, namely, in `types` section, to create nested structures.
+
+For most programming languages, "types" are directly mapped to classes which will perform the parsing of incoming binary stream.
+
+Type description is a map of strings (keys) to various values.
+
+#### seq
+
+* Contents: a sequence of [[attribute descriptions|attribute description]]
+* Purpose: identifier for a primary structure described in top-level map
+* Influences: would be translated into parsing method in a target class
+* Mandatory: no
+
+#### types
+
+* Contents: map of strings to [[type description]]
+* Purpose: create types for sub-structures that could be referenced in [[attribute descriptions|attribute description]] in any `seq` element
+* Influences: would be translated into distinct classes (usually nested into main one, if target language allows it)
+* Mandatory: no
+
+#### instances
+
+* Contents: map of strings to [[instance description]]
+* Purpose: description of data that lies outside of normal sequential parsing flow (for example, that requires seeking somewhere in the file) or just needs to be loaded only by special request
+* Influences: would be translated into distinct methods (that read desired data on demand) in current class
+* Mandatory: no
+
+#### enums
+
+* Contents: map of strings to [[enum description]]
+* Purpose: allow to set up named enums: essentially a mapping between integer constants to some symbolic names; these enums can be used in integer fields using [[enum|attribute description#enum]], thus converting it from simple integer field into a proper enum constant
+* Influences: would be represented as enum-like construct (or closest equivalent, if target language doesn't support enums) in current class
+* Mandatory: no
+**Attribute** description specifies how to read one particular attribute — typically, a single number, a string, array of bytes, etc. Attribute can also reference other complex structures by specifying user type given in [[type description]]. Each attribute is typically compiled into equivalent parsing instruction(s) in target language.
+
+# Common attributes
+
+## id
+
+* Contents: a string that matches `/^[a-z][a-z0-9_]*$/` — i.e. starts with lowercase letter and then may contain lowercase letters, numbers and underscore
+* Purpose: identify attribute among others
+* Influences: used as variable / field name in target programming language
+* Mandatory: yes
+
+## contents
+
+* Contents: one of:
+  * a string in UTF-8 encoding
+  * an array of:
+    * integers in decimal representation
+    * integers in hexadecimal representation, starting with `0x`
+    * strings in UTF-8 encoding
+* Purpose: specify fixed contents that should be encountered by parser at this point
+* Influences: parser checks if specified content exists at a given point in stream; if everything matches, then parsing continues; if content in the stream doesn't match bytes specified in given `contents`, it will trigger a parsing exception, thus signalling that something went terribly wrong and it's meaningless to continue parsing.
+* Mandatory: no
+
+Examples:
+
+* `foo` — expect bytes `66 6f 6f`
+* `[foo, 0, A, 0xa, 42]` — expect bytes `66 6f 6f 00 41 0a 2a`
+* `[1, 0x55, '▒,3', 3]` — expect bytes `01 55 e2 96 92 2c 33 03`
+
+Note that you can use either JSON or YAML array syntax, and quotes are optional in YAML syntax.
+
+## type
+
+* Contents: one of [[primitive data types]] or a [[user-specified type name|type description]]
+* Purpose: define a data type for an attribute
+* Influences: how much bytes would be read, data type and contents of a variable in target programming language
+* Mandatory: no — if `type` is not specified, then attribute is considered [a generic byte sequence](#no-type-specified)
+
+## repeat
+
+* Contents: `expr` or `eos`
+* Purpose: designate repeated attribute in a structure;
+  * if `repeat: expr` is used, then attribute is repeated the number of times specified in `repeat-expr` key;
+  * if `repeat: eos` is used, then attribute is repeated until the end of current stream
+  * if `repeat: until` is used, then attribute is repeated until given expression becomes true (one may use a reference to last parsed element in such expression)
+* Influences: attribute would be read as array / list / sequence, executing parsing code multiple times
+* Mandatory: no
+
+## repeat-expr
+
+* Contents: [[expression|expressions]], expected to be of integer type
+* Purpose: specify number of repetitions for repeated attribute
+* Influences: number of times attribute is parsed
+* Mandatory: yes, if `repeat: expr`
+
+## repeat-until
+
+* Contents: [[expression|expressions]], expected to be of boolean type
+* Purpose: specify expression that would be checked each time after an element of requested type is parsed; while expression is false (i.e. until it becomes true), more elements would be parsed and added to resulting array; one can use `_` in expression as a special variable that references last read element
+* Influences: number of times attribute is parsed
+* Mandatory: yes, if `repeat: until`
+
+## if
+
+* Contents: [[expression|expressions]], expected to be of boolean type
+* Purpose: mark the attribute as optional
+* Influences: attribute would be parsed only if condition specified in `if` key evaluates (in runtime) to true 
+* Mandatory: no
+
+# Attributes that depend on type
+
+## No type specified
+
+If there's no type specified, attribute will be read just as a sequence of bytes from a stream. Thus, one has to decide on how many bytes to read. There are two ways:
+
+* Specify amount of bytes to read in `size` key. One can specify an integer constant or an [[expression|expressions]] in this field (for example, if the number of bytes to read depends on some other attribute).
+* Set `size-eos: true`, thus ordering to read all the bytes till the end of current stream.
+
+### size
+
+### size-eos
+
+### process
+
+It is possible to apply some algorithmic processing to a byte buffer before accessing it. This can be done using  [[process|processing binary data]] attribute.
+
+## `u*`, `s*`
+
+These specify primitive integer types. One can map an integer to some [[enum|enum description]] value with an `enum` attribute.
+
+### enum
+
+* Contents: name of existing `enum`
+* Purpose: apply mapping of parsed integer using a given enum dictionary into some sort of named constant
+* Influences: field data type becomes given enum
+* Mandatory: no
+
+## `str`
+
+Specifies a fixed-length string, i.e. first it reads a designated number of bytes, then it tries to convert bytes to characters using a specified encoding. There are 2 ways to specify amount of data to read:
+
+* Specify number of bytes to read directly in `size` key. One can specify an integer constant or an [[expression|expressions]] in this field (for example, if the number of bytes to read depends on some other attribute).
+* Set `size-eos: true`, thus ordering to read all the bytes till the end of current stream.
+
+### size
+
+### size-eos
+
+### encoding
+
+## `strz`
+
+Specifies parsing a string until a `terminator` byte (i.e. C-style strings terminated with `0`).
+
+### terminator
+
+* Contents: integer that represents terminating byte
+* Purpose: string reading will stop when this byte will be encountered
+* Influences: field data type becomes given enum
+* Mandatory: no, default is `0`
+
+### consume
+
+* Contents: boolean
+* Purpose: specify if terminator byte should be "consumed" when reading - that is:
+  * if `consume` is true, stream pointer will point to the byte after the terminator byte
+  * if `consume` is false, stream pointer will point to the terminator byte itself
+* Influences: stream position after reading of string
+* Mandatory: no, default is `true`
+
+### include
+
+* Contents: boolean
+* Purpose: specify if terminator byte should be considered a part of string read and thus appended to it
+* Influences: string parsed: if `true`, then resulting string would be 1 byte longer and that byte would be terminator byte
+* Mandatory: no, default is `false`
+
+### eos-error
+
+* Contents: boolean
+* Purpose: allow ignoring of lack of terminator (disabling error reporting)
+* Influences:
+  * normally (if `eos-error` is `true`), reading a stream without encountering the terminator byte would result in end-of-stream exception being raised;
+  * if `eos-error` is `false`, string reading will stop successfully at: either:
+    * terminator being encountered, or
+    * end of stream is reached
+string parsed: if `true`, then resulting string would be 1 byte longer and that byte would be terminator byte
+* Mandatory: no, default is `true`
+
+## User-specified typesThere are several data types predefined in Kaitai Struct, thus they are used as basic building blocks for more complex data types:
+
+## Integers
+
+Generally, integer type specification follows this pattern: `([us])(1|2|4|8)(le|be)`
+
+* First letter — `u` or `s` — specifies either unsigned or signed integer respectively
+* Second group — `1`, `2`, `4` or `8` — specifies width of an integer in bytes
+* Third group — `le` or `be` — specifies little-endian or big-endian encoding respectively; it can be omitted if default endianness specified in [[meta.endian|file description#endian]] in file description.
+
+For the sake of completeness, here's the full table of available integer types:
+
+| `type` | Width, bits | Signed? | [Endianness] | Min value            | Max value            |
+|--------|-------------|---------|--------------|----------------------|----------------------|
+| `u1`   |           8 |    No   |      N/A     | 0                    | 255                  |
+| `u2le` |          16 |    No   |    Little    | 0                    | 65535                |
+| `u2be` |          16 |    No   |      Big     | 0                    | 65535                |
+| `u4le` |          32 |    No   |    Little    | 0                    | 4294967295           |
+| `u4be` |          32 |    No   |      Big     | 0                    | 4294967295           |
+| `u8le` |          64 |    No   |    Little    | 0                    | 18446744073709551615 |
+| `u8be` |          64 |    No   |      Big     | 0                    | 18446744073709551615 |
+| `s1`   |           8 |   Yes   |      N/A     | -128                 | 127                  |
+| `s2le` |          16 |   Yes   |    Little    | -32768               | 32767                |
+| `s2be` |          16 |   Yes   |      Big     | -32768               | 32767                |
+| `s4le` |          32 |   Yes   |    Little    | -2147483648          | 2147483647           |
+| `s4be` |          32 |   Yes   |      Big     | -2147483648          | 2147483647           |
+| `s8le` |          64 |   Yes   |    Little    | -9223372036854775808 | 9223372036854775807  |
+| `s8be` |          64 |   Yes   |      Big     | -9223372036854775808 | 9223372036854775807  |
+
+## Floats
+
+Floating point number specification also follows the general pattern: `f(4|8)(le|be)`
+
+* First letter — `f` — specifies floating point type
+* Second group — `4` or `8` — specifies width of an integer in bytes
+* Third group — `le` or `be` — specifies little-endian or big-endian encoding respectively; it can be omitted if default endianness specified in [[meta.endian|file description#endian]] in file description.
+
+The general format of float follows [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point) standard.
+
+The full list of possible floating point type is thus:
+
+| `type` | Width, bits | [Endianness] | Mantissa bits | Exponents bits |
+|--------|-------------|--------------|---------------|----------------|
+| `f4be` |          32 |      Big     | 24            | 8              |
+| `f4le` |          32 |    Little    | 24            | 8              |
+| `f8be` |          64 |      Big     | 53            | 11             |
+| `f8le` |          64 |    Little    | 53            | 11             |
+
+## Strings
+
+* `str`
+* `strz`
+
+[Endianness]: https://en.wikipedia.org/wiki/EndiannessSometimes the data you're working on is not only packed in some structure, but also somehow encoded, obfuscated, encrypted, compressed, etc. So, to be able to parse such data, one has to remove this layer of encryption / obfuscation / compression / etc. This is called "processing" in Kaitai Struct and it is supported with a range of `process` directives. These can be applied to raw byte buffers or user-typed fields in the following way:
+
+```yaml
+seq:
+  - id: buf1
+    size: 0x1000
+    process: zlib
+```
+
+This declares a field named `buf1`. When parsing this structure, KS will read exactly 0x1000 bytes from a source stream and then apply `zlib` processing, i.e. decompression of zlib-compressed stream. Afterwards, accessing `buf1` would return decompressed stream (which would be most likely larger than 0x1000 bytes long), and accessing `_raw_buf1` property would return raw (originally compressed) stream, exactly 0x1000 bytes long.
+
+There are following processing directives available in Kaitai Struct.
+
+## xor(key)
+
+Applies a bitwise XOR (bitwise exclusive "or", written as `^` in most C-like languages) to every byte of the stream. Length of output stays exactly the same as the length of input. There is one mandatory argument - the key to use for XOR operation. It can be:
+
+* a single byte value — in this case this value would be XORed with every byte of the input stream
+* an array of bytes — in this case, first byte of the input would be XORed with first byte of the key, second byte of the input with second byte of the keys, etc. If the key is shorter than the input, key will be reused, starting from the first byte.
+
+For example, given 3-byte key `[b0, b1, b2]` and input line `[x0, x1, x2, x3, x4, ...]` output will be:
+
+```
+[x0 ^ b0, x1 ^ b1, x2 ^ b2,
+ x3 ^ b0, x4 ^ b1, ...]
+```
+
+Examples:
+
+* `process: xor(0xaa)` — XORs every byte with `0xaa`
+* `process: xor([7, 42])` — XORs every odd (1st, 3rd, 5th, ...) byte with `7`, and every even (2nd, 4th, 6th, ...) byte with `42`
+* `process: xor(key_buf)` — XORs bytes using a key stored in a field named `key_buf`
+
+## rol(key), ror(key)
+
+Does a [circular shift](https://en.wikipedia.org/wiki/Circular_shift) operation on a buffer, rotating every byte by `key` bits left (`rol`) or right (`ror`).
+
+Examples:
+
+* `process: rol(5)` — rotates every byte 5 bits left: every given bit combination `b0-b1-b2-b3-b4-b5-b6-b7` becomes `b5-b6-b7-b0-b1-b2-b3-b4`
+* `process: ror(some_val)` — rotates every byte right by number of bits determined by `some_val` field (which might be either parsed previously or calculated on the fly)
+
+## zlib
+
+Applies a `zlib` decompression to input buffer, expecting it to be a full-fledged zlib stream, i.e. having a regular 2-byte zlib header. Decompression parameters are chosen automatically from it. Typical zlib header values:
+
+* `78 01` — no compression or low compression
+* `78 9C` — default compression
+* `78 DA` — best compression
+
+Length of output buffer is usually larger that length of the input. This processing method might throw an exception if the data given is not a valid zlib stream.**Instance** description is very close to [[attribute description]] (and inherits all its properties), but it specifies an attribute to be read (or calculated) out of regular sequence. Typically, each instance is compiled into a reader function that will parse requested data on demand, cache the result and return whatever's been parsed previously on subsequent calls.
+
+# Common attributes
+
+Instance inherits [[attribute description]], so everything that's described there can be used, except for `id`, which is useless, because all instances already have name due to map string key.
+
+## pos
+
+Specifies position in a stream from which the value should be parsed.
+
+## io
+
+Specifies an IO stream from which a value should be parsed.
+
+## value
+
+Overrides any real reading & parsing. Instead, just calculates function specified in `value` and returns the result as this instance. Can be used for multitude of purposes, such as data conversion while reading, etc.**Enum** description allows to set up a enum (or closest equivalent) construct in target language source file, which can then be referenced in attribute descriptions using [[enum|attribute description#enum]] specification.
+
+A given class can have multiple named enums, each of which is essentially a map from integers to strings. For example:
+
+```yaml
+enums:
+  ip_protocol:
+    1: icmp
+    6: tcp
+    0x11: udp
+  port:
+    22: ssh
+    25: smtp
+    80: http
+```
+
+This one defines 2 named enums (named `ip_protocol` and `port` respectively), which can be referenced in attributes like that:
+
+```yaml
+seq:
+  - id: src_port
+    type: u2
+    enum: port
+```
+
+Enum-mapped fields can be also used in [[expressions]]. One can compare it to enum constants, referencing it using *enum_name*`::`*enum_string* syntax:
+
+```yaml
+seq:
+  - id: http_version
+    type: u1
+    if: src_port == port::http
+```
+
+or one can convert them back into an integer, for example:
+
+```yaml
+seq:
+  - id: field_for_privileged_port
+    type: u1
+    if: src_port.to_i < 1024
+```
+Some fields (for example, [[repeat-expr|attribute description#repeat-expr]], [[size|attribute description#size]] or [[if|attribute description#if]]) allow to specify either constant values (for example, `123`) or an expression that could reference another attributes or instances.
+
+A very typical example would be:
+
+```
+seq:
+  - id: filename_len
+    type: u4
+  - id: filename
+    type: str
+    size: filename_len
+    encoding: UTF-8
+```
+
+Here we do two things:
+
+* First, we read 4-byte unsigned integer is read and store it in `filename_len` attribute
+* Second, we read an UTF-8 encoded string exactly `filename_len` bytes long, where `filename_len` is a reference the previous attribute
+
+Actually, these expressions form a fairly powerful expression language that would be translated into a relevant expression in target programming language.

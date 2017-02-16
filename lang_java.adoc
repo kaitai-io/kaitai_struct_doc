@@ -1,0 +1,117 @@
+= Kaitai Struct: Java notes
+
+## Usage patterns
+
+Parsing a structure directly from a local file:
+
+```java
+AnExampleClass.fromFile("an_example.data")
+```
+
+Parsing a structure from a byte array (`byte[]`):
+
+```java
+new AnExampleClass(new KaitaiStream(byteArray))
+```
+
+Note that parsing from non-seekable streams (i.e. [FileInputStream](https://docs.oracle.com/javase/7/docs/api/java/io/FileInputStream.html), [BufferedInputStream](https://docs.oracle.com/javase/7/docs/api/java/io/BufferedInputStream.html), etc) is not supported and probably won't be supported, as a lot of parsing functionality in KS relies on seek support.
+
+## Runtime library
+
+Following most other runtimes example, everything revolves around two basic classes:
+
+* KaitaiStruct — a common superclass for all classes that represent user types in KS. Java implementation is very limited and basically only keeps `_io` member of type KaitaiStream and provides a getter for it.
+* KaitaiStream — a useful abstraction of seekable input stream that can be read with [[Kaitai Struct stream API]] (i.e. methods like `readU4le()`. Internally, it uses either a [ByteArrayInputStream] or [RandomAccessFile] to read either a in-memory byte buffer or a local file.
+
+## Naming
+
+KS tries to follow mandatory and recommended Java practices as close as possible.
+
+Class names would be represented in upper camel case (i.e. `an_example_class` => `AnExampleClass`).
+
+All attributes and instance names use lower camel case (i.e. `an_example_attribute` => `anExampleAttribute`).
+
+## Types
+
+All user types are mapped 1-to-1 to relevant Java classes. Nested types are mapped to nested classes, i.e. for nested types like this:
+
+```yaml
+meta:
+  id: parent
+# ...
+types:
+  child:
+    # ...
+    types:
+      grandchild:
+        # ...
+```
+
+one can expect to get the following class structure:
+
+```java
+public class Parent extends KaitaiStruct {
+    public static class Child extends KaitaiStruct {
+        public static class GrandChild extends KaitaiStruct {
+        }
+    }
+}    
+```
+
+Every generated class will have 3 constructors and a static factory method (plus a private `_parse()` method that is invoked from all the constructors to do actual parsing):
+
+```java
+public AnExampleClass(KaitaiStream _io)
+public AnExampleClass(KaitaiStream _io, KaitaiStruct _parent)
+public AnExampleClass(KaitaiStream _io, KaitaiStruct _parent, AnExampleClass _root)
+public static AnExampleClass fromFile(String fileName)
+```
+
+## Attributes
+
+Attribute parsing is done in `_parse()` method which is typically invoked from a constructor. All parsed attributes are stored as private member variables.
+
+For all attributes, a relevant getter method will be generated, so an attribute can be accessed outside of class like `classInstance.anExampleAttribute()`.
+
+## Instances
+
+TODO
+
+## Enums
+
+TODO
+
+## Primitive type mapping
+
+There are several things of note that influence mapping KS types to Java types:
+
+* There are no support for unsigned integer types in Java. In some cases it's no big deal, but some use cases (for example, comparison or bit shifts) may be severely hindered by that issue. KS tries to make up for that fact by using larger signed types where that's possible and reasonable to do. Where it's not possible (i.e. 64-bit unsigned integers — `u8`), KS would use signed `long` type.
+* Java has 2 types for every numeric type: "primitive" type (i.e. `int`) and "reference" type (i.e. `Integer`) — the latter being a full-featured object that can have `null` assigned to it and stored in collections. It's not practical to use reference types everywhere, so KS makes use of them only in the following situations:
+  * when data type is used as part of a collection
+  * when it's possible that a particular attribute / instance will be unassigned (i.e. because of [[if|attribute description#if]] expression) — `null` will be returned in this case
+
+The overall primitive type mapping goes as follows:
+
+| `type`        | Java primitive type | Java reference type |
+|---------------|-----------|---------|
+| no type       | byte[]    | byte[]  |
+| `u1`          | int       | Integer |
+| `u2`          | int       | Integer |
+| `u4`          | long      | Long    |
+| `u8`          | long      | Long    |
+| `s1`          | byte      | Byte    |
+| `s2`          | short     | Short   |
+| `s4`          | int       | Integer |
+| `s8`          | long      | Long    |
+| `str`, `strz` | String    | String  |
+
+### String encoding
+
+Encoding a stream of bytes into a `String` is done with the standard Java API: [String method constructor](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html#String(byte[],%20java.nio.charset.Charset))
+
+## Array types
+
+All repetitions in Java are translated to `ArrayList<~>`
+
+[ByteArrayInputStream]: https://docs.oracle.com/javase/7/docs/api/java/io/ByteArrayInputStream.html
+[RandomAccessFile]: https://docs.oracle.com/javase/7/docs/api/java/io/RandomAccessFile.html

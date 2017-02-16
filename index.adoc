@@ -6,6 +6,16 @@
 * <<ksy_reference.adoc#,KSY language reference>>
 * <<faq.adoc#,FAQ>> — frequently asked questions
 
+==== Language-specific notes
+
+* <<lang_cpp_stl.adoc#,C++/STL>>
+* <<lang_java.adoc#,Java>>
+* <<lang_javascript.adoc#,JavaScript>>
+* <<lang_php.adoc#,PHP>>
+* <<lang_python.adoc#,Python>>
+
 === Want to contribute to KS development?
 
 * <<developers.adoc#,Developers memo>> — basic information on how to build, test and release KS
+* <<new_language.adoc#,Adding support for new target language>>
+* <<stream_api.adoc#,Kaitai Stream API>>

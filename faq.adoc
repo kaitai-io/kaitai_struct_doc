@@ -1,0 +1,77 @@
+= Kaitai Struct: FAQ
+
+## General
+
+### Is it fast?
+
+Yes, pretty much. Kaitai Struct is not a runtime interpreter, but a compiler — thus it imposes no additional runtime performance penalty. Code that it generates is about as fast as one can write in a particular language to parse a certain data format.
+
+That said, note that Kaitai Struct is all about producing a clean API for parsing binary data. That means that general usage plan is:
+
+1. Create object (structure) in memory and parse stream into it
+2. Use it via API afterwards
+
+This pattern is generally a good fit for most applications, but for some types of workloads you might want a completely different approach: acting as soon as every particular chunk of data stream is parsed based on that chunk only. This calls for an event-based parsing model (i.e. you define some code that will be executed on each particular state of the parser) and thus, probably, you'll find that other tools like [parser combinators](https://en.wikipedia.org/wiki/Parser_combinator), finite-state machine generators or even plain [lexer/parser generators](https://en.wikipedia.org/wiki/Comparison_of_parser_generators) will suit that approach better than Kaitai Struct. In these cases, Kaitai Struct's approach "read-then-use" *might* be slower than event-based "read-and-act-simultaneously" approach.
+
+### Is output of KS readable?
+
+Yes, Kaitai Struct compiler generates very human-readable files, which can be examined with naked eye, debugged if needed, etc. For example, reading a two-byte signed little-endian integer is usually translated into something like:
+
+```java
+field = _io.readS2Le();
+```
+
+### Does it support writing (generation, serialization) of structures into stream, or only reading (parsing, deserialization) of structures from the stream?
+
+So far Kaitai Struct focuses on reading (parsing) only. There are plans to support writing, but don't hold your breath for it — it's a pretty major change and it'll probably happen after 1.x.
+
+## How does it compare to ...
+
+### ... [Google Protocol Buffers], [ASN.1], [Apache Thrift], [Apache Avro], [BSON], etc?
+
+They're completely different. Projects mentioned are actually different serialization specifications that map existing data into some sort of extensible binary stream, usually for easy transmission / interchange. Binary representation is driven by the data and encoded according to particular standard of a given protocol, which usually has a fixed representation for integers, for strings, for arrays, for dictionaries, etc. Most of these project allow generated formats to be automatically extensibile, carry versioning information, automatically embed typing information of some sort.
+
+KS approaches from the other end: given some sort of existing (or planned) binary representation, build a set of classes that the data inside this representation can be held in and build a parser for it. You can't read an arbitrary binary format (like, for example, `.gif`, `.wav`, or `.pdf`).
+
+[Google Protocol Buffers]: https://github.com/google/protobuf
+[ASN.1]: https://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One
+[Apache Thrift]: https://thrift.apache.org/
+[Apache Avro]: https://avro.apache.org/
+[BSON]: http://bsonspec.org/
+
+### ... [Cap'N Proto]?
+
+Most of the arguments from the previous answer (for [Google Protocol Buffers], [ASN.1], [Apache Thrift], [Apache Avro], [BSON]) apply here as well. Cap'N Proto is not a tool for reading or writing arbitrary formats. Instead, it uses a couple of clever tricks to make serialization and deserialization more efficient (casting binary structures as blocks, not assigning individual fields), but, essentially, it emphasizes content, and offers very limited control over serialization format.
+
+In theory, [Cap'N Proto encoding scheme](https://capnproto.org/encoding.html) is well documented and can be implemented in .ksy to parse Cap'N Proto encoded messages.
+
+[Cap'N Proto]: https://capnproto.org/
+
+### ... [GNU Bison], [Yacc], [Lex], [Flex], etc?
+
+All these tools actually work on parsing text (most usually, source code) using context-free grammars. The core problem they solve is ambiguity of whatever was read. For example, a single letter `a` might be part of string literal, part of an identifier, part of a tag name, etc. In most cases, parsers that they generate have a concept of *state* and a fairly complex ruleset to change states. On the other hand, binary files are usually structured in a non-ambiguous way: there's no need to do complex backtracking, re-interpreting everything in a different fashion just because we've encountered something near the end of the file. There's usually no *state* beyond the pointer in the stream and pointer the code that does parsing.
+
+[GNU Bison]: https://www.gnu.org/software/bison/
+[Yacc]: https://en.wikipedia.org/wiki/Yacc
+[Lex]: https://en.wikipedia.org/wiki/Lex_(software)
+[Flex]: http://flex.sourceforge.net/
+
+### ... [SweetScape 010 Editor], [Synalysis], [Hexinator], [Okteta], [iBored]?
+
+All these tools are advanced hex editors with some sort of *template language*, which is actually pretty close to `.ksy` language. One major difference is that `.ksy` files, unlike per-editor templates, can be compiled right into parser source code in any supported language.
+
+[SweetScape 010 Editor]: http://www.sweetscape.com/010editor/
+[Synalysis]: http://www.synalysis.net/
+[Hexinator]: https://hexinator.com/
+[Okteta]: https://docs.kde.org/stable5/en/kdesdk/okteta/tools-structures.html
+[iBored]: http://apps.tempel.org/iBored/
+
+### ... [Preon]?
+
+* Both Preon and KS are declarative
+* Preon is Java-only library, KS is a cross-language tool
+* Preon's data structure definitions are done as annotations inside `.java` source files, KS keeps structure definitions in separate `.ksy` file
+* Preon interpetes data structure annotations in runtime, KS compiles `.ksy` into regular `.java` files first, then they're compiled normally by Java compiler as part of the project
+* Preon supports unaligned bit streams, KS does not (yet)
+
+[Preon]: https://github.com/preon/preon
