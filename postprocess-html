@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+# coding: utf-8
+
+require 'fileutils'
+
+if ARGV.size != 2
+  puts "Usage: postprocess-html <src-file> <dst-file>"
+  exit 1
+end
+
+src, dst = ARGV
+
+doc = File.read(src)
+
+navbar_html = File.read("tmpl/navbar.html")
+footer_html = File.read("tmpl/footer.html")
+
+doc.gsub!(/<div id="header">/, navbar_html + "<div id=\"header\">")
+#doc.gsub!(/<div id="footer">.*$/m, footer_html)
+
+FileUtils::mkdir_p(File.dirname(dst))
+File.write(dst, doc)

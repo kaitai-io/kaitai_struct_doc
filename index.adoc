@@ -1,0 +1,11 @@
+= Kaitai Struct: documentation
+
+=== Want to use Kaitai Struct?
+
+* <<user_guide.adoc#,User guide>>
+* <<ksy_reference.adoc#,KSY language reference>>
+* <<faq.adoc#,FAQ>> — frequently asked questions
+
+=== Want to contribute to KS development?
+
+* <<developers.adoc#,Developers memo>> — basic information on how to build, test and release KS
