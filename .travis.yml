@@ -9,6 +9,11 @@ language: ruby
 cache:
   - apt
 
+before_install:
+  - gem install asciidoctor
+
 script:
   - make
+
+after_success:
   - ./publish
