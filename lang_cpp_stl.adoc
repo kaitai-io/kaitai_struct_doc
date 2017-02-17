@@ -1,5 +1,4 @@
 = Kaitai Struct: C++/STL notes
-
 :source-highlighter: coderay
 
 == Primitive type mapping

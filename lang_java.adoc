@@ -1,5 +1,4 @@
 = Kaitai Struct: Java notes
-
 :source-highlighter: coderay
 
 == Usage patterns

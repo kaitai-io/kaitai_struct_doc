@@ -1,4 +1,5 @@
 = Kaitai Struct: PHP notes
+:source-highlighter: coderay
 
 The [Kaitai Struct: runtime for PHP](https://github.com/kaitai-io/kaitai_struct_php_runtime) requires PHP >= 7.0 and can be used in two different ways:
 

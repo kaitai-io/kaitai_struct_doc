@@ -1,4 +1,5 @@
 = Kaitai Struct: Python notes
+:source-highlighter: coderay
 
 ## Requirements
 

@@ -1,4 +1,5 @@
 = Kaitai Struct: JavaScript notes
+:source-highlighter: coderay
 
 == Approximate 64-bit integers
 
