@@ -1,5 +1,7 @@
 = Kaitai Struct: C++/STL notes
 
+:source-highlighter: coderay
+
 == Primitive type mapping
 
 Mapping KS types to C++ is pretty straight-forward:
