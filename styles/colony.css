@@ -1388,3 +1388,9 @@ body {
 	padding-top: 70px;
 	padding-bottom: 40px;
 }
+
+/* fix for scrolling to headers due to fixed navbar */
+h1, h2, h3, h4, h5, h6 {
+	padding-top: 70px;
+	margin-top: -70px;
+}
