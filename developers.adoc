@@ -1,92 +1,89 @@
 = Developers memo
-
+Kaitai Project
 :toc: left
 :source-highlighter: coderay
 
-KS compiler is written in [Scala language] and thus uses [SBT] for
-building. It can be compiled in one of 2 ways:
+KS compiler is written in http://www.scala-lang.org/[Scala language]
+and thus uses http://www.scala-sbt.org/[SBT] for building. It can be
+compiled in one of 2 ways:
 
 * generating Java `.class` files, to be run in JVM
-* generating JavaScript `.js` file, to be run either inside a browser or
-  in node.js environment
+* generating JavaScript `.js` file, to be run either inside a browser
+  or in node.js environment
 
-[Scala language]: http://www.scala-lang.org/
-[SBT]: http://www.scala-sbt.org/
+== Building for JVM
 
-## Building for JVM
+We use
+http://www.scala-sbt.org/sbt-native-packager/[sbt-native-packager] to
+build deployable formats.
 
-We use [sbt-native-packager] to build deployable formats.
+=== Building an http://www.scala-sbt.org/sbt-native-packager/formats/universal.html[universal] (.zip) package
 
-[sbt-native-packager]: http://www.scala-sbt.org/sbt-native-packager/
+`sbt compilerJVM/universal:packageBin` → generates
+`jvm/target/universal/kaitai-struct-compiler-*.zip`
 
-### Building an [universal] (.zip) package
+=== Building http://www.scala-sbt.org/sbt-native-packager/formats/debian.html[Debian package]
 
-[universal]: http://www.scala-sbt.org/sbt-native-packager/formats/universal.html
+1.  Install prerequisites:
+`sudo -i apt-get install dpkg-deb dpkg-sig dpkg-genchanges lintian fakeroot`
+2.  `sbt compilerJVM/debian:packageBin` -> generates
+`jvm/target/kaitai-struct-compiler_*_all.deb`
 
-`sbt compilerJVM/universal:packageBin` → generates `jvm/target/universal/kaitai-struct-compiler-*.zip`
+=== Building http://www.scala-sbt.org/sbt-native-packager/formats/windows.html[Windows package]
 
-### Building [Debian package]
+1.  Install WIX
+2.  `sbt compilerJVM/windows:packageBin` -> genereates
+`jvm/target/windows/kaitai-struct-compiler.msi`
+3.  Rename to add version to `kaitai-struct-compiler-$VERSION.msi`
 
-[Debian package]: http://www.scala-sbt.org/sbt-native-packager/formats/debian.html
-
-1. Install prerequisites: `sudo -i apt-get install dpkg-deb dpkg-sig dpkg-genchanges lintian fakeroot`
-2. `sbt compilerJVM/debian:packageBin` -> generates `jvm/target/kaitai-struct-compiler_*_all.deb`
-
-### Building [Windows package]
-
-[Windows package]: http://www.scala-sbt.org/sbt-native-packager/formats/windows.html
-
-1. Install WIX
-2. `sbt compilerJVM/windows:packageBin` -> genereates `jvm/target/windows/kaitai-struct-compiler.msi`
-3. Rename to add version to `kaitai-struct-compiler-$VERSION.msi`
-
-### Dependencies for JVM target
+=== Dependencies for JVM target
 
 TODO
 
-## Building for JavaScript platform
+== Building for JavaScript platform
 
-Building to JavaScript platform is done using a Scala.js project. Note
-that it uses a somewhat different set of dependencies, as they must
+Building to JavaScript platform is done using a Scala.js project. Note +
+that it uses a somewhat different set of dependencies, as they must +
 actually be JavaScript libraries, not Java jars.
 
-1. Run `sbt fastOptJS` -> generates `js/target/scala-2.11/kaitai-struct-compiler-fastopt.js`
-2. Use this JavaScript file on a website
+1.  Run `sbt fastOptJS` -> generates
+`js/target/scala-2.11/kaitai-struct-compiler-fastopt.js`
+2.  Use this JavaScript file on a website
 
-### Dependencies for JavaScript target
+=== Dependencies for JavaScript target
 
 TODO
 
-## Publishing a new version
+== Publishing a new version
 
-1. Choose a new version number (WIX imposes harsh requirements for
+. Choose a new version number (WIX imposes harsh requirements for
   version to look like `x.x.x.x`) and update it in `build.sbt`,
   `version := ...`, commit
-2. Prepare an entry in RELEASE_NOTES.md, commit
-3. Create version tag:
+. Prepare an entry in RELEASE_NOTES.md, commit
+. Create version tag:
   * `git tag $VERSION`
   * `git push --tags`
-4. Update [main repository](https://github.com/kaitai-io/kaitai_struct)
-5. Create new version at:
+. Update [main repository](https://github.com/kaitai-io/kaitai_struct)
+. Create new version at:
   * https://bintray.com/kaitai-io/debian/kaitai-struct-compiler/new/version
   * https://bintray.com/kaitai-io/universal/kaitai-struct-compiler/new/version
-6. Upload:
+. Upload:
   * https://bintray.com/kaitai-io/debian/kaitai-struct-compiler/$VERSION/upload
-    * Debian distribution: `jessie`
-    * Debian component: `main`
-    * Debian architecture: `all`
-    * Attached file: `jvm/target/kaitai-struct-compiler_*_all.deb`
+  ** Debian distribution: `jessie`
+  ** Debian component: `main`
+  ** Debian architecture: `all`
+  ** Attached file: `jvm/target/kaitai-struct-compiler_*_all.deb`
   * https://bintray.com/kaitai-io/universal/kaitai-struct-compiler/$VERSION/upload
-    * Target path: `$VERSION`
-    * Attached file: `jvm/target/universal/kaitai-struct-compiler-*.zip`
+  ** Target path: `$VERSION`
+  ** Attached file: `jvm/target/universal/kaitai-struct-compiler-*.zip`
   * https://bintray.com/kaitai-io/universal/kaitai-struct-compiler/$VERSION/upload
-    * Target path: `$VERSION`
-    * Attached file: `jvm/target/windows/kaitai-struct-compiler-*.msi`
-7. Publish them all
+  ** Target path: `$VERSION`
+  ** Attached file: `jvm/target/windows/kaitai-struct-compiler-*.msi`
+. Publish them all
 
-### Runtimes
+=== Runtimes
 
-#### Java
+==== Java
 
 * Pump version, set version to `$VERSION`, without `-SNAPSHOT`
 * `mvn deploy`
@@ -94,23 +91,23 @@ TODO
 * Scroll to the very end of list, seek `iokaitai-...` repositories
 * Select our staging repository
 * Press "Close" toolbar button
-  * Confirm
-  * Wait for checks to complete
+** Confirm
+** Wait for checks to complete
 * Press "Release" toolbar button
-  * Enter release message
-  * Confirm
+** Enter release message
+** Confirm
 * After some time, check https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22kaitai-struct-runtime%22 to have new version
 
-#### Python
+==== Python
 
 * Pump version in `setup.py`, seek `version=`
 * `python3 setup.py sdist upload`
-  * (use `python3 setup.py sdist upload -r pypitest` to publish to testing server)
+** (use `python3 setup.py sdist upload -r pypitest` to publish to testing server)
 * Check that new version appears at https://pypi.python.org/pypi/kaitaistruct/$VERSION
 * `git tag $VERSION`
 * `git push --tags`
 
-#### Ruby
+==== Ruby
 
 * Pump version in `lib/kaitai/struct/struct.rb`, seek `VERSION = `
 * `gem build kaitai-struct.gemspec`
@@ -119,7 +116,7 @@ TODO
 * `git tag $VERSION`
 * `git push --tags`
 
-## Adding new language
+== Adding new language
 
 Don't forget to update lists of languages:
 
