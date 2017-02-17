@@ -1375,6 +1375,7 @@ body {
 }
 #toc.toc2 {
 	top: 70px !important;
+	height: calc(100% - 70px);
 }
 
 .navbar, .navbar li, .nav, .navbar-nav {
