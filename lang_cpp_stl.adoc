@@ -1,56 +1,86 @@
 = Kaitai Struct: C++/STL notes
 
-## Primitive type mapping
+== Primitive type mapping
 
 Mapping KS types to C++ is pretty straight-forward:
 
-| `type`        | C++ type    |
-|---------------|-------------|
-| no type       | std::string |
-| `u1`          | uint8_t     |
-| `u2`          | uint16_t    |
-| `u4`          | uint32_t    |
-| `u8`          | uint64_t    |
-| `s1`          | int8_t      |
-| `s2`          | int16_t     |
-| `s4`          | int32_t     |
-| `s8`          | int64_t     |
-| `str`, `strz` | std::string |
+[cols=",",options="header",]
+|==========================
+|`type` |C++ type
+|no type |std::string
+|`u1` |uint8_t
+|`u2` |uint16_t
+|`u4` |uint32_t
+|`u8` |uint64_t
+|`s1` |int8_t
+|`s2` |int16_t
+|`s4` |int32_t
+|`s8` |int64_t
+|`str`, `strz` |std::string
+|==========================
 
-Note that both byte arrays and strings are mapped to `std::string` — that's because when we store byte array, we need something that would be able to both hold the byte buffer *and* store it's length (or at least able to derive it).
+Note that both byte arrays and strings are mapped to `std::string` —
+that's because when we store byte array, we need something that would be
+able to both hold the byte buffer _and_ store it's length (or at least
+able to derive it).
 
-### String encoding
+=== String encoding
 
-There's no universal agreement on dealing with encodings in C++, so KS allows you to choose one of the few popular approaches. You can choose how to deal with string encoding using a compile-time define.
+There's no universal agreement on dealing with encodings in C++, so KS
+allows you to choose one of the few popular approaches. You can choose
+how to deal with string encoding using a compile-time define.
 
-* Ignore encodings at all. In this mode, all string parsing operations just ignore any encoding specifications and pass raw bytes as a string to application. Note that in some cases it might *break* some .ksy files that actually depend on string being properly decoded / converted.
-* Convert all incoming byte streams into strings in a single, one-size-fits-all encoding (for example, UTF8, as suggested by [UTF8 Everywhere Manifesto](http://utf8everywhere.org/)). By default, the  Since there's no universal way to do it, KS would use one of platform-dependent ways (which can be also enforced by specifying specific defines):
-  * Use POSIX `iconv` library — usually preinstalled (or included in libc) on all POSIX systems, can be linked as external library on most other systems (i.e. Windows)
-  * Use Windows API functions [MultiByteToWideChar] and [WideCharToMultiByte] — obviously, available only on Windows platform
-  * Use [ICU] library
+* Ignore encodings at all. In this mode, all string parsing operations
+just ignore any encoding specifications and pass raw bytes as a string
+to application. Note that in some cases it might _break_ some .ksy files
+that actually depend on string being properly decoded / converted.
+* Convert all incoming byte streams into strings in a single,
+one-size-fits-all encoding (for example, UTF8, as suggested by
+http://utf8everywhere.org/[UTF8 Everywhere Manifesto]).
+Since there's no universal way to do it, KS would use one of
+platform-dependent ways (which can be also enforced by specifying
+specific defines):
+** Use POSIX `iconv` library — usually preinstalled (or included in libc)
+on all POSIX systems, can be linked as external library on most other
+systems (i.e. Windows)
+** Use Windows API functions
+https://msdn.microsoft.com/en-us/library/windows/desktop/dd319072.aspx[MultiByteToWideChar]
+and
+https://msdn.microsoft.com/en-us/library/windows/desktop/dd374130.aspx[WideCharToMultiByte]
+— obviously, available only on Windows platform
+** Use http://site.icu-project.org/[ICU] library
 
-[MultiByteToWideChar]: https://msdn.microsoft.com/en-us/library/windows/desktop/dd319072.aspx
-[WideCharToMultiByte]: https://msdn.microsoft.com/en-us/library/windows/desktop/dd374130.aspx
-[ICU]: http://site.icu-project.org/
+== Null values
 
-## Null values
+In certain cases, namely when using `if` with an expression that will be
+false, a certain attribute won't be parsed. For example:
 
-In certain cases, namely when using `if` with an expression that will be false, a certain attribute won't be parsed. For example:
-
-```yaml
+[source,yaml]
+----
 seq:
   - id: foo
     type: u1
   - id: bar
     type: u1
     if: foo == 42
-```
+----
 
-If `foo` is not 42, then an unsigned 1-byte integer `bar` won't be parsed. By general convention, Kaitai Struct makes sure that `bar` is equal to a `null` value, to be able to distinguish such a situation (as opposed to having some value). However, it's not possible to do so for many primitive (non-reference) types in C++. In the example above, `bar` will have type `uint8_t`, and assigning `null` to it would just set it to 0, thus we won't be able to distinguish a situation when `bar` was read and we've got 0, and `bar` wasn't read.
+If `foo` is not 42, then an unsigned 1-byte integer `bar` won't be
+parsed. By general convention, Kaitai Struct makes sure that `bar` is
+equal to a `null` value, to be able to distinguish such a situation (as
+opposed to having some value). However, it's not possible to do so for
+many primitive (non-reference) types in C++. In the example above, `bar`
+will have type `uint8_t`, and assigning `null` to it would just set it
+to 0, thus we won't be able to distinguish a situation when `bar` was
+read and we've got 0, and `bar` wasn't read.
 
-To work around this situation, Kaitai Struct generates special null checking methods for every attribute that can be null: `_is_null_ATTRIBUTE`, where `ATTRIBUTE` is the name of the attribute. Thus, the proper way to use such nullable values is something like:
+To work around this situation, Kaitai Struct generates special null
+checking methods for every attribute that can be null:
+`_is_null_ATTRIBUTE`, where `ATTRIBUTE` is the name of the attribute.
+Thus, the proper way to use such nullable values is something like:
 
-```cpp
+[source,cpp]
+----
 if (!r->_is_null_bar()) {
     uint8_t bar = r->bar();
     // `bar` is defined, use `bar` here
@@ -59,4 +89,4 @@ if (!r->_is_null_bar()) {
     // note that accessing r->bar() will return an uninitialized value
     // (i.e. random garbage)
 }
-```
+----
