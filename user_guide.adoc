@@ -958,7 +958,7 @@ seq:
 [IMPORTANT]
 ====
 By default, if you'll mix "normal" byte-sized integers (i.e. `uX`,
-`uX`) and bit-sized integers (i.e. `bX`), byte-sized integers will be
+`sX`) and bit-sized integers (i.e. `bX`), byte-sized integers will be
 kept byte-aligned. That means if you do:
 
 [source,yaml]
