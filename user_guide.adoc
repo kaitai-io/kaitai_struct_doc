@@ -1067,12 +1067,16 @@ Expression language operates on the following primitive data types:
 |Literals
 
 |Integers
-|`type: uX`, `type: sX`
+|`type: uX`, `type: sX`, `type: bX`
 |`1234`, `-789`, `0xfc08`, `0b1101`
 
 |Floating point numbers
 |`type: fX`
 |`123.0`, `-456.78`, `4.1607804e+72`
+
+|Booleans
+|`type: b1`
+|`true`, `false`
 
 |Byte arrays
 |`size: XXX`, `size-eos: true`
@@ -1091,8 +1095,8 @@ Expression language operates on the following primitive data types:
 |N/A
 |===
 
-*Integers* come from `uX` or `sX` type specification in sequence or
-instance attributes (i.e. `u1`, `u4le`, `s8`, etc), or can be
+*Integers* come from `uX`, `sX`, `bX` type specifications in sequence
+or instance attributes (i.e. `u1`, `u4le`, `s8`, `b3`, etc), or can be
 specified literally. One can use:
 
 * normal decimal form (i.e. `123`)
@@ -1100,10 +1104,25 @@ specified literally. One can use:
 * binary form using `0b` prefix (i.e. `0b00111011`)
 * octal form using `0o` prefix (i.e. `0o755`)
 
+It's possible to use `_` as a visual separator in literals — it would
+be completely ignored by parser. This could be useful, for example,
+to:
+
+* visually separate thousands in decimal numbers: `123_456_789`
+* show individual bytes/words in hex: `0x1234_5678_abcd`
+* show nibbles/bytes in binary: `0b1101_0111`
+
 *Floating point numbers* also follow the normal notation used in vast
 majority of languages: `123.456` will work, as well as expontential
 notation: `123.456e-55`. Use `123.0` to enforce floating point type to
 an otherwise integer literal.
+
+*Booleans* can be specified as literal `true` and `false` values as in
+most languages, but also can be derived by using `type: b1`. This
+method parses a single bit from a stream and represents it as a
+boolean value: 0 becomes false, 1 becomes true. This is very useful to
+parse flag bitfields, as you can omit `flag_foo != 0` syntax and just
+use something more concise, such as `is_foo`.
 
 *Byte arrays* are defined in the attribute syntax when you don't
 specify anything as `type`, but specify `size` or `size-eos`
