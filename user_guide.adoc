@@ -872,11 +872,14 @@ instances:
 Value instance does no actual parsing, and thus do not require `pos`
 key, or `type` key (type will be derived automatically).
 
-=== Bit-packed integer values
+=== Bit-sized integers
 
-Using calculated instances, it is easy to deal with bit-packed data. For
-example, IPv4 packet starts with a byte that packs both version and
-header length:
+IMPORTANT: Feature available since v0.6.
+
+Quite a few protocols and file formats, especially those who aim to
+conserve space, pack multiple integers into same byte, using integer
+sizes less that 8 bits. For example, IPv4 packet starts with a byte
+that packs both version and header length:
 
 ....
 76543210
@@ -891,6 +894,104 @@ Here's how it can be parsed with KS:
 [source,yaml]
 ----
 seq:
+  - id: version
+    type: b4
+  - id: header_len
+    type: b4
+----
+
+NOTE: By convention, KS starts parsing bits from most significant to
+least significant, so "version" comes first here, and "header_len"
+second.
+
+Using `type: bX` (where X is a number of bits to read) is very
+versatile and can be used to read byte-unaligned data. A more complex
+example of packing, where value spans two bytes:
+
+....
+76543210 76543210
+aaaaabbb bbbbbbcc
+....
+
+[source,yaml]
+----
+seq:
+  - id: a
+    type: b5
+  - id: b
+    type: b9
+    # 3 bits + 6 bits
+  - id: c
+    type: b2
+----
+
+Or it can be used to parse completely unaligned bit streams with
+repetitions. In this example, we parse an arbitrary number of 3-bit
+values:
+
+....
+           76543210 76543210 76543210 76543210
+           nnnnnnnn 00011122 23334445 55666777 ...
+           ----+--- ---___----___---____
+               |     |  |  |   |  |   |
+num_threes ----+     |  |  |   |  |   |
+threes[0]  ----------+  |  |   |  |   |
+threes[1]  -------------+  |   |  |   |
+threes[2]  ----------------+   |  |   |
+threes[3]  --------------------+  |   |
+threes[4]  -----------------------+   |
+threes[5]  ---------------------------+
+  ...
+....
+
+[source,yaml]
+----
+seq:
+  - id: num_threes
+    type: u1
+  - id: threes
+    type: b3
+    repeat: expr
+    repeat-expr: num_thress
+----
+
+[IMPORTANT]
+====
+By default, if you'll mix "normal" byte-sized integers (i.e. `uX`,
+`uX`) and bit-sized integers (i.e. `bX`), byte-sized integers will be
+kept byte-aligned. That means if you do:
+
+[source,yaml]
+----
+seq:
+  - id: foo
+    type: b6
+  - id: bar
+    type: u1
+----
+
+two bytes will get parsed like that:
+
+....
+    76543210 76543210
+    ffffff   bbbbbbbb
+    --+---   ---+----
+      |         |
+foo --+         |
+bar ------------+
+....
+
+i.e. two least significant bits of the first byte would be lost and
+not parsed due to alignment.
+====
+
+Last, but not least, note that it's also possible to parse bit-packed
+integers using old-school methods with value instances. Here's the
+very first example with IPv4 packed start, unpacked manually:
+
+[source,yaml]
+----
+seq:
   - id: packed_1
     type: u1
 instances:
@@ -900,11 +1001,9 @@ instances:
     value: packed_1 >> 4
 ----
 
-Note that it's only possible to do with byte-aligned data, i.e. when you
-don't need to read the next "big" (>=1 byte) element from the middle of
-the byte after you've already consumed several bits. Reading
-https://github.com/kaitai-io/kaitai_struct/issues/9[unaligned bit
-streams] is planned, but not yet implemented, as of v0.5.
+Such method is useful when you need to do more intricate bit
+combinations, like a value with its bits scattered across several
+bytes sparsely.
 
 === Streams and substreams
 
