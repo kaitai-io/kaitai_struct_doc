@@ -13,46 +13,40 @@ compiled in one of 2 ways:
 
 == Building for JVM
 
-We use
-http://www.scala-sbt.org/sbt-native-packager/[sbt-native-packager] to
+We use http://www.scala-sbt.org/sbt-native-packager/[sbt-native-packager] to
 build deployable formats.
 
-=== Building an http://www.scala-sbt.org/sbt-native-packager/formats/universal.html[universal] (.zip) package
+=== Building an universal (.zip) package
 
-`sbt compilerJVM/universal:packageBin` → generates
-`jvm/target/universal/kaitai-struct-compiler-*.zip`
+http://www.scala-sbt.org/sbt-native-packager/formats/universal.html[SBT native packager: universal package docs]
+
+. `sbt compilerJVM/universal:packageBin`
+. Get result in `jvm/target/universal/kaitai-struct-compiler-*.zip`
 
 === Building http://www.scala-sbt.org/sbt-native-packager/formats/debian.html[Debian package]
 
-1.  Install prerequisites:
-`sudo -i apt-get install dpkg-deb dpkg-sig dpkg-genchanges lintian fakeroot`
-2.  `sbt compilerJVM/debian:packageBin` -> generates
-`jvm/target/kaitai-struct-compiler_*_all.deb`
+. Install prerequisites: `sudo -i apt-get install dpkg-deb dpkg-sig dpkg-genchanges lintian fakeroot`
+. `sbt compilerJVM/debian:packageBin`
+. Get result in `jvm/target/kaitai-struct-compiler_*_all.deb`
 
-=== Building http://www.scala-sbt.org/sbt-native-packager/formats/windows.html[Windows package]
+=== Building Windows package
 
-1.  Install WIX
-2.  `sbt compilerJVM/windows:packageBin` -> genereates
-`jvm/target/windows/kaitai-struct-compiler.msi`
-3.  Rename to add version to `kaitai-struct-compiler-$VERSION.msi`
+http://www.scala-sbt.org/sbt-native-packager/formats/windows.html[SBT native packager: Windows package docs]
 
-=== Dependencies for JVM target
-
-TODO
+. Install WIX
+. `sbt compilerJVM/windows:packageBin`
+. Get result in `jvm/target/windows/kaitai-struct-compiler.msi`
+. Rename to add version to `kaitai-struct-compiler-$VERSION.msi`
 
 == Building for JavaScript platform
 
-Building to JavaScript platform is done using a Scala.js project. Note +
-that it uses a somewhat different set of dependencies, as they must +
+Building to JavaScript platform is done using a Scala.js project. Note
+that it uses a somewhat different set of dependencies, as they must
 actually be JavaScript libraries, not Java jars.
 
-1.  Run `sbt fastOptJS` -> generates
-`js/target/scala-2.11/kaitai-struct-compiler-fastopt.js`
-2.  Use this JavaScript file on a website
-
-=== Dependencies for JavaScript target
-
-TODO
+. Run `sbt fastOptJS`
+. Get result in `js/target/scala-2.11/kaitai-struct-compiler-fastopt.js`
+. Use this JavaScript file on a website
 
 == Publishing a new version
 
