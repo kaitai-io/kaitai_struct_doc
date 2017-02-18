@@ -1,8 +1,10 @@
 = Adding support for new target language
+:toc:
+:numbered:
 
 A general overview of what is needed to add support for new target language in reference KS compiler.
 
-== 1. Get acquantied with KS as a user at least on the intermediate level
+== Get acquantied with KS as a user at least on the intermediate level
 
 Things to check out and familiarize oneself with:
 
@@ -16,9 +18,9 @@ Things to check out and familiarize oneself with:
 
 Clone [central KS repo](https://github.com/kaitai-io/kaitai_struct/), consult [DEVELOPERS.md](https://github.com/kaitai-io/kaitai_struct_compiler/blob/master/DEVELOPERS.md), install prerequisites, try to build the compiler and run the tests. Take a look at our [CI](http://kaitai.io/ci).
 
-== 2. Plan how to map KS concept to concepts of new target language
+== Plan how to map KS concept to concepts of new target language
 
-=== 2.1. Structures
+=== Structures
 
 The core element that KS deals with is a "type". Basically, everything starts with a "type", i.e. a "file" is a "type". "Type" can include:
 
@@ -29,11 +31,11 @@ The core element that KS deals with is a "type". Basically, everything starts wi
 
 Most usually, a concept of "type" maps to a concept of "class" or "object" in target language, but technically it can be a standalone data structure with a couple of generated methods to work with it.
 
-=== 2.2. Streams
+=== Streams
 
 Struct has to parse the data from somewhere. Decide on which target language's abstraction of stream is best (probably it's good to support reading both from disk files, if they're available, and from arbitrary byte buffers).
 
-=== 2.3. Primitive and complex type mapping
+=== Primitive and complex type mapping
 
 KS deals with a few primitive and complex types:
 
@@ -50,7 +52,7 @@ Decide upon mapping of all these types into native types of target language. Pay
 * encoding support for strings
 * substitutions / workarounds for everything that target language does not support
 
-=== 2.4. Coding standards, naming practices and other traditions in target language
+=== Coding standards, naming practices and other traditions in target language
 
 Carefully check out different coding practices related to target language. If there is an official or semi-official standard or recommendation, try to follow it. Things to pay particular attention to:
 
@@ -59,17 +61,17 @@ Carefully check out different coding practices related to target language. If th
 * docstrings layout and general documentation standards
 * private/protected/public access restriction traditions
 
-== 3. Implement runtime library
+== Implement runtime library
 
 Keeping it close to [[our standard API|Kaitai Struct stream API]] is heavily recommended, unless there's some good reason to do it differently. In particular, try to 
 
-== 4. Manually compile [hello_world.ksy]
+== Manually compile [hello_world.ksy]
 
 Take one simplest test and translate manually into source code in a new target language, as it would have been compiled by KS compiler. Inspiration can be drawn from any other already supported language.
 
 [hello_world.ksy]: https://github.com/kaitai-io/kaitai_struct_tests/blob/master/formats/hello_world.ksy
 
-== 5. Start testing
+== Start testing
 
 Choose a testing framework that target language would use. Ideally, we should be able to run it with installing little extra dependencies in our Travis CI configuration. At the bare minimum, we'll need a command-line based test runner that will output some report file we can aggregate in our CI later (JUnit XML reports are usually good candidates).
 
@@ -78,7 +80,7 @@ Create testing infrastructure in [tests] repo: usually it boils down to:
 * `spec/$LANG` - a project or just a bunch of files with test specs; it's heavily recommended to do 1 test .ksy format = 1 test case = 1 file, if possible
 * `run-$LANG` - a single script to launch test runner with all the tests
 
-== 6. Port spec for HelloWorld
+== Port spec for HelloWorld
 
 Port spec for HelloWrold test to new target language and make it work with manually compiled `hello_world.ksy`.
 
