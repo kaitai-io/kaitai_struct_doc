@@ -84,6 +84,7 @@ Type description is a map of strings (keys) to various values.
 * Influences: would be translated into distinct methods (that read desired data on demand) in current class
 * Mandatory: no
 
+[[enums]]
 #### enums
 
 * Contents: map of strings to [[enum description]]
