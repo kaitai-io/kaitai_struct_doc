@@ -1,4 +1,5 @@
 = Kaitai Struct: Java notes
+:toc: left
 :source-highlighter: coderay
 
 == Usage patterns
@@ -28,16 +29,20 @@ parsing functionality in KS relies on seek support.
 Following most other runtimes example, everything revolves around two
 basic classes:
 
-* KaitaiStruct — a common superclass for all classes that represent user
-types in KS. Java implementation is very limited and basically only
-keeps `_io` member of type KaitaiStream and provides a getter for it.
-* KaitaiStream — a useful abstraction of seekable input stream that can
-be read with [[Kaitai Struct stream API]] (i.e. methods like
-`readU4le()`. Internally, it uses either a
-https://docs.oracle.com/javase/7/docs/api/java/io/ByteArrayInputStream.html[ByteArrayInputStream]
-or
-https://docs.oracle.com/javase/7/docs/api/java/io/RandomAccessFile.html[RandomAccessFile]
-to read either a in-memory byte buffer or a local file.
+* KaitaiStruct — a common superclass for all classes that represent
+  user types in KS. Java implementation is very limited and basically
+  only keeps `_io` member of type KaitaiStream and provides a getter
+  for it.
+* KaitaiStream — a useful abstraction of seekable input stream that
+  can be read with <<stream_api.adoc#,Kaitai Struct stream API>>
+  (i.e. methods like `readU4le()`. Internally, it uses a
+  https://docs.oracle.com/javase/7/docs/api/java/nio/ByteBuffer.html[ByteBuffer]
+  (either a
+  https://docs.oracle.com/javase/7/docs/api/java/nio/MappedByteBuffer.html[MappedByteBuffer]
+  backed by
+  https://docs.oracle.com/javase/7/docs/api/java/nio/channels/FileChannel.html[FileChanel]
+  for parsing local files, or a regular wrapper over a given byte
+  array), so it can work on both local files and in-memory data.
 
 == Naming
 
@@ -81,7 +86,7 @@ public class Parent extends KaitaiStruct {
 ----
 
 Every generated class will have 3 constructors and a static factory
-method (plus a private `_parse()` method that is invoked from all the
+method (plus a private `_read()` method that is invoked from all the
 constructors to do actual parsing):
 
 [source,java]
@@ -94,9 +99,9 @@ public static AnExampleClass fromFile(String fileName)
 
 == Attributes
 
-Attribute parsing is done in `_parse()` method which is typically
-invoked from a constructor. All parsed attributes are stored as private
-member variables.
+Sequence attribute parsing is done in `_read()` method which is
+typically invoked from a constructor. All parsed attributes are stored
+as private member variables.
 
 For all attributes, a relevant getter method will be generated, so an
 attribute can be accessed outside of class like
