@@ -4,6 +4,10 @@
 dist: trusty
 sudo: false
 
+branches:
+  only:
+    - master
+
 language: ruby
 
 cache:
