@@ -1470,6 +1470,88 @@ a few pre-defined internal methods (they all start with an underscore
 
 TODO
 
+=== Opaque types: plugging in external code
+
+Sometimes you'd want KS-generated code to call a code in your
+application to do the parsing, for example, to parse some text- or
+state-based format. For that, you can instruct ksc to generate code
+with so-called "opaque" types.
+
+Normally, if a compiler encounters a type which is not declared either
+in current file or in one of the imported files, for example:
+
+[source,yaml]
+----
+meta:
+  id: doc_container
+seq:
+  - id: doc
+    type: custom_encrypted_object
+----
+
+... it will output an error:
+
+ /seq/0: unable to find type 'custom_encrypted_object', searching from doc_container
+
+If we want to provide our own implementation of
+`custom_encrypted_object` type, first we need to compile our .ksy file
+with `--opaque-types=true` option. This will avoid the error, and
+compiler will consider all unknown types to be "opaque", i.e. treat it
+will them as existing in some external space.
+
+NOTE: Of course, compiler don't know anything about opaque types, so
+trying to access any attributes of it (i.e. using expression language)
+will fail.
+
+This will generate the following code (for example, in Java):
+
+[source,java]
+----
+public class DocContainer extends KaitaiStruct {
+    // ...
+    private void _read() {
+        this.doc = new CustomEncryptedObject(this._io);
+    }
+}
+----
+
+As you see, `CustomEncryptedObject` is instantiated here with a single
+argument: IO stream. All that's left is to create a class with a
+compatible constructor that will allow a call with single
+argument. For statically typed languages, note that constructor's
+argument is of type KaitaiStream.
+
+An example of what can be done (in Java):
+
+[source,java]
+----
+public class CustomEncryptedObject {
+    byte[] buf;
+
+    public CustomEncryptedObject(KaitaiStream io) {
+        // read all remaining bytes into our buffer
+        buf = io.readBytesFull();
+
+        // implement our custom super Caesar's cipher
+        for (int i = 0; i < buf.length; i++) {
+            byte b = buf[i];
+            if (b >= 'A' && b <= 'Z') {
+                int letter = b - 'A';
+                letter = (letter + 7) % 26;
+                buf[i] = (byte) (letter + 'A');
+            }
+        }
+    }
+}
+----
+
+TIP: Alternatively, opaque types can be (ab)used to connect several
+KS-generated types together without importing. If one type
+instantiates other, but does not use it in any other way (i.e. doesn't
+access its inner attributes using expression language), one can just
+compile two .ksy files separately, throw them into the same project
+and they shall use each other without a problem.
+
 === Enforcing parent type
 
 Every object (except for the top-level object) in a .ksy file has a
