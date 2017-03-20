@@ -1529,6 +1529,8 @@ argument in `Arg` constructor, and, as it is declared as
 `KaitaiStruct`. As both opcode classes are declared with `extends
 KaitaiStruct`, this code will compile properly.
 
+==== Replacing parent
+
 However, in some situations, you might want to replace default `this`
 passed as `_parent` with something else. In some situations this will
 provide you a clean and elegant solution to relatively complex
@@ -1615,6 +1617,37 @@ node's parent, which is a `tree` type object, over and over the whole
 recursive structure. This way one can access structure's root by just
 using `_parent`. Naturally, we've done exactly that to get ourselves
 `chunk_size` by just using `size: _parent.chunk_size`.
+
+==== Omitting parent
+
+In some cases, you'd rather want some object to don't have any parent
+at all. Primary use case for that is to make sure that some
+instantiation it does not affect parent type. In many cases, resorting
+to this method is a sign that you need to stop and rethink your
+design, but for some formats, it's unavoidable and in fact simplifies
+things a lot.
+
+To omit parent (i.e. pass `null` reference or something similar as a
+parent in one particular case), use `parent: false`.
+
+[NOTE]
+====
+Language design explanation: while it might seem logical to specify
+`parent: null`, there are two catches:
+
+* KSY is a YAML-based language, and YAML treats `parent: null` as
+  literally null value, i.e. totally the same as `parent:`. So, just
+  to allow passing solitary `null` to as a value, you'd need to wrap
+  it into quotes: `parent: 'null'`. This would be very awkward for
+  beginners, as we can't even generate a good error message here, as
+  we can't distinguish these two.
+* Omitting parent is actually a special case, not just a matter of
+  passing `null`. In fact, some languages do not have a concept of
+  null, or do not allow passing null as an object reference, so we
+  need to treat it distinctly anyway, and emphasize that.
+====
+
+TODO: an example where omitting the parent comes useful
 
 == Common pitfalls
 
