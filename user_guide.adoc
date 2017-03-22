@@ -1468,7 +1468,87 @@ a few pre-defined internal methods (they all start with an underscore
 
 === Importing types from other files
 
-TODO
+As your project grows in complexity, you might want to have multiple
+.ksy files: for example, for different file formats, structures,
+substructures, or to reuse same subformat in several places. As most
+programming languages, Kaitai Struct allows you to have multiple
+source files and has `imports` functionality for that.
+
+Using multile files is very easy. For example, given that you have a
+`date.ksy` file that describes the date structure:
+
+[source,yaml]
+----
+meta:
+  id: date
+seq:
+  - id: year
+    type: u2le
+  - id: month
+    type: u2le
+  - id: day
+    type: u2le
+----
+
+and you want to use it in a file listing specification
+`filelist.ksy`. Here's how to do that:
+
+[source,yaml]
+----
+meta:
+  id: filelist
+  # this will import "date.ksy"
+  imports:
+    - date
+seq:
+  - id: entries
+    type: entry
+    repeat: eos
+types:
+  entry:
+    seq:
+      - id: filename
+        type: strz
+        encoding: ASCII
+      # just use "date" type from date.ksy as if it was declared in
+      # current file
+      - id: timestamp
+        type: date
+      # you can access its members too!
+      - id: historical_data
+        size: 160
+        if: timestamp.year < 1970
+----
+
+Generally, you just add an array in `meta/imports` and list all you
+want to import there. There are 2 ways to address the files:
+
+Relative::
+  Uses path given as relative path to the file, starting with the same
+  directory as main .ksy file resides. It's useful to include files in
+  the same directory or to navigate to somewhere in your
+  project. Examples include: `foo`, `foo/bar`, `../foo/bar/baz`, etc.
+Absolute::
+  Looks like `/foo` or `/foo/bar` (i.e. starting with a slash), and
+  searches for the given .ksy file in module search path(s). This is
+  usually used to modules from centralized repositories / ksy
+  libraries. Module search paths are determined by (in order of
+  decreasing priority):
+
+  * Paths given using command-line `-I` switch.
+  * Paths given using `KSPATH` environment variable (multiple paths
+    can be specified separated with `:` on Linux/OS X and with `;` on
+    Windows)
+  * Default Platform-dependent search paths, determined in compiler
+    build time and/or during installation
+
+  In Web IDE you obviously don't have environment and command-line
+  switches, so absolute path imports are used to reference modules in
+  preloaded "kaitai.io" library.
+
+CAUTION: Please use only forward slashes `/` in import paths for
+consistency. Kaitai Struct will convert them automatically to proper
+platform-dependent path separator (`/` or `\`).
 
 === Opaque types: plugging in external code
 
