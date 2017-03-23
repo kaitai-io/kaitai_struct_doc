@@ -1,0 +1,125 @@
+= KSY Style Guide
+Kaitai Project
+v0.7
+:toc: left
+:source-highlighter: coderay
+:numbered:
+
+Although .ksy files are treated as YAML files, and YAML syntax allows
+quite a few representations of the same content, it is recommended to
+maintain a certain style in .ksy files to aid collaboration. This
+document serves as offical .ksy style guide. In particular, we strive
+to make sure that all formats in our
+https://github.com/kaitai-io/kaitai_struct_formats[formats repository]
+are using this style.
+
+This document is work in progress, not all sections are complete yet.
+
+== General formatting
+
+MUST use:
+
+* Single implicit YAML document per file (i.e. no `---` header)
+* No `%YAML x.y` version directives, no `%TAG` directives
+* 2-space indent
+* UTF-8 encoding throughout the file
+* LF (AKA "UNIX") line endings
+* trailing newline character in a .ksy file
+
+
+
+* Block YAML style MUST be used in most general cases, unless
+  specified otherwise
+* All identifiers, docstrings, comments and generally all
+  human-readable text SHOULD be kept in English, unless there's a very
+  good reason not to do so
+
+== Order of sections in a type spec
+
+Use the following order of sections:
+
+. `meta`, if present, MUST go first
+. `doc`
+. `doc-ref`
+. `seq`
+. `instances`, `types`, `enums` - use one's best judgement to order
+  these 3 to maximize readability
+
+== Meta section (`meta`)
+
+Use the following order of keys:
+
+. Main identifier (if present): `id`
+. Human-readable meta-information (in order of importance, at least
+  one MUST be present):
+.. `title`
+.. `application` - SHOULD name a particular application, if there's
+   any; if there are too many to list (for example, network packet
+   formats or executables are used virtually everywhere), then one
+   SHOULD omit this field.
+.. `file-extension` - if there's only one extension, MUST be a
+   string; if there are several, MUST be an sequence in block form
+   and SHOULD order extensions from most popular extension to least
+   popular.
+. Legal information - `license` - MUST be a valid
+  https://spdx.org/licenses/[SPDX license expression]
+. Processing instructions:
+.. `ks-version`
+.. `imports`
+. Defaults (in alphabetic order):
+.. `encoding`
+.. `endian`
+
+The following keys are reserved for internal use (i.e. debugging and
+test running) and MUST NOT be used in general-purpose .ksy files:
+
+* `ks-debug`
+* `ks-opaque-types`
+
+== Documentation
+
+=== `doc`
+
+Formatting:
+
+* Single-line documentation strings SHOULD BE formatted using raw
+  unquoted string literals.
+* Multi-line SHOULD BE formatted using
+  http://www.yaml.org/spec/1.2/spec.html#id2795688[YAML literal style
+  scalar], i.e. using `: |` syntax. An example:
+
+[source,yaml]
+----
+doc: |
+  File index entry contains intricate details about file in the
+  archive: there are both meta-information attributes (such as file
+  names, locations, various timestamps, etc) and references to
+  inodes, which can be used to find file body in the container.
+  
+  For networked locations, file index entry uses an optional
+  `remote_resource` type. Proper usage sequence is:
+  
+  * check `code` to be one that requires network usage
+  * determine file name using `name_networked` instance and check if
+    it's really a file requested by the user
+  * proceed to query information from networked resource given by
+    `resource` attribute
+----
+
+Lines should be wrapped to be 80 columns long. If it doesn't fit into
+single line after wrapping, then it's a multi-line docstring, so use
+proper multi-line syntax.
+
+There is no formal coversion of docstrings into language-specific
+docstrings now in KS, but generally we SHOULD keep it close to
+http://commonmark.org/[CommonMark formatting], i.e.:
+
+* paragraphs separated by an empty line
+* bullet lists created by an asterisk `*` and a space at the beginning
+  of the line
+* use backticks `{backtick}` to wrap identifiers and small pieces of
+  code
+
+=== `doc-ref`
+
+TODO
