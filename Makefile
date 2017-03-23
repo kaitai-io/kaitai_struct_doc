@@ -12,6 +12,7 @@ TARGETS=\
 	out/new_language.html \
 	out/stream_api.html \
 	out/user_guide.html \
+	out/ksy_style_guide.html \
 	out/index.html
 
 all: $(TARGETS)
