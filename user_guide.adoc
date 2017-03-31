@@ -178,6 +178,8 @@ is to be used to designate number of bytes in this array
 appending `be` or `le` - i.e. `s4be`, `u8le`, etc
 ** `f4` and `f8` for IEEE 754 floating point numbers; `4` and `8`,
 again, designate the number of bytes (single or double precision)
+*** if you need to specify non-default endianness, you can force it by
+appending `be` or `le` - i.e. `f4be`, `f8le`, etc
 ** `str` is used for strings; that is almost the same as "no type", but
 string has a concept of encoding, which must be specified using
 `encoding`
