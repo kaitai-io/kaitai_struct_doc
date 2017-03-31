@@ -32,7 +32,7 @@ chapter will give an overview of the options available.
 
 If you're going to try Kaitai Struct for the first time, then probably
 it's the easiest way to get started. Just open
-http://kt.pe/kaitai_struct_webide/[Kaitai Struct Web IDE] and you're
+https://ide.kaitai.io/[Kaitai Struct Web IDE] and you're
 ready to go:
 
 image::img/webide_png_example.png[caption="Figure 1: ", title="Kaitai Struct Web IDE (sample PNG file + png.ksy loaded)", alt="Kaitai Struct Web IDE (sample PNG file + png.ksy loaded)", width="1335", height="811"]
