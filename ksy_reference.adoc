@@ -21,10 +21,17 @@ Example:
 ```
 meta:
   id: foo_arc
+  imports:
+    - common/archive_header
+    - common/compressed_file
+  endian: le
+  encoding: UTF-8
+  title: Foo Archive
+  ks-version: 9.9
+  license: CC0-1.0
   file-extension:
     - fooarc
     - fooarcz
-  endian: le
   application: Foo Archiver v1.23  
 ```
 
@@ -35,11 +42,11 @@ meta:
 * Influences: it would be converted to suit general formatting rules of a language and used as the name of class
 * Mandatory: yes
 
-#### file-extension
+#### imports
 
-* Contents: a string or an array of strings
-* Purpose: roughly identify which files can be parsed with this format by filename extension
-* Influences: may be used for navigation purposes by browsing applications
+* Contents: sequence of strings which contain valid filesystem characters (generally A-Z, a-z, 0-9, _, - and /) corresponding to a relative or absolute path to another .ksy file (without the .ksy extension)
+* Purpose: identify one or more .ksy files which will be imported
+* Influences: allows types defined within the imported .ksy files to be used in the current context
 * Mandatory: no
 
 #### endian
@@ -47,6 +54,55 @@ meta:
 * Contents: `le` (for little-endian) or `be` (for big-endian)
 * Purpose: sets a default [endianness] for this file
 * Influences: if set, [[primitive data types]] like `u4` would be treated as aliases to `u4le` / `u4be` (depending on the setting); if not set, attempt to use abbreviated types like `u4` (i.e. without full endianness qualifier) will yield compile-time error.
+* Mandatory: no
+
+#### encoding
+
+* Contents: a string which is a user-defined encoding scheme, for example `ASCII`, `UTF-8`, `UTF-16LE`, `UTF-16BE`, `UTF-32LE`, `UTF-32BE` or a Name from the https://www.iana.org/assignments/character-sets/character-sets.xhtml[IANA character sets registry]
+* Purpose: sets a default string encoding for this file
+* Influences: if set, `str` and `strz` data types will have their encoding by default set to this value
+* Mandatory: no
+
+### title
+
+* Contents: a string
+* Purpose: free-form text string that is a longer title of this .ksy file
+* Influences: nothing
+* Mandatory: no
+
+### ks-version
+
+* Contents: a string which contains a Kaitai Struct version number
+* Purpose: sets the minimum version of Kaitai Struct Compiler (KSC) required to interpret this .ksy file
+* Influences: prevents this .ksy file from being read by older versions of KSC which may not understand newer syntax of this .ksy file
+* Mandatory: no
+
+### ks-debug
+
+* Contents: `true` or `false` (default)
+* Purpose: advise the Kaitai Struct Compiler (KSC) to use debug mode
+* Influences: when set to `true`, KSC will generate classes as if --debug mode was specified in the command line
+* Mandatory: no
+
+### ks-opaque-types
+
+* Contents: `true` or `false` (default)
+* Purpose: advise the Kaitai Struct Compiler (KSC) to ignore missing types in the .ksy file, and assume that these types are already provided externally by the environment the classes are generated for
+* Influences: when set to `true`, KSC will generate classes as if --opaque-types=true mode was specified in the command line
+* Mandatory: no
+
+### license
+
+* Contents: a string which matches one of the identifiers within the https://spdx.org/licenses/[SPDX license list]
+* Purpose: identify the copyright license of this .ksy file
+* Influences: nothing
+* Mandatory: no
+
+#### file-extension
+
+* Contents: a string or an array of strings
+* Purpose: roughly identify which files can be parsed with this format by filename extension
+* Influences: may be used for navigation purposes by browsing applications
 * Mandatory: no
 
 #### application
