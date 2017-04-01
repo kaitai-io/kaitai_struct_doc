@@ -1377,30 +1377,82 @@ library" for expression language.
 |Return type
 |Description
 
-|to_s
+|`to_s`
 |String
 |Converts integer into a string using decimal representation
-
-|to_s(radix)
-|String
-|Converts integer into a string using specified `radix` (i.e. use `16` to get hexadecimal representation, use `8` to get octal, etc)
 |===
 
 ==== Floating point numbers
 
-TODO
+No methods are currently supported for floating point numbers.
 
 ==== Byte arrays
 
-TODO
+[cols="3*", options="header"]
+|===
+|Method name
+|Return type
+|Description
+
+|`to_s(encoding)`
+|String
+|Decodes (converts) a byte array encoded using the specified `encoding` scheme into a string
+|===
 
 ==== Strings
 
-TODO
+[cols="3*", options="header"]
+|===
+|Method name
+|Return type
+|Description
+
+|`length`
+|Integer
+|Length of a string in number of characters
+
+|`reverse`
+|String
+|Reversed version of a string
+
+|`substring(from, to)`
+|String
+|Extracts a portion of a string between character at offset `from` and character at offset `to` (inclusive of characters at `from` and `to` offsets)
+
+|`to_i`
+|Integer
+|Converts string in decimal representation to an integer
+
+|`to_i(radix)`
+|Integer
+|Converts string with number stored in `radix` representation (i.e. use `16` to get hexadecimal representation, use `8` to get octal, etc) to an integer
+|===
 
 ==== Enums
 
-TODO
+[cols="3*", options="header"]
+|===
+|Method name
+|Return type
+|Description
+
+|`to_i`
+|Integer
+|Converts enum into corresponding integer representation
+|===
+
+==== Booleans
+
+[cols="3*", options="header"]
+|===
+|Method name
+|Return type
+|Description
+
+|`to_i`
+|Integer
+|Returns `0` if the boolean value is `false` or `1` if the boolean value is `true`
+|===
 
 ==== User-defined types
 
@@ -1443,6 +1495,10 @@ a few pre-defined internal methods (they all start with an underscore
 |`last`
 |Array base type
 |Gets last element of the array
+
+|`size`
+|Integer
+|Number of elements in the array
 |===
 
 ==== Streams
