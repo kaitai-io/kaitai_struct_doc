@@ -1409,7 +1409,7 @@ No methods are currently supported for floating point numbers.
 
 |`length`
 |Integer
-|Length of a string in number of bytes
+|Length of a string in number of characters
 
 |`reverse`
 |String
@@ -1417,7 +1417,7 @@ No methods are currently supported for floating point numbers.
 
 |`substring(from, to)`
 |String
-|Extracts a portion of a string between byte offset `from` and byte offset `to` (inclusive of bytes at `from` and `to` offsets)
+|Extracts a portion of a string between character at offset `from` and character at offset `to` (inclusive of characters at `from` and `to` offsets)
 
 |`to_i`
 |Integer
@@ -1498,7 +1498,7 @@ a few pre-defined internal methods (they all start with an underscore
 
 |`size`
 |Integer
-|Size of array in number of bytes
+|Number of elements in the array
 |===
 
 ==== Streams
