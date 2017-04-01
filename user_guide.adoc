@@ -1581,6 +1581,20 @@ with `--opaque-types=true` option. This will avoid the error, and
 compiler will consider all unknown types to be "opaque", i.e. treat it
 will them as existing in some external space.
 
+Alternatively, instead of specifying command line argument
+`--opaque-types=true` to the compiler, as of Kaitai Struct version 0.7,
+it is now possible to specify `meta` field `ks-opaque-types` as follows:
+
+[source,yaml]
+----
+meta:
+  id: doc_container
+  ks-opaque-types: true
+seq:
+  - id: doc
+    type: custom_encrypted_object
+----
+
 NOTE: Of course, compiler don't know anything about opaque types, so
 trying to access any attributes of it (i.e. using expression language)
 will fail.
