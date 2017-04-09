@@ -1011,7 +1011,316 @@ bytes sparsely.
 
 === Streams and substreams
 
-TODO
+Imagine that we're dealing with structures of known size. For sake of
+simplicity, let's say that it's fixed to exactly 20 bytes (but all the
+following is also true if the size is defined by some arbitrarily
+complex expression):
+
+[source,yaml]
+----
+types:
+  person:
+    seq:
+      - id: code
+        type: u4
+      - id: name
+        type: str
+        size: 16
+----
+
+When we're invoking user-defined types, we can do either:
+
+[source,yaml]
+----
+seq:
+  - id: joe
+    type: person
+----
+
+or:
+
+[source,yaml]
+----
+seq:
+  - id: joe
+    type: person
+    size: 20
+----
+
+Note the subtle difference: we've skipped the `size` in first example
+and added it in the second one. From end-user's perspective, nothing
+has changed. You can still access Joe's code and name equally well in
+both cases:
+
+[source,java]
+----
+r.joe().code() // works
+r.joe().name() // works
+----
+
+However, what gets changed under the hood? It turns out that
+specifying `size` actually brings some new features: if you modify
+`person` type to be less than 20 bytes long, it still reserves exactly
+20 bytes for `joe`:
+
+[source,yaml]
+----
+seq:
+  - id: joe        # reads from position 0
+    type: person
+    size: 20
+  - id: foo
+    type: u4       # reads from position 20
+types:
+  person: # although this type is 14 bytes long now
+    seq:
+      - id: code
+        type: u4
+      - id: name
+        type: str
+        size: 10
+----
+
+In this example, extra 6 bytes would be just skipped. Alternatively,
+if you'll somehow make `person` to be more than 20 bytes long, it will
+trigger an end-on-stream exception:
+
+[source,yaml]
+----
+seq:
+  - id: joe
+    type: person
+    size: 20
+  - id: foo
+    type: u4
+types:
+  person: # 100 bytes is longer than 20 bytes declared in `size`
+    seq:
+      - id: code
+        type: u4
+      - id: name # will trigger an exception here
+        type: str
+        size: 96
+----
+
+How does it work? Let's take a look under the hood. Sizeless user type
+invocation generates the following parsing code:
+
+[source,java]
+----
+this.joe = new Person(this._io, this, _root);
+----
+
+However, when we declare the `size`, things get a little bit more
+complicated:
+
+[source,java]
+----
+this._raw_joe = this._io.readBytes(20);
+KaitaiStream _io__raw_joe = new KaitaiStream(_raw_joe);
+this.joe = new Person(_io__raw_joe, this, _root);
+----
+
+Every class that KS generates carries a concept of "stream", usually
+available as `_io` member. This is the default stream is reads from
+and writes to. This stream works just as you might exception from a
+regular IO stream implementation in you average language: if
+incapsulates reading from files and memory, stores pointer to its
+current position, and allows reading/writing of various primitives.
+
+Declaring new user-defined type in the middle of `seq` attributes
+generates new object (usually via constructor call), and this object,
+in turn, needs its own IO stream. So, what are our options here?
+
+* In "sizeless" case, we just pass current `_io` along to the new
+  object. This "reuses" the existing stream with all its properties:
+  current pointer position, size, available bytes, etc.
+* In "sized" case, we know the size apriori and want the object we
+  created to be limited within that size. So, instead of passing an
+  existing stream, instead we create a new substream that will be
+  shorter and will contain exact number of bytes requested.
+
+Implementations vary from language to language, but, for example, in
+Java, the following is done:
+
+[source,java]
+----
+// First, we read as many bytes as needed from our current IO stream.
+// Note that if we don't even have 20 bytes right now, this will throw
+// an EOS exception on this line, and user type won't even be invoked.
+this._raw_joe = this._io.readBytes(20);
+
+// Second, we wrap our bytes into a new stream, a substream
+KaitaiStream _io__raw_joe = new KaitaiStream(_raw_joe);
+
+// Finally, we pass our substream to Person class instead of 
+this.joe = new Person(_io__raw_joe, this, _root);
+----
+
+After that, parsing of `person` type will be totally bound to limits
+of that particular substream. Anything in Person class whatsoever
+can't do a thing to original stream - it just doesn't have access to
+that object, period.
+
+Let's check out a few use cases that demonstrate how powerful this
+practice can be.
+
+==== Limiting total size of structure
+
+Quite often binary formats use the following technique:
+
+* First comes some integer that declares total size of the structure
+  (or structure's body, i.e. everything minus this length header).
+* Then comes structure's body, which is expected to have exactly
+  declared number of bytes.
+
+Consider this example:
+
+[source,yaml]
+----
+seq:
+  - id: body_len
+    type: u4
+
+  # The following must be exactly `body_len` bytes long
+  - id: uuid
+    size: 16
+  - id: name
+    type: str
+    size: 24
+  - id: price
+    type: u4
+  # This "comment" entry must fill up all remaining bytes up to the
+  # total of `body_len`.
+  - id: comment
+    size: ???
+----
+
+Of course, one can derive this manually:
+
+* body_len = sizeof(uuid) + sizeof(name) + sizeof(price) + sizeof(comment)
+* body_len = 16 + 24 + 4 + sizeof(comment)
+* sizeof(comment) = body_len - (16 + 24 + 4)
+* sizeof(comment) = body_len - 44
+
+Thus:
+
+[source,yaml]
+----
+  - id: comment
+    size: body_len - 44
+----
+
+But this is very inconvenient and potentially error prone. What will
+happen if in some time in future the record contents will be updated
+and we'll forget to update this formula?
+
+It turns out that substreams offer a much cleaner solution here. Let's
+separate our "header" and "body" into two distinct user types, and
+then we can just specify `size` on this `body`:
+
+[source,yaml]
+----
+seq:
+  - id: body_len
+    type: u4
+  - id: body
+    type: record_body
+    size: body_len
+    # ^^ This is where substream magic kicks in
+types:
+  record_body:
+    seq:
+      - id: uuid
+        size: 16
+      - id: name
+        type: str
+        size: 24
+      - id: price
+        type: u4
+      - id: comment
+        size-eos: true
+----
+
+For `comment`, we just it to have size up until the end of
+stream. Given that we've limited it to the substream in the first
+place, this means exactly what we wanted.
+
+==== Repeating until total size reaches limit
+
+The same technique might be useful for repetitions as well. If you
+have an array of same-type entries, and a format declares total size
+of all entries combined, again, you can try to do this:
+
+[source,yaml]
+----
+seq:
+  - id: total_len
+    type: u4
+  - id: entries
+    type: entry
+    repeat: expr
+    repeat-expr: ???
+----
+
+And do some derivations to calculate number of entries,
+i.e. "total_len / sizeof(entry)". But, again, this is bad because:
+
+* You need to keep remembering to update this "sizeof" value when
+  entry size updates.
+* If entry size if not fixed, then you're totally out of luck here.
+
+Solving it using substreams is much more elegant. You just create a
+substream limited to `total_len` bytes, and then use `repeat: eos` to
+repeat until the end of that stream.
+
+[CAUTION]
+=====
+However, note that one's naïve approach might not work:
+
+* When we're dealing with an array of elements, `size` will refer to
+the size of one particular element of the array.
+* Any repetition (and this includes `repeat: eos`) uses current
+  object's IO stream. Substreams are created individually for every
+  object inside the loop.
+
+So this is wrong:
+
+[source,yaml]
+----
+seq:
+  - id: total_len
+    type: u4
+  - id: entries
+    type: entry
+    size: total_len
+    repeat: eos
+----
+
+=====
+
+The proper solution is to add an extra layer of types:
+
+[source,yaml]
+----
+seq:
+  - id: total_len
+    type: u4
+  - id: entries
+    type: file_entries
+    size: total_len
+    # ^^ here we added the limit and created a single substream
+types:
+  file_entries:
+    seq:
+      - id: entries
+        type: entry
+        repeat: eos
+        # ^^ repeats until the end of that limited substream
+  entry:
+    # ...
+    # Now, this can even be of variable size: that's totally ok.
+----
 
 === Processing: dealing with compressed, obfuscated and encrypted data
 
