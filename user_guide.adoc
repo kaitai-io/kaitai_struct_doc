@@ -786,6 +786,19 @@ allows you to work on TLV-like formats step-by-step, starting with
 support of only 1 or 2 types of records, and gradually adding more and
 more types.
 
+You can use "_" for the default (else) case which will match every
+other value which was not listed explicitly.
+
+[source,yaml]
+----
+    type:
+      switch-on: rec_type
+      cases:
+        1: rec_type_1
+        2: rec_type_2
+        _: rec_type_unknown
+----
+
 === Instances: data beyond the sequence
 
 So far we've done all the data specifications in `seq` - thus they'll
