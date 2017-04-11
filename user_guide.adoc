@@ -380,6 +380,21 @@ enums:
     17: udp
 ----
 
+Alternatively, hexadecimal notation can also be used to define an enumeration:
+
+[source,yaml]
+----
+seq:
+  - id: key
+    type: u4
+    enum: keys
+enums:
+  keys:
+    0x77696474: width #widt
+    0x68656967: height #heig
+    0x64657074: depth #dept
+----
+
 There are two things that should be done to declare a enum:
 
 1.  We add `enums` key on the type level (i.e. on the same level as
