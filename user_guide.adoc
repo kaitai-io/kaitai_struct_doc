@@ -2079,7 +2079,38 @@ beginner Kaitai Struct users.
 
 === Specifying size creates a substream
 
-TODO
+In the following example script, an erronous attempt is made to parse
+an input file with a file size of 2000 bytes:
+
+[source,yaml]
+----
+seq:
+  - id: body
+    type: some_body_type
+    size: 1000
+types:
+  some_body_type:
+    seq:
+      - id: payload
+        size: 999
+      - id: overflow
+        size: 2
+----
+
+The parser can successfully copy the required 999 bytes into
+`body.payload` as the `body` substream has 1000 bytes available to
+be requested, and the root stream has 2000 bytes available.
+
+Where an exception occurs is upon attempting to copy data from the
+`body` substream into the `overflow` object. After data has been
+copied from the `body` substream into the `payload` object, the
+`body` substream will only have 1 byte of data still available for
+the parser to request. As 2 bytes of data are attempted to be
+requested, the `body` substream is exhausted of available data and
+thus an exception occurs. The fact that the root stream still has
+1001 bytes available to be requested from the input file does not
+matter, as the `body` substream never has the opportunity to request
+any more than the first 1000 bytes of the input file.
 
 === Applying `process` without a size
 
