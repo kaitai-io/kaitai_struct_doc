@@ -487,7 +487,25 @@ structure:
 
 [source,yaml]
 ----
-TODO
+seq:
+  - id: header
+    type: file_header
+  - id: metadata
+    type: metadata_section
+types:
+  file_header:
+    seq:
+      - id: version
+        type: u2
+  metadata_section:
+    seq:
+      - id: author
+        type: strz
+        encoding: UTF-8
+      - id: publisher
+        type: strz
+        encoding: UTF-8
+        if: _parent.header.version >= 2
 ----
 
 ==== `_root`
