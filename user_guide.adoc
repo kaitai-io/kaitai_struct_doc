@@ -832,6 +832,39 @@ other value which was not listed explicitly.
         _: rec_type_unknown
 ----
 
+If an enumeration has already been defined, you can use references to
+items in the enumeration instead of specifying integers a second time:
+
+[source,yaml]
+----
+seq:
+  - id: key
+    type: u4
+    enum: keys
+  - id: data
+    type:
+      switch-on: key
+      cases:
+        keys::width: data_field_width
+        keys::height: data_field_height
+        keys::depth: data_field_depth
+types:
+  data_field_width:
+    seq:
+      #...
+  data_field_height:
+    seq:
+     #...
+  data_field_depth:
+    seq:
+     #...
+enums:
+  keys:
+    0x77696474: width #widt
+    0x68656967: height #heig
+    0x64657074: depth #dept
+----
+
 === Instances: data beyond the sequence
 
 So far we've done all the data specifications in `seq` - thus they'll
