@@ -1,40 +1,99 @@
 = Kaitai Struct: KSY reference
-
 :toc: left
+:toclevels: 3
 :source-highlighter: coderay
 
-## Overview
+Kaitai Struct is a DSL (domain-specific language), designed to
+describe binary data structures in human- and machine-readable
+way. This reference is meant to be used as a complete spec on `.ksy`
+files (that are used as input files for KS compiler): it will describe
+how they work, which parts they consist of and how they're used /
+processed. It contains a lot of technical info, so it's mostly suited
+for those who want to write their own tools. If you just want to use
+KS as end-user, please refer to <<user_guide.adoc#,user guide>>
+instead.
 
-Kaitai Struct is a DSL (domain-specific language), designed to describe binary data structures in human- and machine-readable way. Description of certain structure ("format") can be written once and then translated using a [compiler] into a source code for supported programming languages — and then used from any program in that language.
+The basic idea behind Kaitai Struct is very simple:
 
-[compiler]: https://github.com/kaitai-io/kaitai_struct_compiler
-Kaitai Struct data structure (format) descriptions are written as simple [YAML] files and are usually saved using `.ksy` extension to differentiate them from the rest of `.yaml` files.
+* One can describe a certain data structure using KS language (this is
+  only needed to be done once)
+* This description can be translated into a source code for many
+  supported programming languages using a
+  https://github.com/kaitai-io/kaitai_struct_compiler[compiler],
+  without the need to write language- and platform-specific code every
+  time.
+* Generated code can be plugged right into a project in target
+  language (usually as a native module or a library) and used right
+  away.
 
-Every `.ksy` file MUST be a map of strings (keys) to some values. File has only one unique key on top level, in all other respects "file" on the top level represents a class, a thus can use all the keys available for class definition.
+KS compiler gets one or several `.ksy` files for input.
 
-### meta
+[[ksy-file]]
+## KSY files
 
-`meta` key is a map of string to objects that defines various meta-information about the current file, assigns some default and processing directives.
+Kaitai Struct data structure (format) descriptions (KSY files) are
+simple http://yaml.org/[YAML] files and are usually saved using `.ksy`
+extension to differentiate them from the rest of `.yaml` files.
+
+Every `.ksy` file MUST be a valid YAML file, and is expected to be
+parsed with generic YAML parsing libraries. Inside, every file MUST
+provide a map of strings (keys) to some values. Each file is
+essentially a single <<spec-type>>.
+
+[[spec-type]]
+## User-defined type spec
+
+*User-defined type specification* is an essential component of KSY
+specification. It declares a single user-defined type, which may
+include:
+
+* <<meta>>
+* <<doc>>
+* <<seq>>
+* <<instances>>
+* <<enums>>
+* <<types>>
+
+NOTE: User-defined type spec is recursive and can include other
+user-defined type specs inside `types` element.
+
+Any `.ksy` file is a single user-defined type (exactly the same as any
+nested subtypes), with two minor differences:
+
+* top-level type spec MUST include <<meta-id,meta/id>> key that is
+used to give a name for top-level type,
+* all nested types MUST NOT have that key (as they already have a
+certain ID from the map key name provided in <<types>>).
+
+[[meta]]
+### `meta` — meta-information
+
+`meta` key is a map of string to objects that provides
+meta-information relevant the current user-defined type or KSY file in
+whole. It also can be used to assign some defaults and provide some
+configuration options for compiler.
 
 Example:
 
-```
+[source,yaml]
+----
 meta:
   id: foo_arc
-  imports:
-    - common/archive_header
-    - common/compressed_file
-  endian: le
-  encoding: UTF-8
   title: Foo Archive
-  ks-version: 9.9
-  license: CC0-1.0
+  application: Foo Archiver v1.23  
   file-extension:
     - fooarc
     - fooarcz
-  application: Foo Archiver v1.23  
-```
+  license: CC0-1.0
+  ks-version: 9.9
+  imports:
+    - common/archive_header
+    - common/compressed_file
+  encoding: UTF-8
+  endian: le
+----
 
+[[meta-id]]
 #### id
 
 * Contents: a string that follows rules for all identifiers
@@ -42,6 +101,23 @@ meta:
 * Influences: it would be converted to suit general formatting rules of a language and used as the name of class
 * Mandatory: yes
 
+[[meta-title]]
+#### title
+
+* Contents: a string
+* Purpose: free-form text string that is a longer title of this .ksy file
+* Influences: nothing
+* Mandatory: no
+
+[[meta-application]]
+#### application
+
+* Contents: a string
+* Purpose: free-form text string that describes application that's associated with this particular format, if it's a format used by single application
+* Influences: nothing
+* Mandatory: no
+
+[[meta-imports]]
 #### imports
 
 * Contents: sequence of strings which contain valid filesystem characters (generally A-Z, a-z, 0-9, _, - and /) corresponding to a relative or absolute path to another .ksy file (without the .ksy extension)
@@ -49,13 +125,7 @@ meta:
 * Influences: allows types defined within the imported .ksy files to be used in the current context
 * Mandatory: no
 
-#### endian
-
-* Contents: `le` (for little-endian) or `be` (for big-endian)
-* Purpose: sets a default [endianness] for this file
-* Influences: if set, [[primitive data types]] like `u4` would be treated as aliases to `u4le` / `u4be` (depending on the setting); if not set, attempt to use abbreviated types like `u4` (i.e. without full endianness qualifier) will yield compile-time error.
-* Mandatory: no
-
+[[meta-encoding]]
 #### encoding
 
 * Contents: a string which is a user-defined encoding scheme, for example `ASCII`, `UTF-8`, `UTF-16LE`, `UTF-16BE`, `UTF-32LE`, `UTF-32BE` or a Name from the https://www.iana.org/assignments/character-sets/character-sets.xhtml[IANA character sets registry]
@@ -63,35 +133,42 @@ meta:
 * Influences: if set, `str` and `strz` data types will have their encoding by default set to this value
 * Mandatory: no
 
-### title
+[[meta-endian]]
+#### endian
 
-* Contents: a string
-* Purpose: free-form text string that is a longer title of this .ksy file
-* Influences: nothing
+* Contents: `le` (for little-endian) or `be` (for big-endian)
+* Purpose: sets a default
+  https://en.wikipedia.org/wiki/Endianness[endianness] for this type
+  and all nested subtypes
+* Influences: if set, <<primitive-data-types,primitive data types>>
+  like `u4` would be treated as aliases to `u4le` / `u4be` (depending
+  on the setting); if not set, attempt to use abbreviated types like
+  `u4` (i.e. without full endianness qualifier) will yield
+  compile-time error.
 * Mandatory: no
 
-### ks-version
+#### ks-version
 
 * Contents: a string which contains a Kaitai Struct version number
 * Purpose: sets the minimum version of Kaitai Struct Compiler (KSC) required to interpret this .ksy file
 * Influences: prevents this .ksy file from being read by older versions of KSC which may not understand newer syntax of this .ksy file
 * Mandatory: no
 
-### ks-debug
+#### ks-debug
 
 * Contents: `true` or `false` (default)
 * Purpose: advise the Kaitai Struct Compiler (KSC) to use debug mode
 * Influences: when set to `true`, KSC will generate classes as if --debug mode was specified in the command line
 * Mandatory: no
 
-### ks-opaque-types
+#### ks-opaque-types
 
 * Contents: `true` or `false` (default)
 * Purpose: advise the Kaitai Struct Compiler (KSC) to ignore missing types in the .ksy file, and assume that these types are already provided externally by the environment the classes are generated for
 * Influences: when set to `true`, KSC will generate classes as if --opaque-types=true mode was specified in the command line
 * Mandatory: no
 
-### license
+#### license
 
 * Contents: a string which matches one of the identifiers within the https://spdx.org/licenses/[SPDX license list]
 * Purpose: identify the copyright license of this .ksy file
@@ -105,60 +182,171 @@ meta:
 * Influences: may be used for navigation purposes by browsing applications
 * Mandatory: no
 
-#### application
+[[doc]]
+### `doc` — docstrings
 
-* Contents: a string
-* Purpose: free-form text string that describes application that's associated with this particular format, if it's a format used by single application
-* Influences: nothing
+`doc` element is used to give a more detailed description of a
+user-defined type. In most target languages, it will be used as
+docstring (i.e. a special comment which is exported as part of code
+documentation), compatible with tools like
+https://en.wikipedia.org/wiki/Javadoc[Javadoc],
+http://www.doxygen.org/[Doxygen], http://usejsdoc.org/[JSDoc],
+https://msdn.microsoft.com/en-us/library/b2s063f7.aspx[.NET XML
+documentation comments], etc.
+
+* Contents: free-form string (note that multiple lines are allowed and
+  newlines would be respected during compilation)
+* Purpose: provide longer description of a type for a developer that
+  will use it
+* Influences: generated docstring comments
 * Mandatory: no
 
-[YAML]: http://yaml.org/
-[endianness]: https://en.wikipedia.org/wiki/Endianness**Type descriptions** takes central place in every `.ksy` file. Top-level map is a type description with additional `meta` key. Also, type descriptions might be included deeper, namely, in `types` section, to create nested structures.
+Example:
 
-For most programming languages, "types" are directly mapped to classes which will perform the parsing of incoming binary stream.
+[source,yaml]
+----
+doc: |
+  A variable-length unsigned integer using base128 encoding. 1-byte groups
+  consists of 1-bit flag of continuation and 7-bit value, and are ordered
+  "most significant group first", i.e. in "big-endian" manner.
 
-Type description is a map of strings (keys) to various values.
+  This particular encoding is specified and used in:
 
-#### seq
+  * Standard MIDI file format
+  * ASN.1 BER encoding
+----
 
-* Contents: a sequence of [[attribute descriptions|attribute description]]
+[[doc-ref]]
+### `doc-ref` — documentation reference
+
+`doc-ref` element can be used to provide reference to original
+documentation, if your KSY file is actually an implementation of some
+documented format.
+
+* Contents: one of:
+** URL as text
+** Arbitrary string
+** URL as text + space + arbitrary string
+* Purpose: provide reference to original documentation (either in HTML
+  form, available to be referenced by certain URL, or just a free-form
+  reference that can be used to address printed manuals, etc)
+* Influences: generated docstring comments, usually in a form of "see
+  also".
+** If only text is provided, it will be rendered as neutral text.
+** If an URL is provided, it will be rendered an active hyperlink, if
+   possible.
+** If both URL and text is provided, it will create an active
+   hyperlink that leads to URL, with a visible caption equal to
+   provided text.
+* Mandatory: no
+
+Examples:
+
+[source,yaml]
+----
+doc-ref: 'http://example.org/file-format-spec/1.0#header'
+doc-ref: ECMA-119 standard, section 4.18 "Volume Set"
+doc-ref: http://example.org/some-spec Header section
+----
+
+[[seq]]
+### `seq` — sequence of attributes
+
+* Contents: a sequence of <<spec-attribute>> elements
 * Purpose: identifier for a primary structure described in top-level map
 * Influences: would be translated into parsing method in a target class
 * Mandatory: no
 
-#### types
+[[types]]
+### `types` — declaration of subtypes
 
-* Contents: map of strings to [[type description]]
-* Purpose: create types for sub-structures that could be referenced in [[attribute descriptions|attribute description]] in any `seq` element
+* Contents: map of strings to <<spec-type>>
+* Purpose: declare types for sub-structures that could be referenced in <<spec-attribute>> in any `seq` or `instances` element
 * Influences: would be translated into distinct classes (usually nested into main one, if target language allows it)
 * Mandatory: no
 
-#### instances
+[[instances]]
+### `instances`
 
-* Contents: map of strings to [[instance description]]
+* Contents: map of strings to <<spec-instance>>
 * Purpose: description of data that lies outside of normal sequential parsing flow (for example, that requires seeking somewhere in the file) or just needs to be loaded only by special request
 * Influences: would be translated into distinct methods (that read desired data on demand) in current class
 * Mandatory: no
 
 [[enums]]
-#### enums
+### `enums`
 
-* Contents: map of strings to [[enum description]]
-* Purpose: allow to set up named enums: essentially a mapping between integer constants to some symbolic names; these enums can be used in integer fields using [[enum|attribute description#enum]], thus converting it from simple integer field into a proper enum constant
-* Influences: would be represented as enum-like construct (or closest equivalent, if target language doesn't support enums) in current class
+* Contents: map of strings to <<spec-enum>>
+* Purpose: allow to set up named enums: essentially a mapping between
+  integer constants to some symbolic names; these enums can be used in
+  integer attributes using <<attribute-enum>> key, thus converting it
+  from simple integer attribute into a proper enum constant
+* Influences: would be represented as enum-like construct (or closest
+  equivalent, if target language doesn't support enums), nested or
+  namespaced in current type/class
 * Mandatory: no
-**Attribute** description specifies how to read one particular attribute — typically, a single number, a string, array of bytes, etc. Attribute can also reference other complex structures by specifying user type given in [[type description]]. Each attribute is typically compiled into equivalent parsing instruction(s) in target language.
 
-# Common attributes
+[[spec-attribute]]
+## Attribute spec
 
-## id
+**Attribute specification** describes how to read and write one
+particular attribute — typically, a single number, a string, array of
+bytes, etc. Attribute can also be a complex structure, specified with
+a <<spec-type>>. Each attribute is typically compiled into equivalent
+reading / writing instruction(s) in target language.
+
+Every attribute MUST BE a map that maps certain keys to values. Some
+of these keys are common to every possible attribute spec, some are
+only valid for certain types.
+
+Examples:
+
+[source,yaml]
+----
+id: coord_x
+type: f8
+doc: X coordinate of a node.
+----
+
+[source,yaml]
+----
+id: body_len_64
+type: u8
+if: body_len_32 == 0
+doc: |
+  Additional value that designates length of the body as 64-bit
+  integer. To save space in common cases where 32-bit store is enough,
+  present only if `body_len_32` is set to 0.
+----
+
+[source,yaml]
+----
+id: body
+type: encoded_body
+size: (body_len_32 == 0) ? body_len_64 : body_len_32
+process: zlib
+----
+
+### Common keys
+
+[[attribute-id]]
+#### id
 
 * Contents: a string that matches `/^[a-z][a-z0-9_]*$/` — i.e. starts with lowercase letter and then may contain lowercase letters, numbers and underscore
 * Purpose: identify attribute among others
 * Influences: used as variable / field name in target programming language
-* Mandatory: yes
+* Mandatory:
+** yes (for attributes in a <<seq>>)
+** forbidden (for attributes in <<instances>>)
 
-## contents
+[[attribute-doc]]
+#### doc
+
+[[attribute-doc-ref]]
+#### doc-ref
+
+[[attribute-contents]]
+#### contents
 
 * Contents: one of:
   * a string in UTF-8 encoding
@@ -176,99 +364,158 @@ Examples:
 * `[foo, 0, A, 0xa, 42]` — expect bytes `66 6f 6f 00 41 0a 2a`
 * `[1, 0x55, '▒,3', 3]` — expect bytes `01 55 e2 96 92 2c 33 03`
 
-Note that you can use either JSON or YAML array syntax, and quotes are optional in YAML syntax.
+NOTE: You can use either JSON or YAML array syntax, and quotes are
+optional in YAML syntax.
 
-## type
+[[attribute-type]]
+#### type
 
-* Contents: one of [[primitive data types]] or a [[user-specified type name|type description]]
+* Contents: one of <<primitive-data-types,primitive data types>> or a
+  name of <<spec-type>>
 * Purpose: define a data type for an attribute
-* Influences: how much bytes would be read, data type and contents of a variable in target programming language
-* Mandatory: no — if `type` is not specified, then attribute is considered [a generic byte sequence](#no-type-specified)
+* Influences: how much bytes would be read, data type and contents of
+  a variable in target programming language
+* Mandatory: no — if `type` is not specified, then attribute is
+  considered [a generic byte sequence](#no-type-specified)
 
-## repeat
+If `type` is used to reference a <<spec-type>>, then the following
+algorithm it used to find which type is referred to, given the name:
 
-* Contents: `expr` or `eos`
+. It tries to find a given type by name in current type's
+  <<types>> map.
+. If that fails, it checks if current type actually has that name and
+  if it does, uses current type recursively. Both type names given
+  using a key in <<types>> and type name of top-level type given with
+  <<meta-id,meta/id>> work.
+. If that fails too, it goes one level up in the hierarchy of nested
+  types and tries to resolve it there.
+
+This mechanism is similar to the type name resolution algorithm that
+is used by C++, Java, Ruby, etc, and allows one to effectively use
+types as namespaces for subtypes, i.e. for example, this is legal:
+
+[source,yaml]
+----
+meta
+  id: top_level
+seq:
+  - id: foo
+    type: header
+    # resolves to /top_level/header ──┐
+  - id: bar     #                     │
+    type: body1 #                     │
+  - id: baz     #                     │
+    type: body2 #                     │
+types:          #                     │
+  header: # ... <─────────────────────┘ <─┐
+  body1:             #                    │
+    seq:             #                    │
+      - id: foo      #                    │
+        type: header #                    │
+        # resolves to /top_level/header ──┘
+  body2:
+    seq:
+      - id: foo
+        type: header
+        # resolves to /top_level/second_level/header ──┐
+    types: #                                           │
+      header: # ... <──────────────────────────────────┘
+----
+
+[[attribute-repeat]]
+#### repeat
+
+* Contents: `expr` or `eos` or `until`
 * Purpose: designate repeated attribute in a structure;
-  * if `repeat: expr` is used, then attribute is repeated the number of times specified in `repeat-expr` key;
-  * if `repeat: eos` is used, then attribute is repeated until the end of current stream
-  * if `repeat: until` is used, then attribute is repeated until given expression becomes true (one may use a reference to last parsed element in such expression)
-* Influences: attribute would be read as array / list / sequence, executing parsing code multiple times
+** if `repeat: expr` is used, then attribute is repeated the number of
+   times specified in `repeat-expr` key;
+** if `repeat: eos` is used, then attribute is repeated until the end
+   of current stream
+** if `repeat: until` is used, then attribute is repeated until given
+   expression becomes true (one may use a reference to last parsed
+   element in such expression)
+* Influences: attribute would be read as array / list / sequence,
+  executing parsing code multiple times
 * Mandatory: no
 
-## repeat-expr
+[[attribute-repeat-expr]]
+#### repeat-expr
 
-* Contents: [[expression|expressions]], expected to be of integer type
+* Contents: <<expressions,expression>>, expected to be of integer type
 * Purpose: specify number of repetitions for repeated attribute
 * Influences: number of times attribute is parsed
 * Mandatory: yes, if `repeat: expr`
 
-## repeat-until
+[[attribute-repeat-until]]
+#### repeat-until
 
-* Contents: [[expression|expressions]], expected to be of boolean type
+* Contents: <<expressions,expression>>, expected to be of boolean type
 * Purpose: specify expression that would be checked each time after an element of requested type is parsed; while expression is false (i.e. until it becomes true), more elements would be parsed and added to resulting array; one can use `_` in expression as a special variable that references last read element
 * Influences: number of times attribute is parsed
 * Mandatory: yes, if `repeat: until`
 
-## if
+[[attribute-if]]
+#### if
 
-* Contents: [[expression|expressions]], expected to be of boolean type
+* Contents: <<expressions,expression>>, expected to be of boolean type
 * Purpose: mark the attribute as optional
 * Influences: attribute would be parsed only if condition specified in `if` key evaluates (in runtime) to true 
 * Mandatory: no
 
-# Attributes that depend on type
-
-## No type specified
+### Byte array keys
 
 If there's no type specified, attribute will be read just as a sequence of bytes from a stream. Thus, one has to decide on how many bytes to read. There are two ways:
 
 * Specify amount of bytes to read in `size` key. One can specify an integer constant or an [[expression|expressions]] in this field (for example, if the number of bytes to read depends on some other attribute).
 * Set `size-eos: true`, thus ordering to read all the bytes till the end of current stream.
 
-### size
+#### size
 
-### size-eos
+#### size-eos
 
-### process
+#### process
 
-It is possible to apply some algorithmic processing to a byte buffer before accessing it. This can be done using  [[process|processing binary data]] attribute.
+It is possible to apply some algorithmic processing to a byte buffer
+before accessing it. This can be done using <<spec-process>>
+syntax.
 
-## `u*`, `s*`
+### Integer keys
 
-These specify primitive integer types. One can map an integer to some [[enum|enum description]] value with an `enum` attribute.
+One can map an integer to some <<spec-enum>> value with an `enum` attribute.
 
-### enum
+[[attribute-enum]]
+#### enum
 
 * Contents: name of existing `enum`
 * Purpose: apply mapping of parsed integer using a given enum dictionary into some sort of named constant
 * Influences: field data type becomes given enum
 * Mandatory: no
 
-## `str`
+### String keys
 
 Specifies a fixed-length string, i.e. first it reads a designated number of bytes, then it tries to convert bytes to characters using a specified encoding. There are 2 ways to specify amount of data to read:
 
 * Specify number of bytes to read directly in `size` key. One can specify an integer constant or an [[expression|expressions]] in this field (for example, if the number of bytes to read depends on some other attribute).
 * Set `size-eos: true`, thus ordering to read all the bytes till the end of current stream.
 
-### size
+#### size
 
-### size-eos
+#### size-eos
 
-### encoding
+#### encoding
 
-## `strz`
+### `strz` keys
 
 Specifies parsing a string until a `terminator` byte (i.e. C-style strings terminated with `0`).
 
-### terminator
+#### terminator
 
 * Contents: integer that represents terminating byte
 * Purpose: string reading will stop when this byte will be encountered
 * Influences: field data type becomes given enum
 * Mandatory: no, default is `0`
 
-### consume
+#### consume
 
 * Contents: boolean
 * Purpose: specify if terminator byte should be "consumed" when reading - that is:
@@ -277,14 +524,14 @@ Specifies parsing a string until a `terminator` byte (i.e. C-style strings termi
 * Influences: stream position after reading of string
 * Mandatory: no, default is `true`
 
-### include
+#### include
 
 * Contents: boolean
 * Purpose: specify if terminator byte should be considered a part of string read and thus appended to it
 * Influences: string parsed: if `true`, then resulting string would be 1 byte longer and that byte would be terminator byte
 * Mandatory: no, default is `false`
 
-### eos-error
+#### eos-error
 
 * Contents: boolean
 * Purpose: allow ignoring of lack of terminator (disabling error reporting)
@@ -296,44 +543,151 @@ Specifies parsing a string until a `terminator` byte (i.e. C-style strings termi
 string parsed: if `true`, then resulting string would be 1 byte longer and that byte would be terminator byte
 * Mandatory: no, default is `true`
 
-## User-specified typesThere are several data types predefined in Kaitai Struct, thus they are used as basic building blocks for more complex data types:
+[[primitive-data-types]]
+## Primitive data types
 
-## Integers
+There are several data types predefined in Kaitai Struct. They are
+used as basic building blocks for more complex data types.
+
+NOTE: Usually reading and writing of primitive data types is very fast
+and efficient, as it is implemented in most "native" way possible in a
+target language/platform. For example, if you need to read 2-byte
+integer, it is usually much more efficient to just use `u2` type,
+instead of doing two `u1` reads and then composing these two bytes
+using <<instance-value,value instance>>".
+
+### Integers
 
 Generally, integer type specification follows this pattern: `([us])(1|2|4|8)(le|be)`
 
 * First letter — `u` or `s` — specifies either unsigned or signed integer respectively
 * Second group — `1`, `2`, `4` or `8` — specifies width of an integer in bytes
-* Third group — `le` or `be` — specifies little-endian or big-endian encoding respectively; it can be omitted if default endianness specified in [[meta.endian|file description#endian]] in file description.
+* Third group — `le` or `be` — specifies little-endian or big-endian
+  encoding respectively; it can be omitted if default endianness
+  specified in <<meta-endian,meta/endian>> in a type spec.
 
 For the sake of completeness, here's the full table of available integer types:
 
-| `type` | Width, bits | Signed? | [Endianness] | Min value            | Max value            |
-|--------|-------------|---------|--------------|----------------------|----------------------|
-| `u1`   |           8 |    No   |      N/A     | 0                    | 255                  |
-| `u2le` |          16 |    No   |    Little    | 0                    | 65535                |
-| `u2be` |          16 |    No   |      Big     | 0                    | 65535                |
-| `u4le` |          32 |    No   |    Little    | 0                    | 4294967295           |
-| `u4be` |          32 |    No   |      Big     | 0                    | 4294967295           |
-| `u8le` |          64 |    No   |    Little    | 0                    | 18446744073709551615 |
-| `u8be` |          64 |    No   |      Big     | 0                    | 18446744073709551615 |
-| `s1`   |           8 |   Yes   |      N/A     | -128                 | 127                  |
-| `s2le` |          16 |   Yes   |    Little    | -32768               | 32767                |
-| `s2be` |          16 |   Yes   |      Big     | -32768               | 32767                |
-| `s4le` |          32 |   Yes   |    Little    | -2147483648          | 2147483647           |
-| `s4be` |          32 |   Yes   |      Big     | -2147483648          | 2147483647           |
-| `s8le` |          64 |   Yes   |    Little    | -9223372036854775808 | 9223372036854775807  |
-| `s8be` |          64 |   Yes   |      Big     | -9223372036854775808 | 9223372036854775807  |
+[cols="6*", options="header"]
+|===
+|`type`
+|Width, bits
+|Signed?
+|https://en.wikipedia.org/wiki/Endianness[Endianness]
+|Min value
+|Max value
 
-## Floats
+|`u1`
+|8
+|No
+|N/A
+|0
+|255
+
+|`u2le`
+|16
+|No
+|Little
+|0
+|65535
+
+| `u2be` 
+|          16 
+|    No   
+|      Big     
+| 0                    
+| 65535                
+
+| `u4le` 
+|          32 
+|    No   
+|    Little    
+| 0                    
+| 4294967295           
+
+| `u4be` 
+|          32 
+|    No   
+|      Big     
+| 0                    
+| 4294967295           
+
+| `u8le` 
+|          64 
+|    No   
+|    Little    
+| 0                    
+| 18446744073709551615 
+
+| `u8be` 
+|          64 
+|    No   
+|      Big     
+| 0                    
+| 18446744073709551615 
+
+| `s1`   
+|           8 
+|   Yes   
+|      N/A     
+| -128                 
+| 127                  
+
+| `s2le` 
+|          16 
+|   Yes   
+|    Little    
+| -32768               
+| 32767                
+
+| `s2be` 
+|          16 
+|   Yes   
+|      Big     
+| -32768               
+| 32767                
+
+| `s4le` 
+|          32 
+|   Yes   
+|    Little    
+| -2147483648          
+| 2147483647           
+
+| `s4be` 
+|          32 
+|   Yes   
+|      Big     
+| -2147483648          
+| 2147483647           
+
+| `s8le` 
+|          64 
+|   Yes   
+|    Little    
+| -9223372036854775808 
+| 9223372036854775807  
+
+| `s8be` 
+|          64 
+|   Yes   
+|      Big     
+| -9223372036854775808 
+| 9223372036854775807  
+|===
+
+### Floats
 
 Floating point number specification also follows the general pattern: `f(4|8)(le|be)`
 
 * First letter — `f` — specifies floating point type
 * Second group — `4` or `8` — specifies width of an integer in bytes
-* Third group — `le` or `be` — specifies little-endian or big-endian encoding respectively; it can be omitted if default endianness specified in [[meta.endian|file description#endian]] in file description.
+* Third group — `le` or `be` — specifies little-endian or big-endian
+  encoding respectively; it can be omitted if default endianness
+  specified in <<meta-endian,meta/endian>> in a type spec.
 
-The general format of float follows [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point) standard.
+The general format of float follows
+https://en.wikipedia.org/wiki/IEEE_floating_point[IEEE 754] standard.
 
 The full list of possible floating point type is thus:
 
@@ -344,12 +698,51 @@ The full list of possible floating point type is thus:
 | `f8be` |          64 |      Big     | 53            | 11             |
 | `f8le` |          64 |    Little    | 53            | 11             |
 
-## Strings
+### Byte arrays
 
-* `str`
-* `strz`
+Byte arrays are used as generic "fallback" solution, where no
+<<attribute-type>> is defined, but we have some means to understand
+the size of the data. This means that one of the following is defined:
 
-[Endianness]: https://en.wikipedia.org/wiki/EndiannessSometimes the data you're working on is not only packed in some structure, but also somehow encoded, obfuscated, encrypted, compressed, etc. So, to be able to parse such data, one has to remove this layer of encryption / obfuscation / compression / etc. This is called "processing" in Kaitai Struct and it is supported with a range of `process` directives. These can be applied to raw byte buffers or user-typed fields in the following way:
+* <<attribute-size>> — fixed size byte array
+* <<attribute-size-eos>>
+* <<attribute-terminator>>
+
+### Strings
+
+Strings are built on top of byte arrays, inheriting all the properties
+that allow to designate size of underlying byte array. To designate
+attribute as string type, use `type: str` and provide encoding info,
+either by specifying <<attribute-encoding>> key in the attribute, or
+by applying type or file-wide default encoding in
+<<meta-encoding,meta/encoding>>.
+
+[NOTE]
+====
+`type: strz` can be also used as a shortcut to define a
+null-terminated string (C-style). I.e. these `foo` and `bar`
+attributes are equivalent:
+
+[source,yaml]
+----
+- id: foo
+  type: str
+  terminator: 0
+- id: bar
+  type: strz
+----
+====
+
+[[spec-process]]
+## Processing spec
+
+Sometimes the data you're working on is not only packed in some
+structure, but also somehow encoded, obfuscated, encrypted,
+compressed, etc. So, to be able to parse such data, one has to remove
+this layer of encryption / obfuscation / compression / etc. This is
+called "processing" in Kaitai Struct and it is supported with a range
+of `process` directives. These can be applied to raw byte buffers or
+user-typed fields in the following way:
 
 ```yaml
 seq:
@@ -358,11 +751,18 @@ seq:
     process: zlib
 ```
 
-This declares a field named `buf1`. When parsing this structure, KS will read exactly 0x1000 bytes from a source stream and then apply `zlib` processing, i.e. decompression of zlib-compressed stream. Afterwards, accessing `buf1` would return decompressed stream (which would be most likely larger than 0x1000 bytes long), and accessing `_raw_buf1` property would return raw (originally compressed) stream, exactly 0x1000 bytes long.
+This declares a field named `buf1`. When parsing this structure, KS
+will read exactly 0x1000 bytes from a source stream and then apply
+`zlib` processing, i.e. decompression of zlib-compressed
+stream. Afterwards, accessing `buf1` would return decompressed stream
+(which would be most likely larger than 0x1000 bytes long), and
+accessing `_raw_buf1` property would return raw (originally
+compressed) stream, exactly 0x1000 bytes long.
 
 There are following processing directives available in Kaitai Struct.
 
-## xor(key)
+[[process-xor]]
+### xor(key)
 
 Applies a bitwise XOR (bitwise exclusive "or", written as `^` in most C-like languages) to every byte of the stream. Length of output stays exactly the same as the length of input. There is one mandatory argument - the key to use for XOR operation. It can be:
 
@@ -382,16 +782,24 @@ Examples:
 * `process: xor([7, 42])` — XORs every odd (1st, 3rd, 5th, ...) byte with `7`, and every even (2nd, 4th, 6th, ...) byte with `42`
 * `process: xor(key_buf)` — XORs bytes using a key stored in a field named `key_buf`
 
-## rol(key), ror(key)
+[[process-rol]]
+### rol(key), ror(key)
 
-Does a [circular shift](https://en.wikipedia.org/wiki/Circular_shift) operation on a buffer, rotating every byte by `key` bits left (`rol`) or right (`ror`).
+Does a https://en.wikipedia.org/wiki/Circular_shift[circular shift]
+operation on a buffer, rotating every byte by `key` bits left (`rol`)
+or right (`ror`).
 
 Examples:
 
-* `process: rol(5)` — rotates every byte 5 bits left: every given bit combination `b0-b1-b2-b3-b4-b5-b6-b7` becomes `b5-b6-b7-b0-b1-b2-b3-b4`
-* `process: ror(some_val)` — rotates every byte right by number of bits determined by `some_val` field (which might be either parsed previously or calculated on the fly)
+* `process: rol(5)` — rotates every byte 5 bits left: every given bit
+  combination `b0-b1-b2-b3-b4-b5-b6-b7` becomes
+  `b5-b6-b7-b0-b1-b2-b3-b4`
+* `process: ror(some_val)` — rotates every byte right by number of
+  bits determined by `some_val` attribute (which might be either
+  parsed previously or calculated on the fly)
 
-## zlib
+[[process-zlib]]
+### zlib
 
 Applies a `zlib` decompression to input buffer, expecting it to be a full-fledged zlib stream, i.e. having a regular 2-byte zlib header. Decompression parameters are chosen automatically from it. Typical zlib header values:
 
@@ -399,27 +807,53 @@ Applies a `zlib` decompression to input buffer, expecting it to be a full-fledge
 * `78 9C` — default compression
 * `78 DA` — best compression
 
-Length of output buffer is usually larger that length of the input. This processing method might throw an exception if the data given is not a valid zlib stream.**Instance** description is very close to [[attribute description]] (and inherits all its properties), but it specifies an attribute to be read (or calculated) out of regular sequence. Typically, each instance is compiled into a reader function that will parse requested data on demand, cache the result and return whatever's been parsed previously on subsequent calls.
+Length of output buffer is usually larger that length of the input. This processing method might throw an exception if the data given is not a valid zlib stream.
 
-# Common attributes
+[[spec-instance]]
+## Instance spec
 
-Instance inherits [[attribute description]], so everything that's described there can be used, except for `id`, which is useless, because all instances already have name due to map string key.
+*Instance specification* is very close to <<spec-attribute>> (and
+inherits all its properties), but it specifies an attribute that lies
+beyond <<seq,regular parsing sequence>>. Typically, each instance is
+compiled into a https://en.wikipedia.org/wiki/Lazy_evaluation[lazy]
+reader function/method that will parse (or calculate) requested data
+on demand, cache the result and return whatever's been parsed
+previously on subsequent calls.
 
-## pos
+Everything that described in <<spec-attribute>> can be used, except
+for <<attribute-id>>, which is useless, because all instances already
+have name due to map string key.
+
+[[instance-pos]]
+### pos
 
 Specifies position in a stream from which the value should be parsed.
 
-## io
+[[instance-io]]
+### io
 
 Specifies an IO stream from which a value should be parsed.
 
-## value
+[[instance-value]]
+### value
 
-Overrides any real reading & parsing. Instead, just calculates function specified in `value` and returns the result as this instance. Can be used for multitude of purposes, such as data conversion while reading, etc.**Enum** description allows to set up a enum (or closest equivalent) construct in target language source file, which can then be referenced in attribute descriptions using [[enum|attribute description#enum]] specification.
+Overrides any reading & parsing. Instead, just calculates function
+specified in `value` and returns the result as this instance. Can be
+used for multitude of purposes, such as data conversion while reading,
+etc.
 
-A given class can have multiple named enums, each of which is essentially a map from integers to strings. For example:
+[[spec-enum]]
+## Enum spec
 
-```yaml
+*Enum specification* allows to set up a enum (or closest equivalent)
+construct in target language source file, which can then be referenced
+in attribute specs using <<attribute-enum>> key.
+
+A given type can have multiple named enums, each of which is
+essentially a map from integers to strings. For example:
+
+[source,yaml]
+----
 enums:
   ip_protocol:
     1: icmp
@@ -429,18 +863,22 @@ enums:
     22: ssh
     25: smtp
     80: http
-```
+----
 
-This one defines 2 named enums (named `ip_protocol` and `port` respectively), which can be referenced in attributes like that:
+This one defines 2 named enums (named `ip_protocol` and `port`
+respectively), which can be referenced in attributes like that:
 
-```yaml
+[source,yaml]
+----
 seq:
   - id: src_port
     type: u2
     enum: port
-```
+----
 
-Enum-mapped fields can be also used in [[expressions]]. One can compare it to enum constants, referencing it using *enum_name*`::`*enum_string* syntax:
+Enum-mapped fields can be also used in <<expressions>>. One can
+compare it to enum constants, referencing it using
+*enum_name*`::`*enum_string* syntax:
 
 ```yaml
 seq:
@@ -457,11 +895,19 @@ seq:
     type: u1
     if: src_port.to_i < 1024
 ```
-Some fields (for example, [[repeat-expr|attribute description#repeat-expr]], [[size|attribute description#size]] or [[if|attribute description#if]]) allow to specify either constant values (for example, `123`) or an expression that could reference another attributes or instances.
+
+[[expressions]]
+## Expressions
+
+Some fields (for example, <<attribute-repeat-expr>>,
+<<attribute-size>>, or <<attribute-if>>) allow to specify either
+constant values (for example, `123`) or an expression that could
+reference another attributes or instances.
 
 A very typical example would be:
 
-```
+[source,yaml]
+----
 seq:
   - id: filename_len
     type: u4
@@ -469,11 +915,15 @@ seq:
     type: str
     size: filename_len
     encoding: UTF-8
-```
+----
 
 Here we do two things:
 
-* First, we read 4-byte unsigned integer is read and store it in `filename_len` attribute
-* Second, we read an UTF-8 encoded string exactly `filename_len` bytes long, where `filename_len` is a reference the previous attribute
+* First, we read 4-byte unsigned integer is read and store it in
+  `filename_len` attribute
+* Second, we read an UTF-8 encoded string exactly `filename_len` bytes
+  long, where `filename_len` is a reference the previous attribute
 
-Actually, these expressions form a fairly powerful expression language that would be translated into a relevant expression in target programming language.
+These expressions form a fairly powerful expression language that
+would be translated into a relevant expression in target programming
+language.
