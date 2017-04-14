@@ -691,12 +691,38 @@ https://en.wikipedia.org/wiki/IEEE_floating_point[IEEE 754] standard.
 
 The full list of possible floating point type is thus:
 
-| `type` | Width, bits | [Endianness] | Mantissa bits | Exponents bits |
-|--------|-------------|--------------|---------------|----------------|
-| `f4be` |          32 |      Big     | 24            | 8              |
-| `f4le` |          32 |    Little    | 24            | 8              |
-| `f8be` |          64 |      Big     | 53            | 11             |
-| `f8le` |          64 |    Little    | 53            | 11             |
+[cols="5*", options="header"]
+|===
+|`type`
+|Width, bits
+|https://en.wikipedia.org/wiki/Endianness[Endianness]
+|Mantissa bits
+|Exponents bits
+
+|`f4be`
+|32
+|Big
+|24
+|8
+
+|`f4le`
+|32
+|Little
+|24
+|8
+
+|`f8be`
+|64
+|Big
+|53
+|11
+
+|`f8le`
+|64
+|Little
+|53
+|11
+|===
 
 ### Byte arrays
 
