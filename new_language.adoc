@@ -83,4 +83,4 @@ Create testing infrastructure in https://github.com/kaitai-io/kaitai_struct_test
 
 == Port spec for HelloWorld
 
-Port spec for HelloWrold test to new target language and make it work with manually compiled `hello_world.ksy`.
+Port spec for HelloWorld test to new target language and make it work with manually compiled `hello_world.ksy`.
