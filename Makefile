@@ -17,7 +17,7 @@ TARGETS=\
 
 all: $(TARGETS)
 	rm -rf out/img
-	cp -r img styles out
+	cp -r img styles js out
 	cp raw/coderay-asciidoctor.css out
 
 #out/%.html: raw/%.html tmpl/navbar.html tmpl/footer.html
