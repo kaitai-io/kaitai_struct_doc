@@ -1,0 +1,3 @@
+@media (max-width: 767px) {
+  table { overflow-x: auto; display: block }
+}
