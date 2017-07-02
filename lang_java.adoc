@@ -26,6 +26,34 @@ parsing functionality in KS relies on seek support.
 
 == Runtime library
 
+=== Installation
+
+Generated code for Java relies on
+https://github.com/kaitai-io/kaitai_struct_java_runtime[Kaitai Struct
+runtime library for Java]. It is a small, MIT-licensed library, which
+is
+https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22kaitai-struct-runtime%22[published
+in Maven's Central Repository], so typically it's enough to add the
+following to one's `pom.xml`:
+
+[source,xml]
+----
+<dependency>
+    <groupId>io.kaitai</groupId>
+    <artifactId>kaitai-struct-runtime</artifactId>
+    <version>0.7</version>
+</dependency>
+----
+
+For other build tools, such as Ivy, SBT, Gradle, Leiningen, Buildr,
+etc, please consult Central Repository's page for exact instructions.
+
+Alternatively, one can just copy whole source code to one's project:
+the library is intentionally kept as only 2 .java files, so it should
+be easy enough as well.
+
+=== API
+
 Following most other runtimes example, everything revolves around two
 basic classes:
 
