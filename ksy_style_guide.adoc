@@ -477,8 +477,8 @@ This one is less inconsistent, but still could be improved:
 
 * It uses its own convention for specifying "offset", "size" and
   "count" attributes.
-* It prepends `e_` prefix to every element, which would serve absolute
-  no purpose in KS
+* It prepends `e_` prefix to every element, which would serve
+  absolutely no purpose in KS
 * It uses its own non-standard system of types (`Elf32_Half`,
   `Elf32_Word`, `Elf32_Addr`, etc)
 * `e_ident` actually is a complex 16-byte multi-member structure,
