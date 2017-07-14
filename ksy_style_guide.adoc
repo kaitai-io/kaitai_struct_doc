@@ -88,9 +88,17 @@ Use the following order of sections:
 
 == Meta section (`meta`)
 
-Use the following order of keys:
+Meta section is mostly used to specify additional ("meta") information
+for a particular file format, so 99% of time it is only present for
+top-level type. In some cases, meta section might be specified in
+intermediate types as well, for example, to switch default endianness
+or encoding. Thus, style recommendations for "top-level" meta sections
+and "intermediate" meta sections are different, as they serve slightly
+different purposes.
 
-. Main identifier (if present): `id`
+For top-level meta section, use the following order of keys:
+
+. `id` — main identifier
 . Human-readable meta-information (in order of importance, at least
   one MUST be present):
 .. `title`
@@ -102,6 +110,7 @@ Use the following order of keys:
    string; if there are several, MUST be an sequence in block form
    and SHOULD order extensions from most popular extension to least
    popular.
+.. `xref` — keys inside MUST be in alphabetic order
 . Legal information — `license` — MUST be a valid
   https://spdx.org/licenses/[SPDX license expression]
 . Processing instructions:
@@ -110,6 +119,19 @@ Use the following order of keys:
 . Defaults (in alphabetic order):
 .. `encoding`
 .. `endian`
+
+For intermediate-level meta sections, use the following order of keys:
+
+. Defaults (in alphabetic order):
+.. `encoding`
+.. `endian`
+
+NOTE: KS syntax allows usage of some top-level elements deep inside
+the hierarchy — this can be useful during development, for example,
+for purpose of grafting one .ksy file into another quickly. However,
+in production-quality .ksy files, one MUST NOT use keys like `title`,
+`imports` or `ks-version` (i.e. everything except explicitly listed in
+a list above) on intermediate levels.
 
 The following keys are reserved for internal use (i.e. debugging and
 test running) and MUST NOT be used in general-purpose .ksy files:
