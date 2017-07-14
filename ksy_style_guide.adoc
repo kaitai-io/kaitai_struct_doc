@@ -228,7 +228,8 @@ Every key is optional. Attributes SHOULD have at least `id` and `doc`
 NOT be included if it's trivial (i.e. if it is a copy of `id`, and
 there is really nothing more to say about that attribute).
 
-=== Attribute identifiers
+[[attr-id]]
+=== Attribute identifiers (`id`)
 
 KS enforces specific identifier style in the language -
 `lower_underscore_case` (it is needed to be able to convert to other
@@ -345,7 +346,8 @@ Instance attribute use the superset of keys which are allowed in
 sequence attributes (except for `id`), thus all ordering rules apply
 here as well. Keys MUST appear in this order:
 
-. `-orig-id`
+. `-orig-id` (optional)
+. `io` (optional)
 . `pos` or `value`
 . All other keys (except for `id` and `-orig-id`), in order specified
   in <<seq-attr>>
