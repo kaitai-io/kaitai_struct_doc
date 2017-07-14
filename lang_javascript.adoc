@@ -7,5 +7,5 @@ Current JavaScript specification lacks direct access to anything like
 int64 type. Instead, accessing long integers would automatically
 represent them internally as double-precision IEEE754 floats, potentially
 losing least significant bits. It should be ok for smaller integers (up
-to 56 significant bits), but note that JavaScript would use approximate
+to 53 significant bits), but note that JavaScript would use approximate
 values for everything beyond that.
