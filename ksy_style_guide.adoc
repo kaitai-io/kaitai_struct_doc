@@ -215,6 +215,7 @@ When specifying an attribute, one MUST use the following order of keys:
 .. `include`
 .. `consume`
 .. `eos-error`
+.. `encoding`
 . `process`
 . Repetition-related keys:
 .. `repeat`
