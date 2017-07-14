@@ -30,27 +30,34 @@ MUST use:
 
 Formatting of sequences MUST include an indent, i.e.:
 
-[source,yaml]
+[cols="a,a", frame=none]
+|====
+|
 .Good
+[source,yaml]
 ----
 imports:
   - foo
   - bar
 ----
-
-[source,yaml]
+|
 .Bad
+[source,yaml]
 ----
 imports:
 - foo
 - bar
 ----
+|====
 
 Formatting of maps-inside-sequences MUST have `-` delimiter and first
 map element on the same first line, i.e.:
 
-[source,yaml]
+[cols="a,a", frame=none]
+|====
+|
 .Good
+[source,yaml]
 ----
 - id: foo
   type: u1
@@ -58,9 +65,9 @@ map element on the same first line, i.e.:
   type: u2
   enum: baz
 ----
-
-[source,yaml]
+|
 .Bad
+[source,yaml]
 ----
 -
   id: foo
@@ -70,6 +77,7 @@ map element on the same first line, i.e.:
   type: u2
   enum: baz
 ----
+|====
 
 All identifiers, docstrings, comments and generally all human-readable
 text SHOULD be kept in English, unless there's a very good reason not
@@ -273,8 +281,11 @@ specify manually calculated or auto-calculated extra padding to make
 structure consume whole substream. Just omit it — it will save memory
 and CPU time on parsing.
 
-[source,yaml]
+[cols="a,a,a", frame=none]
+|====
+|
 .Good
+[source,yaml]
 ----
 seq:
   - id: header
@@ -288,9 +299,9 @@ types:
       - id: param2
         type: u2
 ----
-
-[source,yaml]
+|
 .Bad
+[source,yaml]
 ----
 seq:
   - id: header
@@ -306,9 +317,9 @@ types:
       - id: padding
         size-eos: true
 ----
-
-[source,yaml]
+|
 .Worst
+[source,yaml]
 ----
 seq:
   - id: header
@@ -322,8 +333,10 @@ types:
       - id: param2
         type: u2
       - id: padding
-        size: 58 # 64 - 4 - 2
+        size: 58
+        # 64 - 4 - 2
 ----
+|====
 
 [[inst-attr]]
 == Instance attributes
@@ -443,20 +456,20 @@ Linux:
 ----
 typedef struct
 {
-  unsigned char	e_ident[EI_NIDENT];	/* Magic number and other info */
-  Elf32_Half	e_type;			/* Object file type */
-  Elf32_Half	e_machine;		/* Architecture */
-  Elf32_Word	e_version;		/* Object file version */
-  Elf32_Addr	e_entry;		/* Entry point virtual address */
-  Elf32_Off	e_phoff;		/* Program header table file offset */
-  Elf32_Off	e_shoff;		/* Section header table file offset */
-  Elf32_Word	e_flags;		/* Processor-specific flags */
-  Elf32_Half	e_ehsize;		/* ELF header size in bytes */
-  Elf32_Half	e_phentsize;		/* Program header table entry size */
-  Elf32_Half	e_phnum;		/* Program header table entry count */
-  Elf32_Half	e_shentsize;		/* Section header table entry size */
-  Elf32_Half	e_shnum;		/* Section header table entry count */
-  Elf32_Half	e_shstrndx;		/* Section header string table index */
+  unsigned char e_ident[EI_NIDENT];     /* Magic number and other info */
+  Elf32_Half    e_type;                 /* Object file type */
+  Elf32_Half    e_machine;              /* Architecture */
+  Elf32_Word    e_version;              /* Object file version */
+  Elf32_Addr    e_entry;                /* Entry point virtual address */
+  Elf32_Off     e_phoff;                /* Program header table file offset */
+  Elf32_Off     e_shoff;                /* Section header table file offset */
+  Elf32_Word    e_flags;                /* Processor-specific flags */
+  Elf32_Half    e_ehsize;               /* ELF header size in bytes */
+  Elf32_Half    e_phentsize;            /* Program header table entry size */
+  Elf32_Half    e_phnum;                /* Program header table entry count */
+  Elf32_Half    e_shentsize;            /* Section header table entry size */
+  Elf32_Half    e_shnum;                /* Section header table entry count */
+  Elf32_Half    e_shstrndx;             /* Section header string table index */
 } Elf32_Ehdr;
 ----
 
