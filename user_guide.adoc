@@ -777,7 +777,7 @@ seq:
 
 This is much more concise and easier to maintain, isn't it? And note
 that `size` is specified on attribute level, thus it applies to all
-possible type values, setting us a good hard limit. What's ever better -
+possible type values, setting us a good hard limit. What's even better -
 even if you're missing the match, as long as you have `size` specified,
 you would still parse `body` of a given size, but instead of
 interpreting it with some user type, it will be treated as having no
