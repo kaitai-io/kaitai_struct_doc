@@ -241,9 +241,9 @@ seq:
     contents: [0xca, 0xfe, 0xba, 0xbe]
 ----
 
-This reads first 4 bytes and compare them to 4 bytes `CA FE BA BE`. If
+This reads first 4 bytes and compares them to 4 bytes `CA FE BA BE`. If
 there would be any mismatch (or there would be less than 4 bytes read),
-that'll throw an exception and stop parsing at early stage, before any
+that'll throw an exception and stop parsing at an early stage, before any
 damage (pointless allocation of huge structures, waste of CPU cycles)
 would be done.
 
@@ -252,8 +252,8 @@ Note that `contents` is very flexible and you can specify there:
 * An UTF-8 string - bytes from such a string would be used to check
 against
 * An array with:
-** integers in decimal representation
-** integers in hexadecimal representation, starting with 0x
+** bytes in decimal representation
+** bytes in hexadecimal representation, starting with 0x
 ** UTF-8 strings
 
 In case of using an array, all elements' byte representations would be
