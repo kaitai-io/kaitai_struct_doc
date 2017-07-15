@@ -351,8 +351,8 @@ process: zlib
 * Contents: one of:
   * a string in UTF-8 encoding
   * an array of:
-    * integers in decimal representation
-    * integers in hexadecimal representation, starting with `0x`
+    * bytes in decimal representation
+    * bytes in hexadecimal representation, starting with `0x`
     * strings in UTF-8 encoding
 * Purpose: specify fixed contents that should be encountered by parser at this point
 * Influences: parser checks if specified content exists at a given point in stream; if everything matches, then parsing continues; if content in the stream doesn't match bytes specified in given `contents`, it will trigger a parsing exception, thus signalling that something went terribly wrong and it's meaningless to continue parsing.
