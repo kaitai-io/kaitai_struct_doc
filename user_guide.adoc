@@ -50,13 +50,13 @@ Please refer to http://kaitai.io/#download[official website] for
 installation instructions. After installation, you're expected to
 have:
 
-* `ksc` (or `kaitai-struct-compiler`) - command-line Kaitai Struct
+* `ksc` (or `kaitai-struct-compiler`) — command-line Kaitai Struct
   compiler, a program that translates `.ksy` into parsing libraries in
   a chosen target language.
-* `ksv` (or `kaitai-struct-visualizer`, optional) - console visualizer
+* `ksv` (or `kaitai-struct-visualizer`, optional) — console visualizer
 
 NOTE: `ksc` shorthand might be not available if your system doesn't
-support symbolic links - just use the full name then.
+support symbolic links — just use the full name then.
 
 If you're going to invoke `ksc` frequently, you'd probably want to add
 it to your executable searching `PATH`, so you don't have to type full
@@ -115,7 +115,7 @@ Struct language itself.
 === Fixed-size structures
 
 Probably the simplest thing KS can do is reading fixed-size structures.
-You might know them as C struct definitions - consider something like
+You might know them as C struct definitions — consider something like
 this fictional database entry that keeps track of the dog show
 participants:
 
@@ -175,11 +175,11 @@ is to be used to designate number of bytes in this array
 *** "s" means signed, "u" means unsigned
 *** number is the number of bytes
 *** if you need to specify non-default endianness, you can force it by
-appending `be` or `le` - i.e. `s4be`, `u8le`, etc
+appending `be` or `le` — i.e. `s4be`, `u8le`, etc
 ** `f4` and `f8` for IEEE 754 floating point numbers; `4` and `8`,
 again, designate the number of bytes (single or double precision)
 *** if you need to specify non-default endianness, you can force it by
-appending `be` or `le` - i.e. `f4be`, `f8le`, etc
+appending `be` or `le` — i.e. `f4be`, `f8le`, etc
 ** `str` is used for strings; that is almost the same as "no type", but
 string has a concept of encoding, which must be specified using
 `encoding`
@@ -249,7 +249,7 @@ would be done.
 
 Note that `contents` is very flexible and you can specify there:
 
-* An UTF-8 string - bytes from such a string would be used to check
+* An UTF-8 string — bytes from such a string would be used to check
 against
 * An array with:
 ** bytes in decimal representation
@@ -291,7 +291,7 @@ definitely not recommended in real-life specs):
 ----
 
 NOTE: There's no need to specify `type` or `size` for fixed contents
-data - it all comes naturally from the `contents`.
+data — it all comes naturally from the `contents`.
 
 === Variable-length structures
 
@@ -318,7 +318,7 @@ seq:
 
 Note the `size` field: we use not a constant, but a reference to a field
 that we've just parsed from a stream. Actually, you can do much more
-than that - you can use a full-blown expression language in `size`
+than that — you can use a full-blown expression language in `size`
 field. For example, what if we're dealing with UTF-16 string and
 `my_len` value designates not a number of bytes, but number of byte
 pairs?
@@ -334,7 +334,7 @@ seq:
     encoding: UTF-16LE
 ----
 
-One can just multiply `my_len` by 2 - and voila - here's our UTF-16
+One can just multiply `my_len` by 2 — and voila — here's our UTF-16
 string. Expression language is very powerful, we'll be talking more
 about it later.
 
@@ -424,7 +424,7 @@ just by doing `type: str_with_len`. The type itself is defined using
 `types:` key on top-level type. That's a map, inside it we can define as
 many subtypes as we want. We define just one, and inside it we just nest
 the exact same syntax as we use for the type description on the top
-level - i.e. the same `seq` designation.
+level — i.e. the same `seq` designation.
 
 NOTE: There's no need for `meta` here, as type name is derived from
 `types` key name here.
@@ -458,10 +458,10 @@ types:
 If `body_len` attribute was in the same type as `body`, we could just
 use `size: body_len`. However, in this case we've decided to split the
 main header into separate subtype, so we'll have to access it using `.`
-operator - i.e. `size: header.body_len`.
+operator — i.e. `size: header.body_len`.
 
 Obviously, one can chain attributes with `.` to dig deeper into type
-hierarchy - i.e. `size: header.subheader_1.subsubheader_1_2.field_4`.
+hierarchy — i.e. `size: header.subheader_1.subsubheader_1_2.field_4`.
 But sometimes we need just the opposite: how do we access upper-level
 elements from lower-level types? KS provides two options here:
 
@@ -752,7 +752,7 @@ However, it's easy to see why it's not a very good solution:
 
 * We end up writing lots of repetitive lines
 * We create lots of `body_*` attributes in a type, while in reality only
-only `body` would exist - everything else would fail the `if` comparison
+only `body` would exist — everything else would fail the `if` comparison
 and thus would be null
 * If we want to catch up the "else" branch, i.e. match everything not
 matched with our `if`s, we have to write an inverse of sum of `if`s
@@ -803,7 +803,7 @@ other value which was not listed explicitly.
 
 === Instances: data beyond the sequence
 
-So far we've done all the data specifications in `seq` - thus they'll
+So far we've done all the data specifications in `seq` — thus they'll
 get parsed immediately from the beginning of the stream, one-by-one, in
 strict sequence. But what if the data you want is located at some other
 position in the file, or comes not in sequence?
@@ -875,8 +875,8 @@ language), `seq` attributes and `instances` are exactly the same.
 
 Sometimes, it is useful to transform the data (using expression
 language) and store it as a named value. There's another sort of
-instances for that - calculated (AKA "value") instances. They're very
-simple to use, there's only one key in it - `value` - that specifies
+instances for that — calculated (AKA "value") instances. They're very
+simple to use, there's only one key in it — `value` — that specifies
 expression to calculate:
 
 [source,yaml]
@@ -1175,7 +1175,7 @@ this.joe = new Person(_io__raw_joe, this, _root);
 
 After that, parsing of `person` type will be totally bound to limits
 of that particular substream. Anything in Person class whatsoever
-can't do a thing to original stream - it just doesn't have access to
+can't do a thing to original stream — it just doesn't have access to
 that object, period.
 
 Let's check out a few use cases that demonstrate how powerful this
@@ -1429,7 +1429,7 @@ or instance attributes (i.e. `u1`, `u4le`, `s8`, `b3`, etc), or can be
 specified literally. One can use:
 
 * normal decimal form (i.e. `123`)
-* hexadecimal form using `0x` prefix (i.e. `0xcafe` - both upper case and lower case letters are legal, i.e. `0XcAfE` or `0xCAfe` will do as well)
+* hexadecimal form using `0x` prefix (i.e. `0xcafe` — both upper case and lower case letters are legal, i.e. `0XcAfE` or `0xCAfe` will do as well)
 * binary form using `0b` prefix (i.e. `0b00111011`)
 * octal form using `0o` prefix (i.e. `0o755`)
 
@@ -1554,7 +1554,7 @@ Ruby, PHP and Shell script:
 |===
 
 NOTE: One of the most widely used control characters, ASCII zero
-character (code 0) can be specified as `\0` - exactly as it works in
+character (code 0) can be specified as `\0` — exactly as it works in
 most languages.
 
 CAUTION: Octal notation is prone to errors: due to its flexible
@@ -1584,7 +1584,7 @@ Basically, that's the types one defines using `.ksy` syntax -
 i.e. top-level structure and all substructures defined in `types` key.
 
 Normally, they are translated into classes (or their closest available
-equivalent - i.e. storage structure with members + access members) in
+equivalent — i.e. storage structure with members + access members) in
 target language.
 
 ==== Arrays
@@ -1607,11 +1607,11 @@ One can use array literals syntax to declare an array (very similar to
 syntax used in JavaScript, Python and Ruby). Type will be derived
 automatically based on types of values inside brackets, for example:
 
-* `[123, 456, -789]` - array of integers
-* `[123.456, 1.234e+78]` - array of floats
-* `["foo", "bar"]` - array of strings
-* `[true, true, false]` - array of booleans
-* `[a0, a1, b0]` - given that `a0`, `a1` and `b0` are all the same
+* `[123, 456, -789]` — array of integers
+* `[123.456, 1.234e+78]` — array of floats
+* `["foo", "bar"]` — array of strings
+* `[true, true, false]` — array of booleans
+* `[a0, a1, b0]` — given that `a0`, `a1` and `b0` are all the same
   objects of user-defined type `some_type`, this would be array of
   user-defined type `some_type`
 
@@ -1630,13 +1630,13 @@ applied to two strings would mean string concatentation.
 
 Can be applied to integers and floats:
 
-* `a + b` - addition
-* `a - b` - subtraction
-* `a * b` - multiplication
-* `a / b` - division
-* `a % b` - modulo; note that it's not a remainder: `-5 % 3` is `1`,
+* `a + b` — addition
+* `a - b` — subtraction
+* `a * b` — multiplication
+* `a / b` — division
+* `a % b` — modulo; note that it's not a remainder: `-5 % 3` is `1`,
   not `-2`; the result is undefined for negative `b`.
-* `a ** b` - exponentiation (`a` in power of `b`)
+* `a ** b` — exponentiation (`a` in power of `b`)
 
 NOTE: If both operands are integer, result of arithmetic operation is
 integer, otherwise it is floating point number. For example, that
@@ -1644,40 +1644,40 @@ means that `7 / 2` is `3`, and `7 / 2.0` is `3.5`.
 
 Can be applied to strings:
 
-* `a + b` - string concatenation
+* `a + b` — string concatenation
 
 ==== Relational operators
 
 Can be applied to integers, floats and strings:
 
-* `a < b` - true if `a` is strictly less than `b`
-* `a <= b` - true if `a` is less or equal than `b`
-* `a > b` - true if `a` is strictly greater than `b`
-* `a >= b` - true if `a` is greater or equal than `b`
+* `a < b` — true if `a` is strictly less than `b`
+* `a <= b` — true if `a` is less or equal than `b`
+* `a > b` — true if `a` is strictly greater than `b`
+* `a >= b` — true if `a` is greater or equal than `b`
 
 Can be applied to integers, floats, strings, booleans and enums (does
 proper string value comparison):
 
-* `a == b` - true if `a` is equal to `b`
-* `a != b` - true if `a` is not equal to `b`
+* `a == b` — true if `a` is equal to `b`
+* `a != b` — true if `a` is not equal to `b`
 
 ==== Bitwise operators
 
 Can be only applied to integers.
 
-* `a << b` - left bitwise shift
-* `a >> b` - right bitwise shift
-* `a & b` - bitwise AND
-* `a | b` - bitwise OR
-* `a ^ b` - bitwise XOR
+* `a << b` — left bitwise shift
+* `a >> b` — right bitwise shift
+* `a & b` — bitwise AND
+* `a | b` — bitwise OR
+* `a ^ b` — bitwise XOR
 
 ==== Logical (boolean) operators
 
 Can be only applied to boolean values.
 
-* `not x` - boolean NOT
-* `a and b` - boolean AND
-* `a or b` - boolean OR
+* `not x` — boolean NOT
+* `a and b` — boolean AND
+* `a or b` — boolean OR
 
 === Methods
 
@@ -2223,7 +2223,7 @@ TODO
 
 In any cases, size of the data to process must be defined (either with
 `size: ...` or with `size-eos: true`), i.e. this is legal (without
-process - size takes will be determined by `some_body_type`, reading
+process — size takes will be determined by `some_body_type`, reading
 normally from a stream):
 
 [source,yaml]
@@ -2241,7 +2241,7 @@ seq:
   - id: body
     process: xor(0xaa)
     type: some_body_type
-    # will not compile - lacks size
+    # will not compile — lacks size
 ----
 
 This is because most processing algorithms require to know size of data
