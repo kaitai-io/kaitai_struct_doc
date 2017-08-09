@@ -1454,15 +1454,17 @@ parse flag bitfields, as you can omit `flag_foo != 0` syntax and just
 use something more concise, such as `is_foo`.
 
 *Byte arrays* are defined in the attribute syntax when you don't
-specify anything as `type`, but specify `size` or `size-eos`
-instead. Byte array literals use typical array syntax like the one
+specify anything as `type`. Size of byte array is thus determined
+using `size`, `size-eos` or `terminator`, one which is mandatory in
+this case. Byte array literals use typical array syntax like the one
 used in Python, Ruby and JavaScript: i.e. `[1, 2, 3]`. There is a
 little catch here: the same syntax is used for "true" arrays of
 objects (see below), so if you'll try to do stuff like `[1, 1000, 5]`
 (`1000` obviously won't fit in a byte), you won't get a byte array,
 you'll get array of integers instead.
 
-*Strings* normally come from using `type: str` or `type: strz`.
+*Strings* normally come from using `type: str` (or `type: strz`, which
+is actually a shortcut that also implicitly adds `terminator: 0`).
 Literal strings can be specified using double quotes or single
 quotes. The meaning of single and double quotes is similar to those of
 Ruby, PHP and Shell script:
@@ -1654,7 +1656,7 @@ Can be applied to integers, floats and strings:
 * `a >= b` - true if `a` is greater or equal than `b`
 
 Can be applied to integers, floats, strings, booleans and enums (does
-proper string value comparsion):
+proper string value comparison):
 
 * `a == b` - true if `a` is equal to `b`
 * `a != b` - true if `a` is not equal to `b`
