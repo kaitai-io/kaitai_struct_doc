@@ -509,14 +509,15 @@ on some conditions. For example, one can have some byte first that
 designates if some field exists (1) or not (0). In KS, you can do that
 using `if` key:
 
-....
+[source,yaml]
+----
 seq:
   - id: has_crc32
     type: u1
   - id: crc32
     type: u4
     if: has_crc32 != 0
-....
+----
 
 In this example, we again use expression language to specify a boolean
 expression in `if` key. If that expression is true, field is parsed and
@@ -529,7 +530,8 @@ After you mark some integer as "enum", it's no longer just an integer,
 so you can't compare it directly with the number. Instead you're
 expected to compare it to other enum values:
 
-....
+[source,yaml]
+----
 seq:
   - id: my_animal
     type: u1
@@ -542,7 +544,7 @@ enums:
   animal:
     1: cat
     2: dog
-....
+----
 
 There are other enum operations available, we'll cover them in
 expression language guide later.
@@ -877,14 +879,15 @@ instances for that - calculated (AKA "value") instances. They're very
 simple to use, there's only one key in it - `value` - that specifies
 expression to calculate:
 
-....
+[source,yaml]
+----
 seq:
   - id: length_in_feet
     type: f8
 instances:
   length_in_m:
     value: length_in_feet * 0.3048
-....
+----
 
 Value instance does no actual parsing, and thus do not require `pos`
 key, or `type` key (type will be derived automatically).
@@ -1949,7 +1952,7 @@ seq:
     type: custom_encrypted_object
 ----
 
-... it will output an error:
+\... it will output an error:
 
  /seq/0: unable to find type 'custom_encrypted_object', searching from doc_container
 
