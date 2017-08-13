@@ -171,7 +171,7 @@ consists of. Every attribute includes several keys, namely:
 * `type` designates attribute type:
 ** no type means that we're dealing with just a raw byte array; `size`
 is to be used to designate number of bytes in this array
-** `s1`, `s2`, `s4`, `u1`, `u2`, `s4`, etc for integers
+** `s1`, `s2`, `s4`, `u1`, `u2`, `u4`, etc for integers
 *** "s" means signed, "u" means unsigned
 *** number is the number of bytes
 *** if you need to specify non-default endianness, you can force it by
