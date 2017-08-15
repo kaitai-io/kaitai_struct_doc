@@ -801,6 +801,9 @@ other value which was not listed explicitly.
         _: rec_type_unknown
 ----
 
+Switching types can be a very useful technique. For more advanced
+usage examples, see <<switch-advanced>>.
+
 === Instances: data beyond the sequence
 
 So far we've done all the data specifications in `seq` — thus they'll
@@ -1850,6 +1853,128 @@ a few pre-defined internal methods (they all start with an underscore
 |===
 
 == Advanced techniques
+
+[[switch-advanced]]
+=== Advanced switching
+
+==== Switching over strings
+
+One can use type switching technique over any other comparable values
+beside integers. For example, one can switch over a string value. Note
+that left side (key) of `cases` map is a full-featured KS expression,
+thus all we need is to specify a string. Don't forget that there's
+still YAML syntax that might get in a way, so we effectively need to
+quote strings twice: once for KS expression language, and once in the
+YAML representation to save these quotes from being interpreted by
+YAML parser, i.e.:
+
+[source,yaml]
+----
+seq:
+  - id: rec_type
+    type: strz
+  - id: body
+    type:
+      switch-on: rec_type
+      cases:
+        '"KETCHUP"': rec_type_1
+        '"MUSTARD"': rec_type_2
+        '"GUACAMOLE"': rec_type_3
+----
+
+If target language allows switching over strings, it will be rendered
+as `switch`-style statement, or, if it does not, ksc will fall back to
+`if`-based rendition.
+
+==== Switching over enums
+
+One can use enums as well. To match against enum values, you would
+have to specify enum literals (i.e. `enum_name::some_value`), and,
+given that it involves semicolons, we'll have to use YAML quotes
+again:
+
+[source,yaml]
+----
+seq:
+  - id: media_type
+    type: u2
+    enum: media
+  - id: body
+    type:
+      switch-on: rec_type
+      cases:
+        'media::cdrom': rec_type_1
+        'media::dvdrom': rec_type_2
+        'media::cassette': rec_type_3
+----
+
+==== FourCC
+
+Quite a few formats (like TIFF, RIFF, AVI, etc) use a thing called
+"FourCC" to switch over in a typical TLV implementation. "FourCC"
+(which stands for "four character code") is essentially a 4-byte
+value, which is often made human-readable to aid debugging. It's
+usually tempting to use a fixed-size string and match it against a
+list of strings:
+
+[source,yaml]
+----
+seq:
+  - id: fourcc
+    type: str
+    size: 4
+    encoding: ASCII
+  - id: len
+    type: u4
+  - id: body
+    size: len
+    type:
+      switch-on: fourcc
+      cases:
+        '"RGB2"': block_rgb2
+        '"RLE4"': block_rle4
+        '"RLE8"': block_rle8
+----
+
+However, this is generally a bad idea:
+
+* Reading and matching strings is slow. At least it's much slower than
+  reading a single 4-byte integer (because it often involves multiple
+  copying of data, encoding checks / conversions, etc). The whole
+  point of using 4-byte FourCC originally was to provide a fast way to
+  read it in single operation.
+* It's hard to provide an encoding for such a string. Quite a few
+  formats introduced non-ASCII FourCC values, and, even if all current
+  values are ASCII-safe, there's no guarantee that there would be no
+  weird values like `C6 A2 ED 39` in future.
+
+The recommended way to handle FourCC-style types is using a enum:
+
+[source,yaml]
+----
+seq:
+  - id: fourcc
+    type: u4le
+    enum: pixel_formats
+  - id: len
+    type: u4
+  - id: body
+    size: len
+    type:
+      switch-on: fourcc
+      cases:
+        'pixel_formats::rgb2': block_rgb2
+        'pixel_formats::rle4': block_rle4
+        'pixel_formats::rle8': block_rle8
+enums:
+  pixel_formats:
+    0x32424752: rgb2
+    0x34454C52: rle4
+    0x38454C52: rle8
+----
+
+This runs as fast as it was originally intended, and it provides extra
+benefits of allowing more verbose FourCC value descriptions.
 
 === Importing types from other files
 
