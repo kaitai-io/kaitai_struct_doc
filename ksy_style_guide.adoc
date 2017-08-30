@@ -251,7 +251,7 @@ guesswork.
   i.e. `width`, `header`, `transaction_id`, `file`.
 * For repeated files (i.e. with `repeat: something`), use plular form
   — i.e. `files`, `transactions`.
-* Don't be overfly verbose: use commonly understood abbreviations
+* Don't be overly verbose: use commonly understood abbreviations
   liberally, if it will improve readablity — i.e. `src_mac` or
   `src_mac_addr` instead of `source_media_access_control_address`
 * For fields that are designed to be used to detect file type (AKA
