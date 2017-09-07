@@ -1028,7 +1028,7 @@ Such method is useful when you need to do more intricate bit
 combinations, like a value with its bits scattered across several
 bytes sparsely.
 
-=== Streams and substreams
+== Streams and substreams
 
 Imagine that we're dealing with structures of known size. For sake of
 simplicity, let's say that it's fixed to exactly 20 bytes (but all the
@@ -1184,7 +1184,7 @@ that object, period.
 Let's check out a few use cases that demonstrate how powerful this
 practice can be.
 
-==== Limiting total size of structure
+=== Limiting total size of structure
 
 Quite often binary formats use the following technique:
 
@@ -1265,7 +1265,7 @@ For `comment`, we just it to have size up until the end of
 stream. Given that we've limited it to the substream in the first
 place, this means exactly what we wanted.
 
-==== Repeating until total size reaches limit
+=== Repeating until total size reaches limit
 
 The same technique might be useful for repetitions as well. If you
 have an array of same-type entries, and a format declares total size
@@ -1339,6 +1339,176 @@ types:
   entry:
     # ...
     # Now, this can even be of variable size: that's totally ok.
+----
+
+=== Relative positioning
+
+Another useful feature that's possible with substreams is the fact
+while you're in a substream, `pos` key works in context of that
+substream as well. That means it addresses data relatively to that
+substream:
+
+[source,yaml]
+----
+seq:
+  - id: some_header
+    size: 20
+  - id: body
+    type: block
+    size: 80
+types:
+  block:
+    seq:
+      - id: foo
+        type: u4
+    instances:
+      some_bytes_in_the_middle:
+        pos: 30
+        size: 16
+----
+
+In this example, `body` allocates a substream spanning from 20th byte
+(inclusive) till 100th byte (exclusive). Then, in that stream:
+
+* `foo` would be parsed right from the beginning of that substream,
+  thus taking up bytes `[20..24)`
+* `some_bytes_in_the_middle` would start parsing 16 bytes from 30th
+  byte *of a substream*, thus parsing bytes `[20 + 30 .. 20 + 46)` =
+  `[50..66)` in the main stream.
+
+This comes super handy if your format's internal structures somehow
+specify offsets relative to some other structures of the format. For
+example, a typical filesystem/database often uses concept of blocks
+and offsets address stuff inside the current block. Note how KSY with
+substreams is easier to read, more concise and less error-prone:
+
+[cols="a,a", frame=none]
+|====
+|
+.Good (w/substream)
+[source,yaml]
+----
+seq:
+  - id: len_block
+    type: u4
+  - id: some_block
+    pos: 12345 * len_block
+    size: len_block
+    type: data_block
+types:
+  data_block:
+    seq:
+      - id: ofs_data
+        type: u2
+    instances:
+      data:
+        pos: ofs_data
+        size: 40
+----
+|
+.Bad (w/o substream)
+[source,yaml]
+----
+seq:
+  - id: len_block
+    type: u4
+  - id: some_block
+    pos: 12345 * len_block
+    # no size => no substream!
+    type: data_block
+types:
+  data_block:
+    seq:
+      - id: ofs_data
+        type: u2
+    instances:
+      data:
+        pos: 12345 * _root.len_block + ofs_data
+        size: 40
+----
+|====
+
+The more levels of structure offset nesting there, the more
+complicated these `pos` expression would get without substreams.
+
+=== Absolute positioning
+
+If you'd ever need to "escape" the limitations of a substream when
+using a `pos` key of a parse instance and address something absolutely
+(i.e. in the main stream), it's easy to do so by adding `io` key to
+choose root's stream:
+
+[source,yaml]
+----
+seq:
+  - id: some_header
+    size: 20
+  - id: files
+    size: 80
+    type: file_entry
+    repeat: eos
+types:
+  file_entry:
+    seq:
+      - id: file_name
+        type: strz
+      - id: ofs_body
+        type: u4
+      - id: len_body
+        type: u4
+    instances:
+      body:
+        io: _root._io
+        pos: ofs_body
+        size: len_body
+----
+
+That's the typical situation encountered in many file container
+formats. Here we have a list of `files`, and each of its entries has
+been limited to exactly 80 bytes. Inside each 80-byte chunk, there's a
+`file_name`, and, more importantly, pointer to absolute location of
+the file's body inside the file. `body` instance allows us to get that
+file's body contents quickly and easily. Note that if there was no
+`io: _root._io` key there, that `body` would have been parsed inside a
+80-byte substream (and most likely that would result in an exception
+trying to read outside of 80 byte limit), and that's not what we want
+here.
+
+=== Choosing a substream
+
+Of course, the technique above is not limited to just the root
+object's stream. You can address any other object's stream as well,
+for example:
+
+[source,yaml]
+----
+seq:
+  - id: global_header
+    size: 1024
+  - id: block_one
+    type: big_container
+    size: 4096
+  - id: block_two
+    type: smaller_container
+    size: 1024
+types:
+  big_container:
+    seq:
+      - id: some_header
+        size: 8
+      # the rest of the data in this container would be referenced
+      # from other blocks
+  smaller_container:
+    seq:
+      - id: ofs_in_big
+        type: u4
+      - id: len_in_big
+        type: u4
+    instances:
+      something_in_big:
+        io: _root.big_container._io
+        pos: ofs_in_big
+        size: len_in_big
 ----
 
 === Processing: dealing with compressed, obfuscated and encrypted data
