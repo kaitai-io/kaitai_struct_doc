@@ -1682,6 +1682,40 @@ Can be only applied to boolean values.
 * `a and b` — boolean AND
 * `a or b` — boolean OR
 
+==== Ternary (if-then-else) operator
+
+If `condition` (must be boolean expression) is true, then `if_true`
+value is returned, otherwise `if_false` value is returned:
+
+[source,java]
+----
+condition ? if_true : if_false
+
+// Examples
+code == block_type::int32 ? 4 : 8
+"It has a header: " + (has_header ? "Yes" : "No")
+----
+
+[NOTE]
+====
+`if_true` and `if_false` must have compatible types. As some
+languages (for example, C++ and, to some extent, Java) do not allow
+storage of, for example, strings, integers and byte arrays in the same
+variable, it's generally a bad idea to do something like `foo ? 123 :
+"some_string"` or `foo ? true : [12, 34]`.
+
+It is acceptable to mix:
+
+* integer of various origins and sizes — it would result in universal
+  "one size fits all" integer for a target language
+* integers and floats — it would result in "one size fits all"
+  floating point type
+* strings of various origin and encodings
+* booleans of various origin
+* objects of different user-defined types — it would result in a
+  generic KaitaiStruct object
+====
+
 === Methods
 
 Just about every value in expression language is an object (including
