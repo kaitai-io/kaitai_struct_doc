@@ -91,3 +91,69 @@ All these tools are advanced hex editors with some sort of *template language*, 
 ****
 * Preon: https://github.com/preon/preon
 ****
+
+== Format specification: how to ...
+
+=== ... use variable-length integer quantities (AKA VLQ, varint, vint, LEB128/ULEB128, 7-bit encoded int, Base-128 encoding)?
+
+In most cases, you can just import existing implementation from our
+stdlib:
+
+* http://formats.kaitai.io/vlq_base128_be/[vlq_base128_be] for
+  big-endian VLQ (as used in ASN.1 BER encoding, standard MIDI file
+  format, etc)
+* http://formats.kaitai.io/vlq_base128_le/[vlq_base128_le] for
+  little-endian VLQ (as used in DWARF debugging info, Google Protocol
+  Buffers, Apache Lucene, Apache Avro, etc)
+
+Typical usage example:
+
+[source,yaml]
+----
+meta:
+  id: test_vlq
+  imports:
+    - /common/vlq_base128_le
+seq:
+  - id: len
+    type: vlq_base128_le
+  - id: buf
+    size: len.value
+----
+
+=== ... binary-coded decimals (BCD)?
+
+There's lot of variety when it comes to BCD representations:
+
+* Number of decimal digits is different
+* BCDs that use byte per digit or nibble (half-of-a-byte) per digit
+* Endianness: might be little or big
+
+Kaitai Struct stdlibs include a parameterized type
+http://formats.kaitai.io/bcd/[bcd] which suports majority of these BCD
+versions using parameters (available in Kaitai Struct v0.8+):
+
+* `num_digits` — integer, number of digits (valid values: 1..8)
+* `bits_per_digit` — integer, number of bits per digit (valid values: 4 or 8)
+* `is_le` — boolean, specifies order of digits: true if little-endian,
+  false if big-endian
+
+Typical usage example:
+
+[source,yaml]
+----
+meta:
+  id: test_bcd
+  imports:
+    - /common/bcd
+seq:
+  - id: len                # In stream: 03 02 01 00 00
+    type: bcd(5, 8, true)
+  - id: buf                # Buffer of 123 bytes
+    size: len.as_int
+----
+
+NOTE: If you don't need to access BCD value as an integer or a string
+(for example, it is very often used to store serial numbers and
+identifiers in hardware protocols), consider just treating it as an
+opaque byte array.
