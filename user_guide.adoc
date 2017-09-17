@@ -2597,6 +2597,21 @@ endianness would use endianness determined by a switch expression in
 would also be propagated to other subtypes, declared within
 `tiff_body`.
 
+If `indicator` is neither `II` nor `MM`, i.e. both `cases` fail, then
+this example would trigger a parsing exception. If you want to handle
+it in a manner like "II means little-endian and everything else means
+big-endian", then use normal else case (`_`):
+
+[source,yaml]
+----
+meta:
+  endian:
+    switch-on: _root.indicator
+    cases:
+      '[0x49, 0x49]': le
+      _: be
+----
+
 == Common pitfalls
 
 This section illustrates problems that are encountered frequently by
