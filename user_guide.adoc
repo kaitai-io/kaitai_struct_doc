@@ -700,6 +700,7 @@ types:
         size: len
 ----
 
+[[tlv]]
 === Typical TLV implementation (switching types on an expression)
 
 "TLV" stands for "type-length-value", and it's a very common staple in
@@ -2538,6 +2539,63 @@ Language design explanation: while it might seem logical to specify
 ====
 
 TODO: an example where omitting the parent comes useful
+
+=== Calculated default endianness
+
+IMPORTANT: Feature available since v0.8.
+
+Most formats (like http://formats.kaitai.io/zip/[zip],
+http://formats.kaitai.io/gif/[gif], and many others) stick to a single
+fixed endianness: they always use either big-endian or little-endian
+integers. Usually it stems from the architecture where the format was
+developed: this way format is relatively easy and quick to parse on
+its "native" architecture, and requires some extra operations (and
+parsing time) on non-native architectures.
+
+Some formats (like http://formats.kaitai.io/elf/[ELF] or
+http://formats.kaitai.io/mach_o/[Mach-O]), however, take alternative
+approach: they come in two versions (with big-endian integers and
+little-endian integers) and they add some sort of header field that
+helps to distinguish between two.
+
+To help implementing such formats, Kaitai Struct supports concept of
+calculated endianness. Instead of using `endian: be` or `endian: le`,
+one can use a switch, similar to the one introduced in
+<<tlv>>. Consider this example of a TIFF file — it begins with either
+"II" (0x49, 0x49) to specify little-endian encoding or "MM" (0x4d,
+0x4d) to specify big-endian encoding:
+
+[source,yaml]
+----
+meta:
+  id: tiff
+seq:
+  - id: indicator
+    size: 2 # first two bytes determines endianness
+  - id: body
+    type: tiff_body
+types:
+  tiff_body:
+    meta:
+      endian:
+        switch-on: _root.indicator
+        cases:
+          '[0x49, 0x49]': le
+          '[0x4d, 0x4d]': be
+    seq:
+      - id: version
+        type: u2
+      # ...
+    types:
+      ifd:
+        # inherits endianness of `tiff_body`
+----
+
+In this example, `version` and all other numeric types without forced
+endianness would use endianness determined by a switch expression in
+`meta/endian` of `tiff_body`. Moreover, this determined endianness
+would also be propagated to other subtypes, declared within
+`tiff_body`.
 
 == Common pitfalls
 
