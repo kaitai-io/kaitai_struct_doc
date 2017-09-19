@@ -1512,6 +1512,7 @@ types:
         size: len_in_big
 ----
 
+[[process]]
 === Processing: dealing with compressed, obfuscated and encrypted data
 
 Some formats obscure the data fully or partially with techniques like
@@ -2265,6 +2266,7 @@ CAUTION: Please use only forward slashes `/` in import paths for
 consistency. Kaitai Struct will convert them automatically to proper
 platform-dependent path separator (`/` or `\`).
 
+[[opaque-types]]
 === Opaque types: plugging in external code
 
 Sometimes you'd want KS-generated code to call a code in your
@@ -2360,6 +2362,131 @@ instantiates other, but does not use it in any other way (i.e. doesn't
 access its inner attributes using expression language), one can just
 compile two .ksy files separately, throw them into the same project
 and they shall use each other without a problem.
+
+[[custom-process]]
+=== Custom processing routines
+
+IMPORTANT: Feature available since v0.8.
+
+As discussed in <<process>>, Kaitai Struct utilizes `process` key to
+invoke processing of the data for the purposes of "bytes in - bytes
+out" transformation. It is meant to be used to implement compression &
+decompression, encryption & decryption, obfuscation & deobfuscation,
+that kind of transformations.
+
+Kaitai Struct runtime libraries come bundled with "standard" set of
+such transformations, but quite often one would encounter the need to
+implement some custom data transformation algorithm. There are many
+thousands of encryption and compression algorithms. It's unpractical
+to both try to implement them in declarative form using standard
+Kaitai Struct types (because as end-user, you're most likely
+interested in decoded result, not internal structures of the
+algorithm/cipher), and it's next to impossible to bundle all the data
+processing algorithms in the world into Kaitai Struct runtime (not
+only it would become *very* bloated, but also quite a few such
+algorithms are encumbered by software patents and licensing
+restrictions).
+
+To alleviate this problem, Kaitai Struct allows one to invoke custom
+processing algorithms, implemented in imperative code in target
+languages. This acts very similar to <<opaque-types,opaque external
+types>>, but this one works for `process` invocations, not for `type`
+invocations.
+
+Calling a custom process type is easy:
+
+[source,yaml]
+----
+seq:
+  - id: key
+    type: s4
+  - id: buf
+    size: 50
+    process: my_custom_processor(key)
+----
+
+This would generate something like this (example is for Java, other
+target languages use similar technique):
+
+[source,java]
+----
+// Reads 50 bytes to process.
+this._raw_buf = this._io.readBytes(50);
+
+// Initializes processor object, passing every argument specified in
+// `process` key into constructor
+MyCustomProcessor _process__raw_buf = new MyCustomProcessor(key());
+
+// Invokes `decode(...)` method, passing unprocessed byte array,
+// expecting it to return a processed one.
+this.buf = _process__raw_buf.decode(this._raw_buf);
+----
+
+Typical implementation of a custom processor would look like that
+(again, example for in Java, refer to language-specific notes for
+documentation on other languages):
+
+[source,java]
+----
+import io.kaitai.struct.CustomDecoder;
+
+public class MyCustomProcessor implements CustomDecoder {
+    private int key;
+
+    public CustomFx(int key) {
+        this.key = key;
+    }
+
+    @Override
+    public byte[] decode(byte[] src) {
+        // custom "bytes in -> bytes out" processing routine
+        byte[] dst = new byte[src.length];
+        for (int i = 0; i < src.length; i++) {
+           dst[i] = (byte) (src[i] + key);
+        }
+
+        return dst;
+    }
+}
+----
+
+This example is mostly self-explanatory. Strong typed languages, such
+as Java, usually provide some sort of interface that such a custom
+processor class should implement. For Java, it's named
+`CustomDecoder`. And, as outlined there, we implement:
+
+* a custom constructor, which accepts the encoding parameters (like
+  keys, etc), as specified in a ksy
+* a `decode(byte[] src)` method which decodes a given byte array — in
+  this particular example, it just adds whatever we supplied as "key"
+  to every byte
+
+NOTE: `decode` can return different number of bytes that it gets
+(which is perfectly normal, for example, for decompression).
+
+By default, specifying a plain name invokes a custom processing class
+in the same namespace/package where the code is generated. If you want
+to keep your generated code in separate namespace/package than your
+custom hand-made code, you can specify it like that:
+
+[source,yaml]
+----
+seq:
+  - id: buf
+    size: 50
+    process: com.example.my_rle(5, 3)
+----
+
+For Java, this would result in invocation of `com.example.MyRle`
+class. Other languages use similar rules of translation, see
+language-specific notes for details.
+
+A special namespace prefix "kaitai." is reserved for extended
+libraries provided by Kaitai project. As of 0.8, none of them were
+published, but in future you can expect implementations like
+"kaitai.crypto.aes" or "kaitai.compress.lzma" to be provided by
+libraries implemented in multiple languages that would be released
+along the minimal core Kaitai Struct runtime.
 
 === Enforcing parent type
 
@@ -2540,6 +2667,7 @@ Language design explanation: while it might seem logical to specify
 
 TODO: an example where omitting the parent comes useful
 
+[[calc-endian]]
 === Calculated default endianness
 
 IMPORTANT: Feature available since v0.8.
