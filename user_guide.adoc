@@ -2699,6 +2699,107 @@ Language design explanation: while it might seem logical to specify
 
 TODO: an example where omitting the parent comes useful
 
+[[typecast]]
+=== Typecasting
+
+IMPORTANT: Feature available since v0.7.
+
+Kaitai Struct always tries its best to infer all the types
+automatically, but in some cases it would be impossible to do so in
+compile-time. For example, there could be some extra conditions known
+to format developer, but not to Kaitai Struct.
+
+Consider this example — a typical image format, implemented as
+<<tlv>>, which includes a variable number of self-describing sections:
+
+[source,yaml]
+----
+seq:
+  - id: num_sections
+    type: u4
+  - id: sections
+    type: section
+    repeat: expr
+    repeat-expr: num_sections
+types:
+  section:
+    seq:
+      - id: sect_type
+        type: u1
+      - id: len
+        type: u4
+      - id: body
+        size: len
+        type:
+          switch-on: sect_type
+          cases:
+            1: sect_header
+            2: sect_color_data
+            # ...
+  sect_header:
+    seq:
+      - id: width
+        type: u4
+      - id: height
+        type: u4
+----
+
+After that, a bitmap follows, and its size is to be derived as `width
+* height`, as described in `sect_header` section. In addition to that,
+we're 100% sure (due to format constraints) that body of `sections[7]`
+is always `sect_header`. How do we access `width` and `height` in it?
+
+A naïve solution like that won't compile:
+
+[source,yaml]
+----
+  - id: bitmap
+    size: sections[7].body.width * sections[7].body.height
+----
+
+reporting the following error:
+
+....
+/seq/2/size: don't know how to call anything on AnyType
+....
+
+The reason for that is that from root type perspective, all section
+bodies are alike, and in a strongly typed language, it's impossible to
+guarantee that `sections[7].body` would be the type we want, and that
+type would have `width` and `height` attributes. Not only that, but
+actually, given that we've specified `size` attribute, a `body` could
+be just a raw byte array, and not even a user type. Thus, KS decided
+that it could be `AnyType` — a type that can include anything.
+
+The best solution would be to enforce our knowledge with explicit
+typecast with `.as<...>` expression operator:
+
+[source,yaml]
+----
+  - id: bitmap
+    size: sections[7].body.as<sect_header>.width * sections[7].body.as<sect_header>.height
+----
+
+To make it prettier, one can extract
+`sections[7].body.as<sect_header>` using a named value instance:
+
+[source,yaml]
+----
+  # ...
+  - id: bitmap
+    size: header.width * header.height
+instances:
+  header:
+    value: sections[7].body.as<sect_header>
+----
+
+CAUTION: Of course, if our assumption about `sections[7]` won't come
+true in run time, things will go bad. You can expect most languages to
+throw a typecasting exception on a failed casting attempt, but in very
+low-level languages, such as C++ with RTTI disabled, this would result
+in data accessed using wrong offsets, and that could potentially lead
+to a crash / segfault / security problem.
+
 [[calc-endian]]
 === Calculated default endianness
 
