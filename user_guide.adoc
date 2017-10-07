@@ -353,6 +353,7 @@ seq:
     size-eos: true
 ----
 
+[[enums]]
 === Enums (named integer constants)
 
 The nature of binary format encoding dictates use that in many cases
@@ -391,6 +392,37 @@ identifiers.
 represented by that enum, instead of just being a raw integer. Note that
 such attributes must have some sort of integer type in the first place
 (i.e. `type: u*` or `type: s*`).
+
+[[verbose-enums]]
+==== Verbose enums
+
+IMPORTANT: Feature available since v0.8.
+
+If you want to add some documentation for enums, this is possible
+using verbose enums declaration:
+
+[source,yaml]
+----
+enums:
+  ip_protocol:
+    1:
+      id: icmp
+      doc: Internet Control Message Protocol
+      doc-ref: https://www.ietf.org/rfc/rfc792
+    6:
+      id: tcp
+      doc: Transmission Control Protocol
+      doc-ref: https://www.ietf.org/rfc/rfc793
+    17:
+      id: udp
+      doc: User Datagram Protocol
+      doc-ref: https://www.ietf.org/rfc/rfc768
+----
+
+In this format, instead of specifying just the identifier for every
+numeric value, you specify YAML map, which has `id` key for
+identifier, and allows other regular keys (like `doc` and `doc-ref`)
+to specify documentation.
 
 === Substructures (subtypes)
 
@@ -1173,7 +1205,7 @@ this._raw_joe = this._io.readBytes(20);
 // Second, we wrap our bytes into a new stream, a substream
 KaitaiStream _io__raw_joe = new KaitaiStream(_raw_joe);
 
-// Finally, we pass our substream to Person class instead of 
+// Finally, we pass our substream to Person class instead of
 this.joe = new Person(_io__raw_joe, this, _root);
 ----
 
@@ -2738,6 +2770,174 @@ meta:
     cases:
       '[0x49, 0x49]': le
       _: be
+----
+
+[[param-types]]
+=== Parameteric types
+
+IMPORTANT: Feature available since v0.8.
+
+[[repeat-index]]
+=== Repetition index
+
+IMPORTANT: Feature available since v0.8.
+
+For majority of formats, one doesn't need to access loop iteration
+index. If you have a typical archive file directory, which lists file
+name, offset of the file body and size of the file body together, just
+use the object-oriented approach:
+
+[source,yaml]
+----
+seq:
+  - id: num_files
+    type: u4
+  - id: files
+    type: file_entry
+    repeat: expr
+    repeat-expr: num_files
+types:
+  file_entry:
+    seq:
+      - id: name
+        type: strz
+      - id: ofs_body
+        type: u4
+      - id: len_body
+        type: u4
+    instances:
+      body:
+        pos: ofs_body
+        size: len_body
+----
+
+However, if your format has that information laid out sparsely,
+i.e. separate table of file names, separate table of file offsets and
+separate table of file sizes, things become more complicated. In these
+cases, it's much more practical to use `_index` to access repetition
+index and use that to access other arrays:
+
+[source,yaml]
+----
+seq:
+  - id: num_files
+    type: u4
+  # ...
+  # ... some other data here, might be variable size
+  # ...
+  - id: file_names
+    type: strz
+    repeat: expr
+    repeat-expr: num_files
+  # ...
+  # ... some other data here, might be variable size
+  # ...
+  - id: len_files
+    type: u4
+    repeat: expr
+    repeat-expr: num_files
+  # ...
+  # ... some other data here, might be variable size
+  # ...
+  - id: ofs_files
+    type: u4
+    repeat: expr
+    repeat-expr: num_files
+instances:
+  file_bodies:
+    pos: ofs_files[_index]
+    size: len_files[_index]
+    repeat: expr
+    repeat-expr: num_files
+----
+
+A more extreme example is a format that specifies only start offsets,
+but does not directly specify sizes of the files:
+
+....
+30 00 00 00│70 00 00 00│f0 02 00 00
+           │           │
+0x30       │0x70       │0x2f0
+  └────────────┘└─────────────┘
+    file 0        file 1
+
+    start 0x30    start 0x70
+    end   0x70    end   0x2f0
+    ──────────    ───────────
+    size  0x40    size  0x280
+....
+
+In this example, we have N = 3 offsets, which specify N - 1 = 2
+sections. Sizes of the sections must be derived as start of the
+following section minus start of the current section. To do such
+calculation, we can use `_index` in the expressions:
+
+[source,yaml]
+----
+seq:
+  - id: num_offsets
+    type: u4
+  # Just read offsets normally
+  - id: ofs_files
+    repeat: expr
+    repeat-expr: num_offsets
+instances:
+  files:
+    pos: ofs_files[_index]
+    size: ofs_files[_index + 1] - ofs_files[_index]
+    repeat: expr
+    repeat-expr: num_offsets - 1
+----
+
+In even more complicated example, we have file names interleaved with
+offsets. There are N - 1 file names and N offsets:
+
+....
+03 00 00 00       = 3 offsets, 2 files
+30 00 00 00       = offset 0x30
+66 6f 6f 2e 63 00 = "foo.c", null-terminated string
+70 00 00 00       = offset 0x70
+62 61 72 2e 63 00 = "bar.c", null-terminated string
+f0 02 00 00       = offset 0x2f0
+....
+
+If we had file sizes, then we could just localize everything in
+`file_entry`, as in the first example. But in this case we'll need to
+do calculation inside `file_entry`, while `_index` is defined in
+`files` attribute in outer type. The solution is to pass `_index` into
+`file_entry` using <<param-types>> and use more complex conditional
+expressions:
+
+[source,yaml]
+----
+seq:
+  - id: num_offsets
+    type: u4
+  - id: first_offset
+    type: u4
+  - id: files
+    type: file_entry(_index) # <= pass `_index` into file_entry
+    repeat: expr
+    repeat-expr: num_offsets - 1
+types:
+  file_entry:
+    params:
+      - id: i                # => receive `_index` as `i` here
+        type: u4
+    seq:
+      - id: name
+        type: strz
+      - id: ofs_end
+        type: u4
+    instances:
+      ofs_start:
+        # Normally we access previous file's end offset and use it as
+        # our current start offset, but for the very first file we'll
+        # use special field, as "previous file" does not exist for it.
+        value: 'i > 0 ? _parent.files[i - 1].ofs_end : _parent.first_offset'
+      body:
+        pos: ofs_start
+        size: ofs_end - ofs_start
 ----
 
 == Common pitfalls
