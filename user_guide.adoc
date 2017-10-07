@@ -215,7 +215,7 @@ folded style strings for longer documentation that spans multiple lines:
 ----
   - id: opcode
     type: u1
-    doc: >
+    doc: |
       Operation code that defines which operation should be performed
       by a virtual machine. Subsequent parameters for operation depend
       on the value of opcode.
