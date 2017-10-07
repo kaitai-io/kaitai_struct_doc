@@ -2777,6 +2777,104 @@ meta:
 
 IMPORTANT: Feature available since v0.8.
 
+Consider the following format, which features two similar lists of key-value pairs:
+
+[source,yaml]
+----
+seq:
+  - id: short_pairs
+    type: kv_pair_3
+    repeat: expr
+    repeat-expr: 0x100
+  - id: long_pairs
+    type: kv_pair_8
+    repeat: expr
+    repeat-expr: 0x100
+types:
+  kv_pair_3:
+    seq:
+      - id: key
+        size: 3
+        type: str
+      - id: value
+        type: strz
+  kv_pair_8:
+    seq:
+      - id: key
+        size: 8
+        type: str
+      - id: value
+        type: strz
+----
+
+The only difference between `kv_pair_3` and `kv_pair_8` types is the
+length of `key`. "Short" pairs use 3-byte long key, and "long" pairs
+use 8-byte key. That's lots of duplication, and just imagine what
+would happen if you'll need 4-byte keys or 6-byte keys. To alleviate
+that, one can declare so called "parameteric" type, like this one:
+
+[source,yaml]
+----
+types:
+  kv_pair:
+    params:
+      - id: len_key
+        type: u2
+    seq:
+      - id: key
+        size: len_key
+        type: str
+      - id: value
+        type: strz
+----
+
+`params` acts like `seq`, but instead of reading attributes values
+from the stream, these attributes are expected to be passed as
+parameters when one invokes this type. This is done by specifying
+parameter value in brackets after type name:
+
+[source,yaml]
+----
+seq:
+  - id: short_pairs
+    type: kv_pair(3)
+    repeat: expr
+    repeat-expr: 0x100
+  - id: long_pairs
+    type: kv_pair(8)
+    repeat: expr
+    repeat-expr: 0x100
+----
+
+Of course, there could be more than one parameter (in this case, they
+are to be comma-separated), and one can use a variety of types:
+
+[source,yaml]
+----
+seq:
+  - id: my_number
+    type: fancy_encrypted_number_format(3, true, [0x03, 0xb7, 0x8f])
+----
+
+`type` specification in `params` definition is slightly different from
+normal `type` specification in `seq` or `instances`. It specifies pure
+concept of "type", as would be used to represent data in a programming
+language, without any serialization details (like endianness, sizes,
+conversions, encodings, etc). Thus, one can't use any extra keys to
+specify that, but instead one can use:
+
+* no type to specify byte arrays
+* `str` to specify strings
+* `bool` to specify booleans
+* `struct` to allow arbitrary KaitaiStruct-compatible user types
+* `io` to specify KaitaiStream-compatible IO streams
+* `any` to allow any type (if target language supports that)
+
+NOTE: Parameteric types with mandatory parameters can't be read from
+file directly (as they obviously need parameter values supplied from
+somewhere), and thus typical `fromFile(...)` helper method is not
+available for them.
+
 [[repeat-index]]
 === Repetition index
 
