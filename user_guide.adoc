@@ -1886,6 +1886,31 @@ It is acceptable to mix:
   generic KaitaiStruct object
 ====
 
+[CAUTION]
+====
+Using ternary operator inside a KSY file (which must remain a valid YAML
+file) might be tricky, as some YAML parsers do not allow colons (`:`)
+inside strings literals. So, trying something like that would fail in
+some parsers (namely, it *will* fail using "desktop"
+kaitai-struct-compiler running under JVM):
+
+[source,java]
+----
+instances:
+  foo:
+    value: condition ? 4 : 8
+----
+
+To ensure maximum compatibility, put quotes around such strings, i.e:
+
+[source,java]
+----
+instances:
+  foo:
+    value: 'condition ? 4 : 8'
+----
+====
+
 === Methods
 
 Just about every value in expression language is an object (including
