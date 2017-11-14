@@ -1434,7 +1434,7 @@ complicated these `pos` expression would get without substreams.
 === Absolute positioning
 
 If you'd ever need to "escape" the limitations of a substream when
-using a `pos` key of a parsed instance and address something absolutely
+using a `pos` key of a parse instance and address something absolutely
 (i.e. in the main stream), it's easy to do so by adding `io` key to
 choose root's stream:
 
