@@ -356,7 +356,7 @@ seq:
 [[enums]]
 === Enums (named integer constants)
 
-The nature of binary format encoding dictates use that in many cases
+The nature of binary format encoding dictates us that in many cases
 we'll be using some kind of integer constants to encode certain
 entities. For example, a widely known IP packet uses 1-byte integer to
 encode protocol type for the payload: 6 would mean "TCP" (which gives us
@@ -366,7 +366,7 @@ infamous TCP/IP), 17 would mean "UDP" (which yields UDP/IP), and 1 means
 It is possible to live with just raw integers, but most programming
 language actually provide a way to program using meaningful string names
 instead. This approach is usually dubbed "enums" and it's totally
-possible to generate a enum in KS:
+possible to generate an enum in KS:
 
 [source,yaml]
 ----
@@ -537,7 +537,7 @@ types:
 === Conditionals
 
 Some protocols and file formats have optional fields, which only exist
-on some conditions. For example, one can have some byte first that
+in some conditions. For example, one can have some byte first that
 designates if some field exists (1) or not (0). In KS, you can do that
 using `if` key:
 
@@ -610,7 +610,7 @@ seq:
 ----
 
 This yields an array of unsigned integers, each is 4 bytes long, which
-spans till the end. Note that if we've got a number of bytes left in the
+spans till the end of the stream. Note that if we've got a number of bytes left in the
 stream that's not divisible by 4 (for example, 7), we'll end up reading
 as much as possible, and then parsing procedure will throw an
 end-of-stream exception. Of course, you can do that with any type,
@@ -757,7 +757,7 @@ seq:
 ----
 
 However, how do we specify the format for `body` that depends on
-`rec_type`? One of the approaches if using conditionals, as we've seen
+`rec_type`? One of the approaches is using conditionals, as we've seen
 before:
 
 [source,yaml]
@@ -785,7 +785,7 @@ However, it's easy to see why it's not a very good solution:
 
 * We end up writing lots of repetitive lines
 * We create lots of `body_*` attributes in a type, while in reality only
-only `body` would exist — everything else would fail the `if` comparison
+one `body` would exist — everything else would fail the `if` comparison
 and thus would be null
 * If we want to catch up the "else" branch, i.e. match everything not
 matched with our `if`s, we have to write an inverse of sum of `if`s
@@ -934,7 +934,7 @@ IMPORTANT: Feature available since v0.6.
 
 Quite a few protocols and file formats, especially those who aim to
 conserve space, pack multiple integers into same byte, using integer
-sizes less that 8 bits. For example, IPv4 packet starts with a byte
+sizes less than 8 bits. For example, IPv4 packet starts with a byte
 that packs both version and header length:
 
 ....
@@ -1174,9 +1174,9 @@ this.joe = new Person(_io__raw_joe, this, _root);
 ----
 
 Every class that KS generates carries a concept of "stream", usually
-available as `_io` member. This is the default stream is reads from
-and writes to. This stream works just as you might exception from a
-regular IO stream implementation in you average language: if
+available as `_io` member. This is the default stream it reads from
+and writes to. This stream works just as you might expect from a
+regular IO stream implementation in you average language: it
 incapsulates reading from files and memory, stores pointer to its
 current position, and allows reading/writing of various primitives.
 
@@ -1264,7 +1264,7 @@ Thus:
 ----
 
 But this is very inconvenient and potentially error prone. What will
-happen if in some time in future the record contents will be updated
+happen if at some time in future the record contents will be updated
 and we'll forget to update this formula?
 
 It turns out that substreams offer a much cleaner solution here. Let's
@@ -1294,7 +1294,7 @@ types:
         size-eos: true
 ----
 
-For `comment`, we just it to have size up until the end of
+For `comment`, we just made it to have size up until the end of
 stream. Given that we've limited it to the substream in the first
 place, this means exactly what we wanted.
 
@@ -1575,7 +1575,7 @@ seq:
 
 Note that:
 
-* Applying `process: ...` in available only to raw byte arrays or user
+* Applying `process: ...` is available only to raw byte arrays or user
 types.
 * One might use expression language inside `xor(...)`, thus referencing
 XOR obfuscation key read in the same format into some other field
@@ -1783,7 +1783,7 @@ will give us a stream associated with this particular object.
 === Composite data types
 
 There are two composite data types in the expression language
-(i.e. data types which include other types are components).
+(i.e. data types which include other types as components).
 
 ==== User-defined types
 
@@ -1918,6 +1918,31 @@ It is acceptable to mix:
 * booleans of various origin
 * objects of different user-defined types — it would result in a
   generic KaitaiStruct object
+====
+
+[CAUTION]
+====
+Using ternary operator inside a KSY file (which must remain a valid YAML
+file) might be tricky, as some YAML parsers do not allow colons (`:`)
+inside strings literals. So, trying something like that would fail in
+some parsers (namely, it *will* fail using "desktop"
+kaitai-struct-compiler running under JVM):
+
+[source,java]
+----
+instances:
+  foo:
+    value: condition ? 4 : 8
+----
+
+To ensure maximum compatibility, put quotes around such strings, i.e:
+
+[source,java]
+----
+instances:
+  foo:
+    value: 'condition ? 4 : 8'
+----
 ====
 
 === Methods
@@ -2325,8 +2350,8 @@ seq:
 If we want to provide our own implementation of
 `custom_encrypted_object` type, first we need to compile our .ksy file
 with `--opaque-types=true` option. This will avoid the error, and
-compiler will consider all unknown types to be "opaque", i.e. treat it
-will them as existing in some external space.
+compiler will consider all unknown types to be "opaque", i.e. it will treat 
+them as existing in some external space.
 
 Alternatively, instead of specifying command line argument
 `--opaque-types=true` to the compiler, as of Kaitai Struct version 0.7,
