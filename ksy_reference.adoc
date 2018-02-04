@@ -173,11 +173,11 @@ meta:
 * Contents: a string which matches one of the identifiers within the https://spdx.org/licenses/[SPDX license list]
 * Purpose: identify the copyright license of this .ksy file
 * Influences: nothing
-* Mandatory: no
+* Mandatory: no (organisation requires it for posting on their site, not compiler)
 
 #### file-extension
 
-* Contents: a string or an array of strings
+* Contents: a string or an array of strings, without a preceding "." dot
 * Purpose: roughly identify which files can be parsed with this format by filename extension
 * Influences: may be used for navigation purposes by browsing applications
 * Mandatory: no
@@ -192,7 +192,7 @@ documentation), compatible with tools like
 https://en.wikipedia.org/wiki/Javadoc[Javadoc],
 http://www.doxygen.org/[Doxygen], http://usejsdoc.org/[JSDoc],
 https://msdn.microsoft.com/en-us/library/b2s063f7.aspx[.NET XML
-documentation comments], etc.
+documentation comments], https://www.python.org/dev/peps/pep-0257/[Python docstrings], etc.
 
 * Contents: free-form string (note that multiple lines are allowed and
   newlines would be respected during compilation)
@@ -506,7 +506,7 @@ Specifies a fixed-length string, i.e. first it reads a designated number of byte
 
 ### `strz` keys
 
-Specifies parsing a string until a `terminator` byte (i.e. C-style strings terminated with `0`).
+Specifies parsing a string until a `terminator` byte (i.e. C-style strings terminated with `0` null byte).
 
 #### terminator
 
