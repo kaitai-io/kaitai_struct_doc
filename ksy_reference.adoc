@@ -96,7 +96,7 @@ meta:
 [[meta-id]]
 #### id
 
-* Contents: a string that follows rules for all identifiers
+* Contents: string that follows rules for all identifiers
 * Purpose: identifier for a primary structure described in top-level map
 * Influences: it would be converted to suit general formatting rules of a language and used as the name of class
 * Mandatory: yes
@@ -104,7 +104,7 @@ meta:
 [[meta-title]]
 #### title
 
-* Contents: a string
+* Contents: string
 * Purpose: free-form text string that is a longer title of this .ksy file
 * Influences: nothing
 * Mandatory: no
@@ -112,7 +112,7 @@ meta:
 [[meta-application]]
 #### application
 
-* Contents: a string
+* Contents: string
 * Purpose: free-form text string that describes application that's associated with this particular format, if it's a format used by single application
 * Influences: nothing
 * Mandatory: no
@@ -128,7 +128,7 @@ meta:
 [[meta-encoding]]
 #### encoding
 
-* Contents: a string which is a user-defined encoding scheme, for example `ASCII`, `UTF-8`, `UTF-16LE`, `UTF-16BE`, `UTF-32LE`, `UTF-32BE` or a Name from the https://www.iana.org/assignments/character-sets/character-sets.xhtml[IANA character sets registry]
+* Contents: string which is a user-defined encoding scheme, for example `ASCII`, `UTF-8`, `UTF-16LE`, `UTF-16BE`, `UTF-32LE`, `UTF-32BE` or a Name from the https://www.iana.org/assignments/character-sets/character-sets.xhtml[IANA character sets registry]
 * Purpose: sets a default string encoding for this file
 * Influences: if set, `str` and `strz` data types will have their encoding by default set to this value
 * Mandatory: no
@@ -149,7 +149,7 @@ meta:
 
 #### ks-version
 
-* Contents: a string which contains a Kaitai Struct version number
+* Contents: string which contains a Kaitai Struct version number
 * Purpose: sets the minimum version of Kaitai Struct Compiler (KSC) required to interpret this .ksy file
 * Influences: prevents this .ksy file from being read by older versions of KSC which may not understand newer syntax of this .ksy file
 * Mandatory: no
@@ -170,14 +170,14 @@ meta:
 
 #### license
 
-* Contents: a string which matches one of the identifiers within the https://spdx.org/licenses/[SPDX license list]
+* Contents: string which matches one of the identifiers within the https://spdx.org/licenses/[SPDX license list]
 * Purpose: identify the copyright license of this .ksy file
 * Influences: nothing
-* Mandatory: no
+* Mandatory: no (organisation requires it for posting on their site, not compiler)
 
 #### file-extension
 
-* Contents: a string or an array of strings
+* Contents: string or an array of strings, without a preceding "." dot
 * Purpose: roughly identify which files can be parsed with this format by filename extension
 * Influences: may be used for navigation purposes by browsing applications
 * Mandatory: no
@@ -192,7 +192,7 @@ documentation), compatible with tools like
 https://en.wikipedia.org/wiki/Javadoc[Javadoc],
 http://www.doxygen.org/[Doxygen], http://usejsdoc.org/[JSDoc],
 https://msdn.microsoft.com/en-us/library/b2s063f7.aspx[.NET XML
-documentation comments], etc.
+documentation comments], https://www.python.org/dev/peps/pep-0257/[Python docstrings], etc.
 
 * Contents: free-form string (note that multiple lines are allowed and
   newlines would be respected during compilation)
@@ -252,7 +252,7 @@ doc-ref: http://example.org/some-spec Header section
 [[seq]]
 ### `seq` — sequence of attributes
 
-* Contents: a sequence of <<spec-attribute>> elements
+* Contents: sequence of <<spec-attribute>> elements
 * Purpose: identifier for a primary structure described in top-level map
 * Influences: would be translated into parsing method in a target class
 * Mandatory: no
@@ -332,7 +332,7 @@ process: zlib
 [[attribute-id]]
 #### id
 
-* Contents: a string that matches `/^[a-z][a-z0-9_]*$/` — i.e. starts with lowercase letter and then may contain lowercase letters, numbers and underscore
+* Contents: string that matches `/^[a-z][a-z0-9_]*$/` — i.e. starts with lowercase letter and then may contain lowercase letters, numbers and underscore
 * Purpose: identify attribute among others
 * Influences: used as variable / field name in target programming language
 * Mandatory:
@@ -349,8 +349,8 @@ process: zlib
 #### contents
 
 * Contents: one of:
-  * a string in UTF-8 encoding
-  * an array of:
+  * string in UTF-8 encoding
+  * array of:
     * bytes in decimal representation
     * bytes in hexadecimal representation, starting with `0x`
     * strings in UTF-8 encoding
@@ -506,7 +506,7 @@ Specifies a fixed-length string, i.e. first it reads a designated number of byte
 
 ### `strz` keys
 
-Specifies parsing a string until a `terminator` byte (i.e. C-style strings terminated with `0`).
+Specifies parsing a string until a `terminator` byte (i.e. C-style strings terminated with `0` null byte).
 
 #### terminator
 
@@ -792,8 +792,8 @@ There are following processing directives available in Kaitai Struct.
 
 Applies a bitwise XOR (bitwise exclusive "or", written as `^` in most C-like languages) to every byte of the stream. Length of output stays exactly the same as the length of input. There is one mandatory argument - the key to use for XOR operation. It can be:
 
-* a single byte value — in this case this value would be XORed with every byte of the input stream
-* an array of bytes — in this case, first byte of the input would be XORed with first byte of the key, second byte of the input with second byte of the keys, etc. If the key is shorter than the input, key will be reused, starting from the first byte.
+* single byte value — in this case this value would be XORed with every byte of the input stream
+* array of bytes — in this case, first byte of the input would be XORed with first byte of the key, second byte of the input with second byte of the keys, etc. If the key is shorter than the input, key will be reused, starting from the first byte.
 
 For example, given 3-byte key `[b0, b1, b2]` and input line `[x0, x1, x2, x3, x4, ...]` output will be:
 
