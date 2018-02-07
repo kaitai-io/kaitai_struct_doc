@@ -7,3 +7,13 @@
 
 * On Debian / Ubuntu, this library can be installed with `sudo apt-get install python-enum34`
 * Otherwise, one can use just `sudo pip install enum34`
+
+## setuptools extension
+
+https://setuptools.readthedocs.io/en/latest/[Setuptools] is the de-facto standard way to build and install python packages. This library allows extension with https://setuptools.readthedocs.io/en/latest/setuptools.html#extending-and-reusing-setuptools[plugins]. https://github.com/KOLANICH have developed https://github.com/KOLANICH/kaitaiStructCompile.py[an extension to setuptools], allowing you to automate transpilation of `*.ksy` files as the part of python module build process. The library provides a mostly declarative syntax to installation: you just add a parameter `kaitai` to your `setup.py` where you enumerate files needed to be compiled, output directory, compilation flags and source code postcompilation transformations. Here are some examples: https://github.com/KOLANICH/NTMDTRead/blob/master/setup.py[1], https://github.com/KOLANICH/SpecprParser.py/blob/master/setup.py[2].
+
+Here are https://github.com/KOLANICH/kaitaiStructCompile.py/blob/master/kaitaiStructCompile/config.schema.json[the docs] in JSON Schema format.
+
+Please remember that the lib is VERY UNSTABLE and very likely to be improved in the way changing the API much (but due to API simplicity it'd be easy to fix your files), but I guess it's much better to use it than to reinvent a wheel. https://github.com/KOLANICH/kaitaiStructCompile.py/issues[Contributions are welcome!]
+
+Please note that the lib is NOT available in https://pypi.python.org[pypi] and if you want to install it automatically you should add `git+https://github.com/KOLANICH/kaitaiStructCompile.py` into `dependency_links` in the config passed to `setuptools.setup`.
