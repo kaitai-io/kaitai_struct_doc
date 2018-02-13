@@ -94,7 +94,7 @@ actually be JavaScript libraries, not Java jars.
 
 ==== Python
 
-* Pump version in `setup.py`, seek `version=`
+* Pump version in `kaitaistruct.py`, seek `__version__ =`
 * `python3 setup.py sdist upload`
 ** (use `python3 setup.py sdist upload -r pypitest` to publish to testing server)
 * Check that new version appears at https://pypi.python.org/pypi/kaitaistruct/$VERSION
