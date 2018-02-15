@@ -189,6 +189,9 @@ but there are a few good reasons to use it. It is consistent, it is
 easily extendable, and it's easy to parse, so it's easy to make your own
 programs/scripts that work with .ksy specs.
 
+[[docstrings]]
+=== Docstrings
+
 A very simple example is that we can add docstrings to every attribute,
 using syntax like that:
 
@@ -392,37 +395,6 @@ identifiers.
 represented by that enum, instead of just being a raw integer. Note that
 such attributes must have some sort of integer type in the first place
 (i.e. `type: u*` or `type: s*`).
-
-[[verbose-enums]]
-==== Verbose enums
-
-IMPORTANT: Feature available since v0.8.
-
-If you want to add some documentation for enums, this is possible
-using verbose enums declaration:
-
-[source,yaml]
-----
-enums:
-  ip_protocol:
-    1:
-      id: icmp
-      doc: Internet Control Message Protocol
-      doc-ref: https://www.ietf.org/rfc/rfc792
-    6:
-      id: tcp
-      doc: Transmission Control Protocol
-      doc-ref: https://www.ietf.org/rfc/rfc793
-    17:
-      id: udp
-      doc: User Datagram Protocol
-      doc-ref: https://www.ietf.org/rfc/rfc768
-----
-
-In this format, instead of specifying just the identifier for every
-numeric value, you specify YAML map, which has `id` key for
-identifier, and allows other regular keys (like `doc` and `doc-ref`)
-to specify documentation.
 
 === Substructures (subtypes)
 
@@ -1060,6 +1032,193 @@ instances:
 Such method is useful when you need to do more intricate bit
 combinations, like a value with its bits scattered across several
 bytes sparsely.
+
+[[ksy-documentation]]
+=== Documenting your spec
+
+We've introduced `doc` key <<docstrings,early in this user guide>> as
+a simple way to add docstrings to the attributes. However, it's not
+only attributes that can be documented. The same `doc` key can be used
+in several different contexts:
+
+[source,yaml]
+----
+doc: |
+  Documentation for type. Works for top-level types too, in case you
+  were wondering.
+seq:
+  - id: attr_1
+    type: u1
+    doc: Documentation for sequence attribute.
+instances:
+  attr_2:
+    pos: 0x1234
+    type: u1
+    doc: Documentation for parse instance attribute.
+  attr_3:
+    value: attr_2 + 1
+    doc: Documentation for value instance attribute.
+types:
+  some_type:
+    doc: Documentation for type as well. Works for inner types too.
+params:
+  - id: param_1
+    type: u1
+    doc: |
+      Documentation for a parameter. Parameters are relatively
+      advanced topic, see below for the explanations.
+----
+
+[[doc-ref]]
+==== `doc-ref`
+
+`doc` key has a "sister" key `doc-ref`, which can be used to specify
+references to original documentation. This is very useful to keep
+track of what corresponds to what when transcribing an existing
+specification. Everywhere where you can use `doc`, you can use
+`doc-ref` as well. Depending on target language, this key would be
+rendered as something akin to "see also" extra paragraph after the
+main docstring. For example:
+
+[cols="a,a", frame=none]
+|====
+|
+.Kaitai Struct
+[source,yaml]
+----
+seq:
+  - id: len_record
+    type: u1
+    doc: Total length of record in bytes.
+    doc-ref: ISO spec, section 1.2.3
+----
+|
+.Java
+[source,java]
+----
+/**
+ * Total length of record in bytes.
+ * @see "ISO-9876 spec, section 1.2.3"
+ */
+public int lenRecord() { return lenRecord; }
+----
+|====
+
+Inside `doc-ref`, one can specify:
+
+* Just a user-readable string. Most widely used to reference offline documentation. User would need to find relevant portion of documentation manually.
++
+[source,yaml]
+----
+doc-ref: ISO-9876 spec, section 1.2.3
+----
+
+* Just a link. Used when existing documentation has non-ambiguous,
+  well defined URL that everyone can refer to, and there's nothing
+  much to add to it.
++
+[source,yaml]
+----
+doc-ref: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+----
+
+* Link + description. Used when adding some extra text information is
+  beneficial: for example, when URL is not enough and needs some
+  comments on how to find relevant info inside the document, or the
+  document is also accessible through some other means and it's useful
+  to specify both URL and section numbering for those who won't be
+  using URL. In this case, `doc-ref` is composed of URL, then a space,
+  then description.
++
+[source,yaml]
+----
+doc-ref: https://tools.ietf.org/html/rfc2795#section-6.1 RFC2795, 6.1 "SIMIAN Client Requests"
+----
+
+[[orig-id]]
+==== `-orig-id`
+
+When transcribing spec based on some existing implementation, most
+likely you won't be able to keep exact same spelling of all
+identifiers. Kaitai Struct imposes pretty draconian rules on what can
+be used as `id`, and there is a good reason for it: different target
+languages have different ideas of what constitutes a good identifier,
+so Kaitai Struct had to choose some "middle ground" that yields decent
+results when converted to all supported languages' standards.
+
+However, in many cases, it might be useful to keep references to how
+things were named in original implementation. For that, one can
+customarily use `-orig-id` key:
+
+[source,yaml]
+----
+seq:
+  - id: len_str_buf
+    -orig-id: StringBufferSize
+    type: u4
+  - id: str_buf
+    -orig-id: StringDataInputBuffer
+    size: len_str_buf
+----
+
+[TIP]
+====
+Kaitai Struct compiler would just ignore any key that starts with
+`-`, and silently allow it. These kind of keys can be used to store
+arbitrary additional information, which can be accessible to external
+tools (i.e. other than the compiler). Feel free to add more arbitrary
+keys if you need to store extra structured information for some
+reason. For example, if you have 2 concurrent existing implementations
+in C++ and Java, you can store IDs for both of them for future
+reference:
+
+[source,yaml]
+----
+seq:
+  - id: foo_bar
+    -getter-id-cpp: get_foo_bar()
+    -getter-id-java: getFooBar()
+----
+====
+
+[[verbose-enums]]
+==== Verbose enums
+
+IMPORTANT: Feature available since v0.8.
+
+If you want to add some documentation for enums, this is possible
+using verbose enums declaration:
+
+[source,yaml]
+----
+enums:
+  ip_protocol:
+    1:
+      id: icmp
+      doc: Internet Control Message Protocol
+      doc-ref: https://www.ietf.org/rfc/rfc792
+    6:
+      id: tcp
+      doc: Transmission Control Protocol
+      doc-ref: https://www.ietf.org/rfc/rfc793
+    17:
+      id: udp
+      doc: User Datagram Protocol
+      doc-ref: https://www.ietf.org/rfc/rfc768
+----
+
+In this format, instead of specifying just the identifier for every
+numeric value, you specify YAML map, which has `id` key for
+identifier, and allows other regular keys (like `doc` and `doc-ref`)
+to specify documentation.
+
+=== Meta section
+
+`meta` key is used to define a section which stores meta-information
+about a given type, i.e. various complimentary stuff, such as titles,
+descriptions, pointers to external linked resources, etc.
+
+TODO
 
 == Streams and substreams
 
