@@ -1583,7 +1583,8 @@ substreams is easier to read, more concise and less error-prone:
 seq:
   - id: len_block
     type: u4
-  - id: some_block
+instances:
+  some_block:
     pos: 12345 * len_block
     size: len_block
     type: data_block
@@ -1595,6 +1596,7 @@ types:
     instances:
       data:
         pos: ofs_data
+        # relative to data_block
         size: 40
 ----
 |
@@ -1604,7 +1606,8 @@ types:
 seq:
   - id: len_block
     type: u4
-  - id: some_block
+instances:
+  some_block:
     pos: 12345 * len_block
     # no size => no substream!
     type: data_block
@@ -1616,6 +1619,7 @@ types:
     instances:
       data:
         pos: 12345 * _root.len_block + ofs_data
+        # have to calculate position manually
         size: 40
 ----
 |====
