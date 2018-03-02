@@ -148,9 +148,15 @@ actually be JavaScript libraries, not Java jars.
   ** Attached file: `jvm/target/windows/kaitai-struct-compiler-*.msi`
 . Publish them all
 
-=== Runtimes
+== Tests
 
-==== Java
+TODO
+
+== Runtimes
+
+=== Java
+
+==== Publishing
 
 * Pump version, set version to `$VERSION`, without `-SNAPSHOT`
 * `mvn deploy`
@@ -165,7 +171,9 @@ actually be JavaScript libraries, not Java jars.
 ** Confirm
 * After some time, check https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22kaitai-struct-runtime%22 to have new version
 
-==== Python
+=== Python
+
+==== Publishing
 
 * Pump version in `kaitaistruct.py`, seek `__version__ =`
 * `python3 setup.py sdist upload`
@@ -174,7 +182,9 @@ actually be JavaScript libraries, not Java jars.
 * `git tag $VERSION`
 * `git push --tags`
 
-==== Ruby
+=== Ruby
+
+==== Publishing
 
 * Pump version in `lib/kaitai/struct/struct.rb`, seek `VERSION = `
 * `gem build kaitai-struct.gemspec`
