@@ -746,15 +746,14 @@ by applying type or file-wide default encoding in
 [NOTE]
 ====
 `type: strz` can be also used as a shortcut to define a
-null-terminated string (C-style). I.e. these `foo` and `bar`
-attributes are equivalent:
+null-terminated string (C-string). I.e. these two attributes are equivalent:
 
 [source,yaml]
 ----
-- id: foo
+- id: text1
   type: str
   terminator: 0
-- id: bar
+- id: text2
   type: strz
 ----
 ====
