@@ -181,7 +181,7 @@ Lines should be wrapped to be 80 columns long. If it doesn't fit into
 single line after wrapping, then it's a multi-line docstring, so use
 proper multi-line syntax.
 
-There is no formal coversion of docstrings into language-specific
+There is no formal conversion of docstrings into language-specific
 docstrings now in KS, but generally we SHOULD keep it close to
 http://commonmark.org/[CommonMark formatting], i.e.:
 
