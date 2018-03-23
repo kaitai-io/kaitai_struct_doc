@@ -2,30 +2,67 @@
 :source-highlighter: coderay
 
 == Quick start
- 
+
 === Node.js
- 
-Create an empty directory and install the https://www.npmjs.com/package/kaitai-struct[runtime from npm] by running: 
- 
+
+Create an empty directory and install the https://www.npmjs.com/package/kaitai-struct[runtime from npm] by running:
+
 ```bash
-npm i kaitai-struct 
-``` 
- 
-Copy your compiled .ksy parser (eg. `Elf.js`) or download a http://formats.kaitai.io/[parser from the format gallery] (eg. http://formats.kaitai.io/elf/javascript.html[Elf.js]) to this directory. 
- 
-Create `index.js` with the following content: 
- 
-```javascript 
-const fs = require("fs"); 
-const Elf = require("./Elf"); 
-const KaitaiStream = require('kaitai-struct/KaitaiStream'); 
- 
-const fileContent = fs.readFileSync("/bin/ls"); 
-const parsedElf = new Elf(new KaitaiStream(fileContent)); 
-console.log(parsedElf); 
-``` 
- 
-Test the code by running `node index.js`. 
+npm i kaitai-struct
+```
+
+Copy your compiled .ksy parser into this directory or download one http://formats.kaitai.io/[parser from the format gallery] (eg. http://formats.kaitai.io/elf/javascript.html[Elf.js]).
+
+Create `index.js` with the following content:
+
+```javascript
+const fs = require("fs");
+const Elf = require("./Elf");
+const KaitaiStream = require('kaitai-struct/KaitaiStream');
+
+const fileContent = fs.readFileSync("/bin/ls");
+const parsedElf = new Elf(new KaitaiStream(fileContent));
+console.log(parsedElf);
+```
+
+Test the code by running `node index.js`.
+
+=== Browser
+
+Create an `index.html` with the following content:
+
+```html
+<html>
+<head>
+    <script src="KaitaiStream.js"></script>
+    <script src="Elf.js"></script>
+</head>
+<body>
+    <pre id="dump">parsing in process...</pre>
+    <script>
+        var oReq = new XMLHttpRequest();
+        oReq.open("GET", "sample.elf", true);
+        oReq.responseType = "arraybuffer";
+
+        oReq.onload = function (oEvent) {
+            var arrayBuffer = oReq.response;
+            var parsedElf = new Elf(new KaitaiStream(arrayBuffer));
+            document.getElementById("dump").textContent =
+                "machineType: " + Elf.Machine[parsedElf.header.machine] + "\n" +
+                "program headers:\n" + parsedElf.header.sectionHeaders.map(x => " - " + x.name).join("\n");
+        };
+
+        oReq.send(null);
+    </script>
+</body>
+</html>
+```
+
+Copy your compiled .ksy parser into this directory or download one http://formats.kaitai.io/[parser from the format gallery] (eg. http://formats.kaitai.io/elf/javascript.html[Elf.js]).
+
+Also deploy the Kaitai Struct JavaScript Runtime (`KaitaiStream.js`)  https://github.com/koczkatamas/kaitai_struct_javascript_runtime/blob/master/KaitaiStream.js[from Github] or https://www.npmjs.com/package/kaitai-struct[npm] and a `sample.elf` file.
+
+Publish the files on a webserver. Simplest method is running `python -mSimpleHTTPServer` and opening http://localhost:8000.
 
 == Approximate 64-bit integers
 
