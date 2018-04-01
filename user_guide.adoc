@@ -3364,3 +3364,26 @@ seq:
 This is because most processing algorithms require to know size of data
 to process beforehand, and final size of `some_body_type` might be
 determined only in run-time, after parsing took place.
+
+=== Supported stream types
+
+There are different types of streams. There are memory-based streams, file-based streams, and special streams (like stdin/stdout/stderr but also sockets pipes block/character devices etc). Those special streams are often non-seekable and non-tellable.
+
+Only certain types of streams are affected:
+* memory-based streams are OK
+* file-based streams are OK
+* stdin/stdout/stderr are affected
+* sockets, pipes, block/character devices are affected
+
+Only some runtimes are affected:
+* C# is affected, `MemoryStream` and `FileStream` are OK but `NetworkStream` and `PipeStream` and `CryptoStream` are not
+* Python is affected, in-memory `BytesIO` and file-based `open()` are OK but special streams are not
+* C++ is OK
+* Java is OK
+
+Only some KSY tags and expressions are affected:
+* expressions using `_io.pos`, `_io.size` and `_io.eof`
+* `seq` fields using `terminator` with `consume: false`
+* `instances` fields using `pos`
+
+Those listed above may still not fail, if they happen to use a substream, which is a memory-based stream which of course, supports seek and tell.
