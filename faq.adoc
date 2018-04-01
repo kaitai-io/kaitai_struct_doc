@@ -28,6 +28,19 @@ So far Kaitai Struct focuses on reading (parsing) only. There are plans to suppo
 
 == How does it compare to ...
 
+=== ... Python library Construct?
+
+Actually, Construct is the closest analog to Kaitai Struct. It is also a declarative and symmetric binary parsing library, but there are significant differences:
+
+* Construct does both parsing and serialization, instead of only parsing (https://github.com/kaitai-io/kaitai_struct/issues/27[feature #27]).
+* Construct is a Python-only module, instead of supporting multiple languagues.
+* Construct is "declarative" in sense that it defines data structures instead of parsing code. The structures are still defined using Python language, instead of YAML.
+* Construct aims at offering more sophisticated building blocks, including those only available on Python like Pickle and Numpy protocols, instead of most basic/common elements.
+
+In fact, there is an open and active collaboration between Construct and Kaitai Struct. There are (currently being implemented) import/export tools, that allow translating schemes between the two frameworks.
+
+Main documentation site: https://construct.readthedocs.io
+
 === ... Google Protocol Buffers, ASN.1, Apache Thrift, Apache Avro, BSON, etc?
 
 They're completely different. Projects mentioned are actually different serialization specifications that map existing data into some sort of extensible binary stream, usually for easy transmission / interchange. Binary representation is driven by the data and encoded according to particular standard of a given protocol, which usually has a fixed representation for integers, for strings, for arrays, for dictionaries, etc. Most of these project allow generated formats to be automatically extensibile, carry versioning information, automatically embed typing information of some sort.
