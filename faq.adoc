@@ -26,6 +26,50 @@ field = _io.readS2Le();
 
 So far Kaitai Struct focuses on reading (parsing) only. There are plans to support writing, but don't hold your breath for it — it's a pretty major change and it'll probably happen after 1.x.
 
+There is a
+https://github.com/kaitai-io/kaitai_struct/issues/27[relevant issue in
+our issue tracker], which sports a proof-of-concept compiler branch
+that has some writing support (Java only).
+
+=== Does it support `mmap` (memory-mapped) to access files?
+
+Some languages runtimes support so-called "memory mapped" files. The
+idea is simple: using OS-provided mechanism, one marks up a certain
+memory area to reflect exactly contents of a file. After that, one can
+parse the file by accessing that memory area (as it would be using
+normal in-memory buffer).
+
+Right now, mmap support is available:
+
+* In Java — by using https://github.com/kaitai-io/kaitai_struct_java_runtime/blob/master/src/main/java/io/kaitai/struct/ByteBufferKaitaiStream.java[ByteBufferKaitaiStream]
+
+* in C# — by:
+** opening a file using https://msdn.microsoft.com/en-us/library/system.io.memorymappedfiles.memorymappedfile(v=vs.110).aspx[MemoryMappedFile] object
+** calling https://msdn.microsoft.com/en-us/library/dd267538(v=vs.110).aspx[MemoryMappedFile.CreateViewStream] method on it to get https://msdn.microsoft.com/en-us/library/system.io.memorymappedfiles.memorymappedviewstream(v=vs.110).aspx[MemoryMappedViewStream]
+** passing that MemoryMappedViewStream as a Stream into a KaitaiStream constructor
+
+* In all other languages — by invoking mmap operation manually
+  (getting a pointer to in-memory buffer), and then wrapping that
+  buffer into KaitaiStream
+
+Note that memory-mapped files are not "the silver bullet" and have
+both their pros and cons, namely:
+
+* Organizing a memory map is relatively slow operation in comparison
+  to simple file opening. If you want to process lots of small files,
+  chances are memory-mapped approach would be slower just because of
+  the per-file mmap overhead.
+* Memory-mapped files work by specifying exact file size to do a
+  memory map operation. File size must be known a priori and must
+  remain constant during the parsing timeframe. That means that one
+  can't use mmap on:
+** Files that get appended to during parsing, i.e. live packet capture
+   stream file, live log files, etc
+** Virtual files on unknown size (such as majority of Linux procfs /
+   sysfs files)
+* Concurrent access of different processes to the same file using mmap
+  might be non-trivial.
+
 == How does it compare to ...
 
 === ... Python library Construct?
