@@ -88,7 +88,7 @@ Common options:
 
 Language-specific options:
 
-* `--dot-net-namespace <namespace>` — .NET namespace (C# only, default: Kaitai)
+* `--dotnet-namespace <namespace>` — .NET namespace (C# only, default: Kaitai)
 * `--java-package <package>` — Java package (Java only, default: root package)
 * `--php-namespace <namespace>` — PHP namespace (PHP only, default: root package)
 
