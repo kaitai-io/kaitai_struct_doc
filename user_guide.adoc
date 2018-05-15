@@ -277,7 +277,7 @@ concatenated and expected in sequence. Few examples:
     # expects bytes: CA FE BA BE
   - id: magic3
     contents: [CAFE, 0, BABE]
-    # expects bytes: 43 41 47 45 00 42 41 42 45
+    # expects bytes: 43 41 46 45 00 42 41 42 45
 ----
 
 More extreme examples to illustrate the idea (i.e. possible, but
