@@ -5,6 +5,7 @@
 * <<user_guide.adoc#,User guide>>
 * <<ksy_reference.adoc#,KSY language reference>>
 * <<faq.adoc#,FAQ>> — frequently asked questions
+* https://github.com/kaitai-io/awesome-kaitai[awesome-kaitai] — A list of Kaitai Struct tools and resources
 
 === Tutorials
 
