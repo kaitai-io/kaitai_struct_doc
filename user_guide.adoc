@@ -1707,6 +1707,23 @@ types:
         size: len_in_big
 ----
 
+IMPORTANT: For this technique to work, you must create an actual
+object, because unparsed byte arrays do not have an `._io` property
+that can be referenced. If your file format contains something like a
+heap, and you want to be able to address instances in that stream but
+there are no fixed-location elements to parse, you need to create a
+dummy object using a technique like the following:
+
+[source,yaml]
+----
+seq:
+  - id: heap
+    size-eos: true
+    type: dummy
+types:
+  dummy: {}
+----
+
 [[process]]
 === Processing: dealing with compressed, obfuscated and encrypted data
 
@@ -2513,7 +2530,7 @@ seq:
 If we want to provide our own implementation of
 `custom_encrypted_object` type, first we need to compile our .ksy file
 with `--opaque-types=true` option. This will avoid the error, and
-compiler will consider all unknown types to be "opaque", i.e. it will treat 
+compiler will consider all unknown types to be "opaque", i.e. it will treat
 them as existing in some external space.
 
 Alternatively, instead of specifying command line argument
