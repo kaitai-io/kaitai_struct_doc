@@ -3,6 +3,7 @@
 == Want to use Kaitai Struct?
 
 * <<user_guide.adoc#,User guide>>
+* <<ksy_style_guide.adoc#,KSY style guide>> — best practices in creation of robust KSY specs
 * <<ksy_reference.adoc#,KSY language reference>>
 * <<faq.adoc#,FAQ>> — frequently asked questions
 
