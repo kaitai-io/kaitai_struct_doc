@@ -6,6 +6,7 @@
 * <<ksy_style_guide.adoc#,KSY style guide>> — best practices in creation of robust KSY specs
 * <<ksy_reference.adoc#,KSY language reference>>
 * <<faq.adoc#,FAQ>> — frequently asked questions
+* https://github.com/kaitai-io/awesome-kaitai[awesome-kaitai] — A list of Kaitai Struct tools and resources
 
 === Tutorials
 
