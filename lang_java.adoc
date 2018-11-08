@@ -41,7 +41,7 @@ following to one's `pom.xml`:
 <dependency>
     <groupId>io.kaitai</groupId>
     <artifactId>kaitai-struct-runtime</artifactId>
-    <version>0.7</version>
+    <version>0.8</version>
 </dependency>
 ----
 
@@ -110,7 +110,7 @@ public class Parent extends KaitaiStruct {
         public static class GrandChild extends KaitaiStruct {
         }
     }
-}    
+}
 ----
 
 Every generated class will have 3 constructors and a static factory
