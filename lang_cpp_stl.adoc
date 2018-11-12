@@ -31,7 +31,7 @@ There's no universal agreement on dealing with encodings in C++, so KS
 allows you to choose one of the few popular approaches. You can choose
 how to deal with string encoding using a compile-time define.
 
-* Ignore encodings at all. In this mode, all string parsing operations
+* `KS_STR_ENCODING_NONE`: Ignore encodings at all. In this mode, all string parsing operations
 just ignore any encoding specifications and pass raw bytes as a string
 to application. Note that in some cases it might _break_ some .ksy files
 that actually depend on string being properly decoded / converted.
@@ -41,15 +41,15 @@ http://utf8everywhere.org/[UTF8 Everywhere Manifesto]).
 Since there's no universal way to do it, KS would use one of
 platform-dependent ways (which can be also enforced by specifying
 specific defines):
-** Use POSIX `iconv` library — usually preinstalled (or included in libc)
+** `KS_STR_ENCODING_ICONV`: Use POSIX `iconv` library — usually preinstalled (or included in libc)
 on all POSIX systems, can be linked as external library on most other
 systems (i.e. Windows)
-** Use Windows API functions
+** *(not implemented yet)* Use Windows API functions
 https://msdn.microsoft.com/en-us/library/windows/desktop/dd319072.aspx[MultiByteToWideChar]
 and
 https://msdn.microsoft.com/en-us/library/windows/desktop/dd374130.aspx[WideCharToMultiByte]
 — obviously, available only on Windows platform
-** Use http://site.icu-project.org/[ICU] library
+** *(not implemented yet)* Use http://site.icu-project.org/[ICU] library
 
 == Null values
 
