@@ -106,7 +106,7 @@ different purposes.
 
 For top-level meta section, use the following order of keys:
 
-. `id` — main identifier
+. `id` — main identifier, MUST match the name of the `.ksy` file
 . Human-readable meta-information (in order of importance, at least
   one MUST be present):
 .. `title`
@@ -166,10 +166,10 @@ doc: |
   archive: there are both meta-information attributes (such as file
   names, locations, various timestamps, etc) and references to
   inodes, which can be used to find file body in the container.
-  
+
   For networked locations, file index entry uses an optional
   `remote_resource` type. Proper usage sequence is:
-  
+
   * check `code` to be one that requires network usage
   * determine file name using `name_networked` instance and check if
     it's really a file requested by the user
@@ -249,7 +249,7 @@ guesswork.
 
 * For simple non-repeated fields, use a simple singular form —
   i.e. `width`, `header`, `transaction_id`, `file`.
-* For repeated files (i.e. with `repeat: something`), use plular form
+* For repeated files (i.e. with `repeat: something`), use plural form
   — i.e. `files`, `transactions`.
 * Don't be overly verbose: use commonly understood abbreviations
   liberally, if it will improve readablity — i.e. `src_mac` or
