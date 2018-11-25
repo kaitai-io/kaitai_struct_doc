@@ -53,6 +53,7 @@ include:
 * <<instances>>
 * <<enums>>
 * <<types>>
+* <<params>>
 
 NOTE: User-defined type spec is recursive and can include other
 user-defined type specs inside `types` element.
@@ -675,6 +676,12 @@ For the sake of completeness, here's the full table of available integer types:
 |-9223372036854775808
 |9223372036854775807
 |===
+
+### Bit-size integers
+
+To specify integers having non-standard number of bits in them, one
+can use the following pattern: `b(\d+)`, where `\d+` is the number of
+bits allocated.
 
 ### Floats
 
