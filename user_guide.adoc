@@ -2402,6 +2402,14 @@ enums:
 This runs as fast as it was originally intended, and it provides extra
 benefits of allowing more verbose FourCC value descriptions.
 
+WARNING: Until
+https://github.com/kaitai-io/kaitai_struct/issues/300[Issue #300] is
+resolved, this approach cannot be used unless you can guarantee that
+every possible FourCC value the file might contain is defined in the
+enum. Otherwise you will encounter unavoidable parse exceptions in
+Java and Python, preventing you from accessing further data from the
+file.
+
 === Importing types from other files
 
 As your project grows in complexity, you might want to have multiple
@@ -2513,7 +2521,7 @@ seq:
 If we want to provide our own implementation of
 `custom_encrypted_object` type, first we need to compile our .ksy file
 with `--opaque-types=true` option. This will avoid the error, and
-compiler will consider all unknown types to be "opaque", i.e. it will treat 
+compiler will consider all unknown types to be "opaque", i.e. it will treat
 them as existing in some external space.
 
 Alternatively, instead of specifying command line argument
