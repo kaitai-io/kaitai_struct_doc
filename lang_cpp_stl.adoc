@@ -1,6 +1,164 @@
 = Kaitai Struct: C++/STL notes
 :source-highlighter: coderay
 
+== Invocation
+
+=== Quick start
+
+Parsing from local file:
+
+[source,cpp]
+----
+#include <fstream>
+#include <kaitai/kaitaistream.h>
+
+std::ifstream is("path/to/local/file.dat", std::ifstream::binary);
+kaitai::kstream ks(&is);
+example_t data(&ks);
+----
+
+Parsing from `std::string`:
+
+[source,cpp]
+----
+#include <fstream>
+#include <kaitai/kaitaistream.h>
+#include <sstream>
+
+std::string buf;
+std::istringstream is(buf);
+kaitai::kstream ks(&is);
+example_t data(&ks);
+----
+
+=== Auto-read
+
+By default, invoking constructor with a stream argument assumes that
+you want to run parsing process and populate object's fields with the
+data read from the stream:
+
+[source,cpp]
+----
+example_t data(&ks);
+data.some_attribute(); // already populated and available
+----
+
+However, sometimes you want more control and want to trigger that
+process manually. In that case, you can supply `--no-auto-read`
+argument for kaitai-struct-compiler, and you'll have to trigger
+reading manually using `_read()` invocation:
+
+[source,cpp]
+----
+example_t data(&ks);
+data.some_attribute(); // not yet populated, may contain random garbage
+data._read();
+data.some_attribute(); // populated and available
+----
+
+There are several reasons why you'd want to separate object creation
+and object population:
+
+* Obviously, if you're using read-write mode with the intent to
+  populate the object manually and call `_write()` afterwards to
+  serialize it. In this use-case, you probably won't call `_read()` at
+  all.
+* You want to reuse the same object and thus want to repeatedly call
+  `_read()` on several times manually.
+* If you're not using smart pointers (see below), any exception (data
+  validation, IO error, etc) during object creation might result in
+  memory leak, as destructor will NOT be executed.
+
+=== Ownership model
+
+In all modes, Kaitai Struct follows the same ownership model:
+
+* If something is created during the parsing process, it belongs to
+  the enclosing object which represents the user type. As soon as
+  enclosing object will be deleted, it will take care of deletion (and
+  cleanup) of all owned attributes.
+* If something is assigned to a user type using `set...()` methods for
+  serialization process, after `set...()` is completed, user type
+  assumes ownership of everything you've passed through `set...()`.
+* Everything else passed in a constructor and/or any other
+  invocations, is not owned by user type (and will not be cleaned up
+  automatically), namely:
+  * root object reference/pointer
+  * parent object reference/pointer
+  * IO object
+  * type parameters
+
+To illustrate these principles, using the following .ksy spec:
+
+[source,yaml]
+----
+meta:
+  id: example
+seq:
+  - id: foo
+    type: block
+types:
+  block:
+    seq:
+      - id: bar
+        type: u1
+----
+
+You would always do reading this way:
+
+[source,cpp]
+----
+// On stack
+{
+    kaitai::kstruct in_stream(...);  // belongs here
+    example_t example(&in_stream);   // belongs here
+
+    // assumes auto-read; in case of --no-auto-read, add:
+    // example._read();
+
+    example_t::block_t* foo = example->foo();
+    // does not belong here, belongs to user type
+
+    // can use `foo` here:
+    int foo_bar = foo->bar();
+
+    // but must not delete it:
+    // delete foo; // ILLEGAL: will result in double free
+
+    // example & in_stream get deleted here as they go out of scope
+}
+
+// On heap
+{
+    kaitai::kstruct* in_stream = new kaitai::kstruct(...);  // belongs here
+    example_t* example = new example_t(in_stream);          // belongs here
+
+    // assumes auto-read; in case of --no-auto-read, add:
+    // example->_read();
+
+    example_t::block_t* foo = example->foo();
+    // does not belong here, belongs to user type
+
+    // can use `foo` here:
+    int foo_bar = foo->bar();
+
+    // but must not delete it:
+    // delete foo; // ILLEGAL: will result in double free
+
+    // delete in reverse order to order of creation
+    delete example;
+    // also deletes `foo`, so `foo` should not be used after this point
+
+    // int foo_bar_2 = foo->bar(); // ILLEGAL: foo pointer is already deleted
+
+    delete in_stream;
+}
+----
+
+=== Pointers model
+
+TODO: raw pointers, unique+raw pointers
+
 == Primitive type mapping
 
 Mapping KS types to C++ is pretty straight-forward:
