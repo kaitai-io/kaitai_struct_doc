@@ -15,6 +15,7 @@ are using this style.
 
 This document is work in progress, not all sections are complete yet.
 
+[[general]]
 == General formatting
 
 MUST use:
@@ -83,6 +84,7 @@ All identifiers, docstrings, comments and generally all human-readable
 text SHOULD be kept in English, unless there's a very good reason not
 to do so.
 
+[[type]]
 == Order of sections in a type spec
 
 Use the following order of sections:
@@ -94,6 +96,7 @@ Use the following order of sections:
 . `instances`, `types`, `enums` — use one's best judgement to order
   these 3 to maximize readability
 
+[[meta]]
 == Meta section (`meta`)
 
 Meta section is mostly used to specify additional ("meta") information
@@ -147,8 +150,10 @@ test running) and MUST NOT be used in general-purpose .ksy files:
 * `ks-debug`
 * `ks-opaque-types`
 
+[[documentation]]
 == Documentation
 
+[[doc]]
 === `doc`
 
 Formatting:
@@ -193,6 +198,7 @@ http://commonmark.org/[CommonMark formatting], i.e.:
 
 TODO: documentation contents, what should and should no be included
 
+[[doc-ref]]
 === `doc-ref`
 
 TODO
