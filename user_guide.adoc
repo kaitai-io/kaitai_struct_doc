@@ -1212,13 +1212,117 @@ numeric value, you specify YAML map, which has `id` key for
 identifier, and allows other regular keys (like `doc` and `doc-ref`)
 to specify documentation.
 
+[[meta]]
 === Meta section
 
 `meta` key is used to define a section which stores meta-information
 about a given type, i.e. various complimentary stuff, such as titles,
-descriptions, pointers to external linked resources, etc.
+descriptions, pointers to external linked resources, etc:
 
-TODO
+* `id`
+* `title`
+* `application`
+* `file-extension`
+* `xref` — used to specify <<meta-xref,cross-references>>
+* `license`
+* `ks-version`
+* `ks-debug`
+* `ks-opaque-types`
+* `imports`
+* `encoding`
+* `endian`
+
+TIP: While it's technically possible to specify `meta` keys in
+arbitary order (as in any other YAML map), please use order
+recommended in <<ksy_style_guide.adoc#meta,style guide>> when
+authoring .ksy specs for public use to improve readability.
+
+[[meta-xref]]
+==== Cross-references
+
+`meta/xref` can be used to provide arbitrary cross-references for a
+particular type in other collections, such as references / IDs in
+format databases, wikis, encyclopedias, archives, formal standards,
+etc. Syntactically, it's just a place where you can store arbitrary
+key-value pairs, e.g.:
+
+[source,yaml]
+----
+meta:
+  xref:
+    forensicswiki: Portable_Network_Graphics_(PNG)
+    iso: 15948:2004
+    justsolve: PNG
+    loc: fdd000153
+    mime: image/png
+    pronom:
+      - fmt/13
+      - fmt/12
+      - fmt/11
+    rfc: 2083
+    wikidata: Q178051
+----
+
+There are several "well-known" keys used by convention by many spec
+authors to provide good cross references of their formats:
+
+* `forensicswiki` specifies article name at
+  https://forensicswiki.org/wiki/Main_Page[Forensics Wiki], which is a
+  CC-BY-SA-licensed wiki with information on digital forensics, file
+  formats and tools. Full link name could be generated as
+  `https://forensicswiki.org/wiki/` + this value.
+* `iso` key specifies ISO/IEC standard number, reference to a standard
+  accepted and published by https://www.iso.org/[ISO] (International
+  Organization for Standardization). Typically these standards are not
+  available for free (i.e. one has to pay to get a copy of a standard
+  from ISO), and it's non-trivial to link to ISO standards
+  catalogue. However, ISO standards typically have clear designations
+  like "ISO/IEC 15948:2004", so value should be citing everything
+  except for "ISO/IEC", i.e. `15948:2004`.
+* `justsolve` specifies article name at
+  http://fileformats.archiveteam.org/["Just Solve the File Format
+  Problem" wiki], a wiki that collects information on many file
+  formats. Full link name could be generated as
+  `http://fileformats.archiveteam.org/wiki/` + this value.
+* `loc` key is used to specify identifier in
+  https://www.loc.gov/preservation/digital/formats/fdd/browse_list.shtml[Digital
+  Formats] database of https://www.loc.gov/[US Library of Congress], a
+  major effort to enumerate and document many file formats for digital
+  preservation purposes. Value typically looks like `fddXXXXXX`, where
+  `XXXXXX` is a 6-digit identifier.
+* `mime` key is used to specify
+  https://en.wikipedia.org/wiki/Media_type[MIME (Multipurpose Internet
+  Mail Extensions) type], AKA "media type" designation, a string
+  typically used in various Internet protocols to specify format of
+  binary payload. As of 2019, there is a
+  https://www.iana.org/assignments/media-types/media-types.xhtml[central
+  registry of media types] managed by IANA. Value must specify full
+  MIME type (both parts), e.g. `image/png`.
+* `pronom` key specifies format identifier in
+  http://www.nationalarchives.gov.uk/PRONOM/Default.aspx[PRONOM
+  Technical Registry] of http://www.nationalarchives.gov.uk/[UK
+  National Archives], which is a massive file formats database that
+  catalogues many file formats for digital preservation
+  purposes. Value typically looks like `fmt/xxx`, where `xxx` is a
+  number assigned at PRONOM (this idenitifer is called "PUID", AKA
+  "PRONOM Unique Identifier" in PRONOM itself). If many different
+  PRONOM formats correspond to a particular spec, specify them as YAML
+  array (see example above).
+* `rfc` key is used to specify reference to
+  https://en.wikipedia.org/wiki/Request_for_Comments[RFC], "Request
+  for Comments" documents maintained by ISOC (Internet
+  Society). Despite the confusing name, RFCs are typically treated as
+  global, Internet-wide standards, and, for example, many networking /
+  interoperability protocols are specified in RFCs. Value should be
+  just raw RFC number, without any prefixes, e.g. `1234`.
+* `wikidata` specifies item name at
+  https://www.wikidata.org/[Wikidata], a global knowledge base. All
+  Wikimedia projects (such as language-specific Wikipedias,
+  Wiktionaries, etc) use Wikidata at least for connecting various
+  translations of encyclopedic articles on a particular subject, so
+  keeping just a link to Wikidata is typically enough to.  Value
+  typically follows `Qxxx` pattern, where `xxx` is a number generated
+  by Wikidata, e.g. `Q535473`.
 
 == Streams and substreams
 
