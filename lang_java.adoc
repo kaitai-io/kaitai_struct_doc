@@ -24,6 +24,18 @@ https://docs.oracle.com/javase/7/docs/api/java/io/BufferedInputStream.html[Buffe
 etc) is not supported and probably won't be supported, as a lot of
 parsing functionality in KS relies on seek support.
 
+== Generating code
+
+Before parsing structures described in Kaitai templates you need to generate code of Java classes
+which implement parsing logic.
+
+Generating this code can be done by call `kaitai-struct-compiler` http://doc.kaitai.io/user_guide.html#_invocation[directly].
+
+For some build tools exists plugins which can involve this step simiously into project's build flow:
+
+* https://maven.apache.org[Apache Maven]: https://github.com/valery1707/kaitai-maven-plugin[kaitai-maven-plugin]
+* https://gradle.org[Gradle]: https://github.com/valery1707/kaitai-gradle-plugin[kaitai-gradle-plugin]
+
 == Runtime library
 
 === Installation
