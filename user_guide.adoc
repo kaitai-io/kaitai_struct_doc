@@ -65,6 +65,7 @@ and Windows .msi install (provided you don't disable that option) -
 but it might take some extra manual setup if you use a generic .zip
 package.
 
+[[invocation]]
 ==== Invocation
 
 Invoking `ksc` is easy:
@@ -1251,7 +1252,7 @@ key-value pairs, e.g.:
 meta:
   xref:
     forensicswiki: Portable_Network_Graphics_(PNG)
-    iso: 15948:2004
+    iso: '15948:2004'
     justsolve: PNG
     loc: fdd000153
     mime: image/png
