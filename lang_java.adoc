@@ -2,6 +2,19 @@
 :toc: left
 :source-highlighter: coderay
 
+== Source files generation
+
+To use Kaitai Struct specifications in Java, one must compile .ksy
+specs to .java classes implementing parsing/serialization logic first:
+
+* This can be done manually: by <<user_guide.adoc#invocation,invoking
+  kaitai-struct-compiler directly>>, and adding generated files to
+  your project.
+* For certain build pipelines, the process can be automated by
+  introducing this generation step into build flow:
+** for https://maven.apache.org[Apache Maven]: https://github.com/valery1707/kaitai-maven-plugin[kaitai-maven-plugin]
+** for https://gradle.org[Gradle]: https://github.com/valery1707/kaitai-gradle-plugin[kaitai-gradle-plugin]
+
 == Usage patterns
 
 Parsing a structure directly from a local file:
@@ -24,17 +37,6 @@ https://docs.oracle.com/javase/7/docs/api/java/io/BufferedInputStream.html[Buffe
 etc) is not supported and probably won't be supported, as a lot of
 parsing functionality in KS relies on seek support.
 
-== Generating code
-
-Before parsing structures described in Kaitai templates you need to generate code of Java classes
-which implement parsing logic.
-
-Generating this code can be done by call `kaitai-struct-compiler` http://doc.kaitai.io/user_guide.html#_invocation[directly].
-
-For some build tools exists plugins which can involve this step simiously into project's build flow:
-
-* https://maven.apache.org[Apache Maven]: https://github.com/valery1707/kaitai-maven-plugin[kaitai-maven-plugin]
-* https://gradle.org[Gradle]: https://github.com/valery1707/kaitai-gradle-plugin[kaitai-gradle-plugin]
 
 == Runtime library
 
