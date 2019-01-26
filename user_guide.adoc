@@ -357,6 +357,121 @@ seq:
     size-eos: true
 ----
 
+[[delimited-struct]]
+=== Delimited structures
+
+NOTE: All features specified in this section are demonstrated on
+strings, but the same features should work on any user types as well.
+
+Another popular way to avoid allocating huge fixed-size buffers is to
+use some sort of trailing delimiter. The most well-known example of
+this is probably null-terminated string which became a standard of
+strings representation in C:
+
+....
+61 62 63 00
+....
+
+This 4 bytes actually represent 3-character string "abc", and extra
+one trailing byte "0" (AKA null) serves as a delimiter or
+terminator. By agreement, C strings cannot include 0 byte: every time
+a function in C sees that either in stream or in memory, it considers
+that as special mark to stop processing.
+
+In Kaitai Struct, you can define all sorts of delimited
+structures. For example, this is how you define a null-terminated
+string:
+
+[source,yaml]
+----
+seq:
+  - id: my_string
+    type: str
+    terminator: 0
+    encoding: UTF-8
+----
+
+As this is a very common thing, there's a shortcut for `type: str` and
+`terminator: 0`. One can write it as this:
+
+[source,yaml]
+----
+seq:
+  - id: my_string
+    type: strz
+    encoding: UTF-8
+----
+
+Of course, you can use any other byte (for example, `0xa`, AKA
+newline) as a terminator. This gives Kaitai Struct some limited
+capabilities to parse of certain text formats as well.
+
+Reading "until the terminator byte is encountered" could be
+dangerous. What if we'll never encounter that byte?
+
+Another very widespread model is actually having *both* a fixed-sized
+buffer for a string *and* a terminator. This is typically an artifact
+of serializing structures like this from C. For example, if one would
+just take this example structure:
+
+[source,c]
+----
+struct {
+    char name[16];       /* Name of the animal */
+    uint16_t birth_year; /* Year of birth, used to calculate the age */
+} animal_record;
+----
+
+and will do the following in C:
+
+[source,c]
+----
+struct animal_record rec;
+strcpy(rec.name, "Princess");
+// then, after some time, the same record is reused
+strcpy(rec.name, "Sam");
+----
+
+After first `strcpy` operation, the buffer will look like that:
+
+....
+50 72 69 6e|63 65 73 73|00 ?? ?? ??|?? ?? ?? ??| |Princess.???????|
+....
+
+And after the second `strcpy`, the the following will remain in the
+memory:
+
+....
+53 61 6d 00|63 65 73 73|00 ?? ?? ??|?? ?? ?? ??| |Sam.cess.???????|
+....
+
+Effectively, the buffer is still 16 bytes, but the only meaningful
+contents it has is up to first null terminator. Everything beyond that
+is garbage left over from either buffer not being initialized at all
+(these `??` bytes could contain anything), or it will contain parts of
+strings previously occupying this buffer.
+
+It's easy to model that kind of behavior in Kaitai Struct as well,
+just by combining `size` and `terminator`:
+
+[source,yaml]
+----
+seq:
+  - id: name
+    type: str
+    size: 16
+    terminator: 0
+    encoding: UTF-8
+----
+
+This works in 2 steps:
+
+* `size` always that exactly 16 bytes would be read from the stream.
+* `terminator`, given that `size` is present, only works inside these
+  16 bytes, cutting string short early with the first terminator byte
+  encountered, saving application from getting all that trailing
+  garbage.
+
 [[enums]]
 === Enums (named integer constants)
 
@@ -2514,6 +2629,150 @@ every possible FourCC value the file might contain is defined in the
 enum. Otherwise you will encounter unavoidable parse exceptions in
 Java and Python, preventing you from accessing further data from the
 file.
+
+[[delimited-struct-advanced]]
+=== Advanced delimited structures
+
+<<delimited-struct,Delimited structures>>, having `terminator`
+specified to define a structure of arbitrary size, are pretty common
+and useful. However, sometimes you're dealing with more advanced
+versions of these which require you to fine-tune certain aspects of
+delimiting.
+
+[[consume-include]]
+==== Terminator: consume or include?
+
+What happens with the terminator byte itself, when you're defining a
+delimited structure? Normally, terminator is not needed inside your
+structure, it's an external entity. For example, if you're parsing
+dot-delimited strings, you don't want these strings to contain the
+dot:
+
+[cols="a,a", frame=none]
+|====
+|
+.KSY
+[source,yaml]
+----
+seq:
+  - id: str1
+    type: str
+    terminator: 0x2e # `.`
+  - id: str2
+    type: str
+    terminator: 0x2e # `.`
+----
+|
+.Input and output
+
+....
+66 6f 6f 2e 62 61 72 2e = "foo.bar."
+
+str1 = "foo"
+str2 = "bar"
+....
+
+|====
+
+But sometimes you indeed want that dot, and it should be part of
+output. It is actually possible too, if you'll specify `include: true`
+(the default it is false):
+
+[cols="a,a", frame=none]
+|====
+|
+.KSY
+[source,yaml]
+----
+seq:
+  - id: str1
+    type: str
+    terminator: 0x2e # `.`
+    include: true
+  - id: str2
+    type: str
+    terminator: 0x2e # `.`
+    include: true
+----
+|
+.Input and output
+
+....
+66 6f 6f 2e 62 61 72 2e = "foo.bar."
+
+str1 = "foo."
+str2 = "bar."
+....
+
+|====
+
+Or sometimes your terminator is actually part of following structure,
+and you don't want it to be consumed — you want you next structure to
+start with that terminator byte. It's possible to do so too with
+`consume: false` (which true by default):
+
+[cols="a,a", frame=none]
+|====
+|
+.KSY
+[source,yaml]
+----
+seq:
+  - id: str1
+    type: str
+    terminator: 0x2e # `.`
+    consume: false
+  - id: the_rest
+    type: str
+    size-eos: true
+----
+|
+.Input and output
+
+....
+66 6f 6f 2e 62 61 72 2e = "foo.bar."
+
+str1 = "foo"
+the_rest = ".bar."
+....
+
+|====
+
+[[eos-error]]
+==== Ignoring errors in delimited structures
+
+Delimited structures actually could be pretty scary: if we read until
+the terminator is encountered, what will happen if we'll never find
+one? In raw C, a typical answer is "segmentation fault" occuring in
+the operation that deals with such string due to runaway reads past
+the buffer, i.e. a very bad thing and a big security hole.
+
+In Kaitai Struct, however, you can control this behavior. By default,
+if you'll parse a structure awaiting for a terminator, and that
+terminator never happens, you'll get a clear error / exception similar
+to "attempted to read past end of stream". However, in some cases, you
+really want to read until the end of stream, and this should be
+considered normal encoding, not an error. For this cases, you can
+specify `eos-error`:
+
+[source,yaml]
+----
+seq:
+  - id: my_string
+    type: str
+    terminator: 0
+    eos-error: false
+    encoding: UTF-8
+----
+
+This structure will read both terminated and non-terminated strings
+successfully, without triggering an error:
+
+....
+61 62 63 00 64 65 66 => my_string = "abc"
+61 62 63 00          => my_string = "abc"
+61 62 63             => my_string = "abc"
+....
 
 === Importing types from other files
 
