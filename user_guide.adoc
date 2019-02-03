@@ -2484,6 +2484,14 @@ a few pre-defined internal methods (they all start with an underscore
 |`size`
 |Integer
 |Number of elements in the array
+
+|`min`
+|Array base type
+|Gets the minimam element of the array
+
+|`max`
+|Array base type
+|Gets the maximum element of the array
 |===
 
 ==== Streams
