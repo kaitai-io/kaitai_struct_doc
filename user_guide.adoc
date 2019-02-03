@@ -2360,7 +2360,16 @@ library" for expression language.
 
 ==== Floating point numbers
 
-No methods are currently supported for floating point numbers.
+[cols="3*", options="header"]
+|===
+|Method name
+|Return type
+|Description
+
+|`to_i`
+|Integer
+|Truncates a floating point number to an integer
+|===
 
 ==== Byte arrays
 
