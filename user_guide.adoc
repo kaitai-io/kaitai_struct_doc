@@ -677,7 +677,7 @@ pattern over and over. Repetition might be:
 
 * element repeated up to the very end of the stream
 * element repeated a pre-defined number of times
-* element repeated while some condition is satified (or until some
+* element repeated while some condition is satisfied (or until some
 condition won't become true)
 
 KS supports all these types of repetitions. In all cases, it will create
@@ -2487,7 +2487,7 @@ a few pre-defined internal methods (they all start with an underscore
 
 |`min`
 |Array base type
-|Gets the minimam element of the array
+|Gets the minimum element of the array
 
 |`max`
 |Array base type
@@ -2611,7 +2611,7 @@ However, this is generally a bad idea:
   values are ASCII-safe, there's no guarantee that there would be no
   weird values like `C6 A2 ED 39` in future.
 
-The recommended way to handle FourCC-style types is using a enum:
+The recommended way to handle FourCC-style types is using an enum:
 
 [source,yaml]
 ----
@@ -3489,7 +3489,7 @@ The only difference between `kv_pair_3` and `kv_pair_8` types is the
 length of `key`. "Short" pairs use 3-byte long key, and "long" pairs
 use 8-byte key. That's lots of duplication, and just imagine what
 would happen if you'll need 4-byte keys or 6-byte keys. To alleviate
-that, one can declare so called "parameteric" type, like this one:
+that, one can declare so called "parametric" type, like this one:
 
 [source,yaml]
 ----
