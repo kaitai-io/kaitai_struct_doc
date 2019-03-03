@@ -2,6 +2,7 @@ STYLESHEET=colony
 
 TARGETS=\
 	out/developers.html \
+	out/developers_intro.html \
 	out/faq.html \
 	out/ksy_reference.html \
 	out/lang_cpp_stl.html \

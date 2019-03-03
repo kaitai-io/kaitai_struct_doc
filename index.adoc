@@ -25,5 +25,6 @@
 == Want to contribute to KS development?
 
 * <<developers.adoc#,Developers memo>> — basic information on how to build, test and release KS
+* <<developers_intro.adoc#,Developers intro>> — gentle introduction to KS reference compiler architecture
 * <<new_language.adoc#,Adding support for new target language>>
 * <<stream_api.adoc#,Kaitai Stream API>>
