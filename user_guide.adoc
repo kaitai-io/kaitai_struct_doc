@@ -2379,6 +2379,10 @@ library" for expression language.
 |Return type
 |Description
 
+|`length`
+|Integer
+|Number of bytes in the array
+
 |`to_s(encoding)`
 |String
 |Decodes (converts) a byte array encoded using the specified `encoding` scheme into a string
