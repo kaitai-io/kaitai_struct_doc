@@ -2032,7 +2032,7 @@ to:
 * show nibbles/bytes in binary: `0b1101_0111`
 
 *Floating point numbers* also follow the normal notation used in vast
-majority of languages: `123.456` will work, as well as expontential
+majority of languages: `123.456` will work, as well as exponential
 notation: `123.456e-55`. Use `123.0` to enforce floating point type to
 an otherwise integer literal.
 
@@ -2226,7 +2226,6 @@ Can be applied to integers and floats:
 * `a / b` — division
 * `a % b` — modulo; note that it's not a remainder: `-5 % 3` is `1`,
   not `-2`; the result is undefined for negative `b`.
-* `a ** b` — exponentiation (`a` in power of `b`)
 
 NOTE: If both operands are integer, result of arithmetic operation is
 integer, otherwise it is floating point number. For example, that
