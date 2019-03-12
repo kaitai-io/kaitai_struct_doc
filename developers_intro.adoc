@@ -35,11 +35,12 @@ point to get us started. There are multiple, platform-dependent entry
 points in the compiler:
 
 * JVM: io.kaitai.struct.JavaMain does:
-  * command-line argument parsing, which results in a `CLIConfig` object
-  * runs JavaMain.run with it
-  * runs JavaMain.compileOneInput for every .ksy source file specified, doing lots of wrapping to properly handle 
-* JS: io.kaitai.struct.MainJs has the main `compile` method:
-  * 
+** command-line argument parsing, which results in a `CLIConfig` object
+** runs JavaMain.run with it
+** runs JavaMain.compileOneInput for every .ksy source file specified,
+   doing lots of wrapping to properly handle regular output and
+   exceptions
+* JS: io.kaitai.struct.MainJs has the main `compile` method
 
 == 3-step compilation process
 
@@ -65,12 +66,14 @@ types.
 Loading YAML files is currently, unfortunately, done by external
 library in platform-specific manner:
 
-* For JVM, it calls snake-yaml. Everything related to this step is
-  incapsulated in `JavaKSYParser`.
+* For JVM, it calls
+  https://bitbucket.org/asomov/snakeyaml[SnakeYAML]. Everything
+  related to this step is incapsulated in `JavaKSYParser`.
 * For JS, it calls: TODO
 
 We're working on bringing pure Scala YAML parser, but it's a
-relatively distant goal: TODO link
+relatively distant goal: see
+https://github.com/kaitai-io/kaitai_struct/issues/229[#229].
 
 ==== Parsing
 
