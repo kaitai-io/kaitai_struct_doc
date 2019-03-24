@@ -213,10 +213,12 @@ When specifying an attribute, one MUST use the following order of keys:
 .. `-orig-id` — use to specify original ID spelling if transcribing a
   structure from existing software and/or official spec
 . `size`
+. `size-eos`
 . `type`
 . Type-related keys:
 .. `enum`
 .. `contents`
+.. `pad-right`
 .. `terminator`
 .. `include`
 .. `consume`
