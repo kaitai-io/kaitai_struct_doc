@@ -2562,7 +2562,7 @@ again:
 [source,yaml]
 ----
 seq:
-  - id: media_type
+  - id: rec_type
     type: u2
     enum: media
   - id: body
@@ -2649,6 +2649,54 @@ every possible FourCC value the file might contain is defined in the
 enum. Otherwise you will encounter unavoidable parse exceptions in
 Java and Python, preventing you from accessing further data from the
 file.
+
+[[do-nothing]]
+=== Do nothing
+
+In some rare cases, you need a type that actually does absolutely
+nothing. For example, you purposedly want to ignore parsing certain
+switch case and avoid running it through default type, i.e. situation
+like that:
+
+[source,yaml]
+----
+seq:
+  - id: rec_type
+    type: u4
+  - id: body
+    type:
+      switch-on: rec_type
+      cases:
+        1: rec_type_1
+        2: rec_type_2
+        3: dummy # <= must ignore rec_type=3!
+        _: rec_type_others
+----
+
+This is very easy to achieve, here are a few examples of type
+definitions which do nothing when invoked:
+
+[source,yaml]
+----
+types:
+  # One can use empty JSON object syntax to avoid specifying any of
+  # `seq`, `instances`, etc, sections.
+  dummy_1: {}
+  # One can use explicit doc to note that it's nothing there.
+  dummy_2:
+    doc: This type is intentionally left blank.
+  # One can use empty `seq` or `instances` or `types` section, any
+  # other empty sections, or any combination of thereof.
+  dummy_3:
+    seq: []
+    instances: {}
+    types: {}
+  # Very explicit notion of the fact that we want to parse 0 bytes.
+  dummy_4:
+    seq:
+      - id: no_value
+        size: 0
+----
 
 [[delimited-struct-advanced]]
 === Advanced delimited structures
