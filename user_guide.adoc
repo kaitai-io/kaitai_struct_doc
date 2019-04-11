@@ -1922,7 +1922,7 @@ types:
         type: u4
     instances:
       something_in_big:
-        io: _root.big_container._io
+        io: _root.block_one._io
         pos: ofs_in_big
         size: len_in_big
 ----
