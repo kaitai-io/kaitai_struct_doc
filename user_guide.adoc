@@ -3774,7 +3774,81 @@ beginner Kaitai Struct users.
 
 === Specifying size creates a substream
 
-TODO
+Specifying `size` (or `size-eos`, or `terminator`) while specifying a
+user type creates a substream. This will mean that all offsets (`pos:
+XXX`) inside that user type will be (1) relative to that substream's
+beginning, (2) constrained to that substream. For example:
+
+[source,yaml]
+----
+seq:
+  - id: header
+    size: 4
+  - id: block
+    type: block
+    size: 4 # <= important size designation, creates a substream
+instances:
+  byte_3:
+    pos: 3
+    type: u1
+types:
+  block:
+    byte_3:
+      pos: 3
+      type: u1
+----
+
+Given input `00 01 02 03|04 05 06 07`:
+
+* If `size` is present, main type's `byte_3` will be `03`, and
+  `block.byte_3` will be `07` (due to its allocation in a substream)
+* If `size` is absent, main type's `byte_3` will be `03`, and
+  `block.byte_3` will be `03` as well (as it will be reusing root stream)
+
+Avoiding this pitfall is simple: there are two ways:
+
+1. Avoid creating substream when it's not needed (i.e. drop `size` designation)
+2. Force use of a particular stream in parse instance with `io: XXX`, e.g.:
+
+[source,yaml]
+----
+types:
+  block:
+    byte_3:
+      io: _root._io # <= thanks to this, always points to a byte in main stream
+      pos: 3
+      type: 3
+----
+
+=== Not specifying size does not create a substream
+
+An opposite of previous pitfall, not specifying `size` (or `size-eos`)
+does not create a substream and thus accessing that element's IO will
+effectively point to main stream (and thus will be a no-op). In this
+example, the idea is to reparse `block` region twice with two different
+types `type1` and `type2`:
+
+[source,yaml]
+----
+seq:
+  - id: header
+    type: strz # some variable-sized field before `block`
+  - id: block_as_type1
+    type: type1
+    size: 16 # <= important, creates a substream
+instances:
+  block_as_type2:
+    io: block_as_type1._io
+    pos: 0
+    type: type2
+----
+
+If that `size` will be missing, then `block_as_type2` will reuse main
+stream and will parse a piece of data from `pos: 0`, which would likely
+be part of `header`, not the region occupied by `block_as_type1`.
+
+To avoid this pitfall, always make sure you specify `size` / `size-eos` /
+`terminator` when you want a substream to be created.
 
 === Applying `process` without a size
 
