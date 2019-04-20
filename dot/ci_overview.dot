@@ -1,0 +1,64 @@
+digraph {
+	rankdir=LR;
+	compound=true;
+	node [shape=plaintext, style=filled];
+
+	git_compiler [label="git: compiler",fillcolor="#ffffba",href="https://github.com/kaitai-io/kaitai_struct_compiler"];
+	git_tests [label="git: tests",fillcolor="#ffffba",href="https://github.com/kaitai-io/kaitai_struct_tests"];
+	git_ci_artifacts [label="git: ci_artifacts",fillcolor="#baffc9",href="https://github.com/kaitai-io/ci_artifacts"];
+
+	artifact_deb [label="bintray: compiler .deb",fillcolor="#baffc9",href="https://bintray.com/kaitai-io/debian_unstable/kaitai-struct-compiler"];
+	artifact_zip [label="bintray: compiler .zip",fillcolor="#baffc9",href="https://bintray.com/kaitai-io/universal_unstable/kaitai-struct-compiler"];
+	artifact_js [label="npm: compiler .js",fillcolor="#baffc9",href="https://www.npmjs.com/package/kaitai-struct-compiler"];
+	artifact_msi [label="appveyor: compiler .msi",fillcolor="#baffc9",href="https://ci.appveyor.com/project/GreyCat/kaitai-struct/build/artifacts"];
+	
+	artifact_ci_targets [label="git: ci_targets",fillcolor="#eaffe9",href="https://github.com/kaitai-io/ci_targets"];
+
+	build_compiler_appveyor [label="appveyor: build_compiler",fillcolor="#d0d0d0",href="https://ci.appveyor.com/project/GreyCat/kaitai-struct"];
+
+	dashboard [label="https://ci.kaitai.io/",href="https://ci.kaitai.io/"];
+	web_ide_unstable [label="https://ide.kaitai.io/devel/",href="https://ide.kaitai.io/devel/"];
+
+	git_compiler -> build_compiler;
+	git_compiler -> build_compiler_appveyor -> artifact_msi;
+
+#	subgraph cluster_git_runtimes {
+#		graph[style=dotted];
+
+		git_runtime_ruby [label="git: runtime_ruby",fillcolor="#ffffba",href="https://github.com/kaitai-io/kaitai_struct_ruby_runtime"];
+#	}
+
+	subgraph cluster_build_compiler {
+		label="travis: compiler and targets";
+		graph[style=dotted];
+
+		build_compiler -> {test_compiler build_formats};
+	}
+
+	git_tests -> {build_formats build_ruby_1_9 build_ruby_2_3};
+	build_compiler -> {artifact_deb artifact_zip artifact_js};
+
+	subgraph cluster_travis_ci_targets {
+		label="travis: ci_targets";
+		graph[style=dotted];
+
+		build_ruby_1_9 [label="ruby/1.9"];
+		build_ruby_2_3 [label="ruby/2.3"];
+	}
+
+	build_formats -> artifact_ci_targets -> {build_ruby_1_9 build_ruby_2_3} -> git_ci_artifacts -> dashboard;
+
+	git_runtime_ruby -> {build_ruby_1_9 build_ruby_2_3};
+
+	artifact_js -> web_ide_unstable;
+
+	subgraph cluster_legend {
+		label="Legend";
+		graph[style=dotted];
+
+		legend_artifact_int [label="Intemediate artifact",fillcolor="#eaffe9"];
+		legend_artifact_final [label="Final artifact",fillcolor="#baffc9"];
+		legend_source [label="Source repo",fillcolor="#ffffba"];
+		legend_build [label="Build process",fillcolor="#d0d0d0"];
+	}
+}

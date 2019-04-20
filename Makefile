@@ -1,6 +1,7 @@
 STYLESHEET=colony
 
 TARGETS=\
+	out/ci.html \
 	out/developers.html \
 	out/developers_intro.html \
 	out/faq.html \

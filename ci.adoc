@@ -1,0 +1,178 @@
+= Continuous Integration infrastructure
+Kaitai Project
+:toc: left
+:source-highlighter: coderay
+
+Kaitai Struct project sports a relatively complex CI (Continuous
+Integration) pipeline. This document describes how it's working.
+
+== High-level overview
+
+Kaitai Struct CI strives to be highly modular and, by design, tries
+not to rely on a single CI engine provider. Currently, we use:
+
+* https://travis-ci.org/kaitai-io[Travis]
+* AppVeyor: https://ci.appveyor.com/project/GreyCat/kaitai-struct[for kaitai_struct], https://ci.appveyor.com/project/GreyCat/ci-targets[for ci_targets]
+* CircleCI: https://circleci.com/gh/kaitai-io/kaitai_struct_formats[for kaitai_struct_formats]
+
+With so many different jobs/flows, it's hard to rely on CI providers
+internal tools (such as job browsers, test browsers, log explorers,
+etc), so we're using our own https://ci.kaitai.io/[CI dashboard] to
+unify all the data coming from different test runs/sources and monitor
+current status of the compiler.
+
+The following (clickable) chart gives an overview of CI
+pipeline, tracing the path for one particular target language (Ruby):
+
+image::img/ci_overview.svg[caption="Figure 1: ", title="Kaitai Struct CI high-level overview", alt="Kaitai Struct CI high-level overview"]
+
+On a high level, it can be summarized as:
+
+* We build the compiler: sources are in
+  https://github.com/kaitai-io/kaitai_struct_compiler[compiler repo],
+  all dependencies are fetched automatically by build tooling (sbt).
+* This results in several packages, which get published as artifacts
+  to several artifact stores (our "unstable builds"). Some of these
+  unstable builds trigger other products' pipelines (such as
+  https://ide.kaitai.io/[Web IDE]).
+* We run internal compiler unit tests (`test_compiler`).
+* We fetch test .ksy files from
+  https://github.com/kaitai-io/kaitai_struct_tests[tests repo] (~150
+  tests), and run compiler on them, asking for every possible target
+  language.
+* This produces ~150 tests × ~15 targets ~ 1500 compiled format files
+  in various target languages. We push them all into
+  https://github.com/kaitai-io/ci_targets[ci_targets repo] at GitHub.
+* Once `ci_targets` is updated, this triggers lots of CI jobs in
+  various environments in parallel. Every such job tests one
+  particular target language in one particular environment. To
+  identify them, we give every such job a name in form of
+  `language/environment`. For example:
+** `ruby/1.9` tests "ruby" target language in default (Linux)
+   environment, using Ruby 1.9 (at Travis).
+** `cpp_stl_11/msvc141_windows_x64` tests "cpp_stl_11" (which is
+   actually a subvariant of "cpp_stl" target with compiler options set
+   to generate exactly C++11 code using STL library), building and
+   running it in Windows environment with Microsoft Visual C++
+   compiler, toolkit version 141, x64 architecture. This job runs in
+   AppVeyor CI.
+* Every test job eventually produces test results, which get pushed
+  into https://github.com/kaitai-io/ci_artifacts/[ci_artifacts
+  repo]. Every job gets individual branch: for example,
+  https://github.com/kaitai-io/ci_artifacts/tree/ruby/1.9[ruby/1.9
+  branch] keeps results of `ruby/1.9` test run.
+* Finally, these test results can be viewed online at our
+  https://ci.kaitai.io/[CI dashboard], which is a simple JavaScript
+  app which fetches and aggregates all test results from all runs on
+  the fly.
+
+== Main CI pipeline in details
+
+=== Compiler
+
+Compiler is the heart of everything in Kaitai Struct, so it's only
+natural that we concenrate on making compiler maintenance as automated
+as possible.
+
+In other words:
+
+* Everything starts with
+  https://github.com/kaitai-io/kaitai_struct_compiler[compiler] repo.
+* A new commit (or build request) for compiler repo triggers building
+  of new compiler binaries. There are two builds running:
+** https://travis-ci.org/kaitai-io/kaitai_struct[compiler build at
+   Travis] runs on Linux and gets us .deb, .zip and .js builds of
+   compiler
+** https://ci.appveyor.com/project/GreyCat/kaitai-struct[compiler
+   build at AppVeyor] runs on Windows and gets us .msi Windows
+   installer build of compiler
+* These build results are already useful (as unstable builds for other
+  projects / people who would like to test bleeding edge features) and
+  they get published as artifacts:
+** Universal .zip packages get published in
+   https://bintray.com/kaitai-io/universal_unstable/kaitai-struct-compiler[universal_unstable
+   folder], powered by Bintray
+** Linux .deb packages get published in
+   https://bintray.com/kaitai-io/debian_unstable/kaitai-struct-compiler[debian_unstable
+   repo], powered by Bintray
+** Windows .msi packages become available at
+   https://ci.appveyor.com/project/GreyCat/kaitai-struct/build/artifacts[AppVeyor
+   project build artifacts]
+** JavaScript compiler build gets packaged as npm module and published
+   as
+   https://www.npmjs.com/package/kaitai-struct-compiler[kaitai-struct-compiler
+   npm package]
+
+NOTE: Direct links / instructions how to reach these downloads are
+available as "unstable" at https://kaitai.io/[Kaitai homepage /
+Download]
+
+* After compiler builds are finished, we run the internal compiler
+  unit tests (`test_compiler`). These are
+  https://github.com/kaitai-io/kaitai_struct_compiler/tree/master/jvm/src/test/scala/io/kaitai/struct[included
+  inside compiler repo] and are supposed to test individual functions
+  & methods inside the compiler.
+
+=== Building tests formats
+
+After we've got the compiler, next steps is to take "test formats" (a
+large bunch of different input .ksy files) and run compiler on
+them. `build_formats` process does that. To do that, we'll need:
+
+* Obviously, pre-built kaitai-struct-compiler
+* Test format files (.ksy), which will come from
+  https://github.com/kaitai-io/kaitai_struct_tests/tree/master/formats[formats/
+  dir in tests repo]
+
+This results in many files in target languages generated in
+`compiled/$LANG` directories. That directory gets pushed into
+https://github.com/kaitai-io/ci_targets[ci_targets repo]. One can use
+version control history in that repo to track which formats code
+generation has changed over development iterations.
+
+=== Running test formats
+
+The exact mechanism of "building and running tests" largely depends
+on target language and environment, but there are a few common
+things:
+
+* The scripts to automate it come from
+  https://github.com/kaitai-io/kaitai_struct_tests[tests repo] again.
+* All these runs require some
+  https://github.com/kaitai-io/kaitai_struct_tests/tree/master/src[binary
+  inputs that they will parse] — these also come from same tests repo.
+* All languages require its relevant KS runtime to build & run. For
+  example, for Ruby, we'll fetch
+  https://github.com/kaitai-io/kaitai_struct_ruby_runtime[ruby_runtime
+  repo] at this stage.
+
+== Other CI pipelines
+
+=== Web IDE
+
+TODO
+
+=== Formats gallery
+
+https://formats.kaitai.io/[Formats gallery] is a static website, which
+provides user-friendly rendition of contents of our
+https://github.com/kaitai-io/kaitai_struct_formats/[formats repo].
+
+Its pipeline is very simple and consists of
+https://circleci.com/gh/kaitai-io/kaitai_struct_formats[only one job,
+running on CircleCI]:
+
+* It fetches latest *stable* KS compiler from
+  https://bintray.com/kaitai-io/debian/kaitai-struct-compiler[our own
+  repository at bintray].
+* Then it uses it and
+  https://github.com/kaitai-io/kaitai_struct_formats/tree/master/_build[some
+  script magic] to build compiled versions of these formats and,
+  ultimately, static website.
+* Static website gets published into
+  https://github.com/kaitai-io/formats-kaitai-io.github.io[formats-kaitai-io.github.io
+  repo], which is served over HTTP to everyone as https://formats.kaitai.io/
+
+=== Documentation
+
+TODO
