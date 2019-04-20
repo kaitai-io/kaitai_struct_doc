@@ -38,3 +38,4 @@
 * <<developers_intro.adoc#,Developers intro>> — gentle introduction to KS reference compiler architecture
 * <<new_language.adoc#,Adding support for new target language>>
 * <<stream_api.adoc#,Kaitai Stream API>>
+* <<ci.adoc#,Continuous Integration (CI) infrastructure>>
