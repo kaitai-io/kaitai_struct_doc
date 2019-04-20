@@ -13,6 +13,11 @@ to make sure that all formats in our
 https://github.com/kaitai-io/kaitai_struct_formats[formats repository]
 are using this style.
 
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+"SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+document are to be interpreted as described in
+https://tools.ietf.org/html/rfc2119[RFC 2119].
+
 This document is work in progress, not all sections are complete yet.
 
 [[general]]
@@ -20,14 +25,14 @@ This document is work in progress, not all sections are complete yet.
 
 MUST use:
 
-* Single implicit YAML document per file (i.e. no `---` header)
-* No `%YAML x.y` version directives, no `%TAG` directives
-* 2-space indent
-* UTF-8 encoding throughout the file
-* LF (AKA "UNIX") line endings
-* trailing newline character in a .ksy file
+* Single implicit YAML document per file (i.e. no `---` header).
+* No `%YAML x.y` version directives, no `%TAG` directives.
+* 2-space indent.
+* UTF-8 encoding throughout the file.
+* LF (AKA "UNIX") line endings.
+* Trailing newline character in a .ksy file.
 * Block YAML style in most general cases, unless explicitly
-  specified/allowed otherwise
+  specified/allowed otherwise.
 
 Formatting of sequences MUST include an indent, i.e.:
 
@@ -125,7 +130,8 @@ For top-level meta section, use the following order of keys:
 . Legal information — `license` — MUST be a valid
   https://spdx.org/licenses/[SPDX license expression]
 . Processing instructions:
-.. `ks-version`
+.. `ks-version` — SHOULD list lowest possible KS compiler version that
+   is able to compile this file.
 .. `imports`
 . Defaults (in alphabetic order):
 .. `encoding`
@@ -256,11 +262,11 @@ surprise" and make life easier to end-users, reducing amount of
 guesswork.
 
 * For simple non-repeated fields, use a simple singular form —
-  i.e. `width`, `header`, `transaction_id`, `file`.
+  e.g. `width`, `header`, `transaction_id`, `file`.
 * For repeated files (i.e. with `repeat: something`), use plural form
-  — i.e. `files`, `transactions`.
+  — e.g. `files`, `transactions`.
 * Don't be overly verbose: use commonly understood abbreviations
-  liberally, if it will improve readablity — i.e. `src_mac` or
+  liberally, if it will improve readablity — e.g. `src_mac` or
   `src_mac_addr` instead of `source_media_access_control_address`
 * For fields that are designed to be used to detect file type (AKA
   "magic values"), use `magic` name, or, if there are several of them,
