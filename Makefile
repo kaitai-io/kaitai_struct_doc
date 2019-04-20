@@ -1,6 +1,8 @@
 STYLESHEET=colony
 
 TARGETS=\
+	out/svg/two_parents.svg \
+	out/svg/ci_overview.svg \
 	out/ci.html \
 	out/developers.html \
 	out/developers_intro.html \
@@ -22,11 +24,6 @@ all: $(TARGETS)
 	cp -r img styles js out
 	cp raw/coderay-asciidoctor.css out
 
-#out/%.html: raw/%.html tmpl/navbar.html tmpl/footer.html
-#	cat tmpl/navbar.html $< tmpl/footer.html >tmp.html
-#	mkdir -p out
-#	mv tmp.html $@
-
 out/%.html: raw/%.html tmpl/navbar.html postprocess-html
 	./postprocess-html $< $@
 
@@ -37,9 +34,9 @@ raw/styles/$(STYLESHEET).css: styles/$(STYLESHEET).css
 	mkdir -p raw/styles
 	cp $< $@
 
-#styles/colony.css:
-#	mkdir -p styles
-#	wget -O styles/colony.css http://themes.asciidoctor.org/stylesheets/colony.css
+out/svg/%.svg: dot/%.dot
+	mkdir -p out/svg
+	dot -Tsvg $< -o $@
 
 clean:
 	rm -rf out

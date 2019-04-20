@@ -1,0 +1,36 @@
+digraph {
+	rankdir=LR;
+	node [shape=plaintext];
+
+	subgraph cluster__opcode_jmp {
+		label="Meh::OpcodeJmp";
+		graph[style=dotted];
+
+		opcode_jmp__seq [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+			<TR><TD BGCOLOR="#E0FFE0">pos</TD><TD BGCOLOR="#E0FFE0">size</TD><TD BGCOLOR="#E0FFE0">type</TD><TD BGCOLOR="#E0FFE0">id</TD></TR>
+			<TR><TD PORT="target_pos">0</TD><TD PORT="target_size">...</TD><TD>Arg</TD><TD PORT="target_type">target</TD></TR>
+		</TABLE>>];
+	}
+	subgraph cluster__opcode_push {
+		label="OpcodePush";
+		graph[style=dotted];
+
+		opcode_push__seq [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+			<TR><TD BGCOLOR="#E0FFE0">pos</TD><TD BGCOLOR="#E0FFE0">size</TD><TD BGCOLOR="#E0FFE0">type</TD><TD BGCOLOR="#E0FFE0">id</TD></TR>
+			<TR><TD PORT="value_pos">0</TD><TD PORT="value_size">...</TD><TD>Arg</TD><TD PORT="value_type">value</TD></TR>
+		</TABLE>>];
+	}
+	subgraph cluster__arg {
+		label="Arg";
+		graph[style=dotted];
+
+		arg__seq [label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+			<TR><TD BGCOLOR="#E0FFE0">pos</TD><TD BGCOLOR="#E0FFE0">size</TD><TD BGCOLOR="#E0FFE0">type</TD><TD BGCOLOR="#E0FFE0">id</TD></TR>
+			<TR><TD PORT="arg_type_pos">0</TD><TD PORT="arg_type_size">1</TD><TD>u1</TD><TD PORT="arg_type_type">arg_type</TD></TR>
+			<TR><TD PORT="arg_value_pos">1</TD><TD PORT="arg_value_size">1</TD><TD>u1</TD><TD PORT="arg_value_type">arg_value</TD></TR>
+		</TABLE>>];
+	}
+
+	opcode_jmp__seq:target_type -> arg__seq [style=bold];
+	opcode_push__seq:value_type -> arg__seq [style=bold];
+}

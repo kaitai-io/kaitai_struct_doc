@@ -3154,7 +3154,7 @@ Every object (except for the top-level object) in a .ksy file has a
 parent, and that parent has a type, which is some sort of user-defined
 type. What happens if two or more objects use the same type?
 
-image::img/two_parents.svg[float="right"]
+image::svg/two_parents.svg[float="right"]
 
 [source,yaml]
 ----

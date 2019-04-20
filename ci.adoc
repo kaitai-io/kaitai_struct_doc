@@ -24,7 +24,7 @@ current status of the compiler.
 The following (clickable) chart gives an overview of CI
 pipeline, tracing the path for one particular target language (Ruby):
 
-image::img/ci_overview.svg[caption="Figure 1: ", title="Kaitai Struct CI high-level overview", alt="Kaitai Struct CI high-level overview"]
+image::svg/ci_overview.svg[caption="Figure 1: ", title="Kaitai Struct CI high-level overview", alt="Kaitai Struct CI high-level overview"]
 
 On a high level, it can be summarized as:
 
