@@ -74,8 +74,6 @@ Compiler is the heart of everything in Kaitai Struct, so it's only
 natural that we concenrate on making compiler maintenance as automated
 as possible.
 
-In other words:
-
 * Everything starts with
   https://github.com/kaitai-io/kaitai_struct_compiler[compiler] repo.
 * A new commit (or build request) for compiler repo triggers building
