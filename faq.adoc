@@ -3,6 +3,7 @@
 
 == General
 
+[[fast]]
 === Is it fast?
 
 Yes, pretty much. Kaitai Struct is not a runtime interpreter, but a compiler — thus it imposes no additional runtime performance penalty. Code that it generates is about as fast as one can write in a particular language to parse a certain data format.
@@ -14,6 +15,7 @@ That said, note that Kaitai Struct is all about producing a clean API for parsin
 
 This pattern is generally a good fit for most applications, but for some types of workloads you might want a completely different approach: acting as soon as every particular chunk of data stream is parsed based on that chunk only. This calls for an event-based parsing model (i.e. you define some code that will be executed on each particular state of the parser) and thus, probably, you'll find that other tools like https://en.wikipedia.org/wiki/Parser_combinator[parser combinators], finite-state machine generators or even plain https://en.wikipedia.org/wiki/Comparison_of_parser_generators[lexer/parser generators] will suit that approach better than Kaitai Struct. In these cases, Kaitai Struct's approach "read-then-use" *might* be slower than event-based "read-and-act-simultaneously" approach.
 
+[[readable]]
 === Is output of KS readable?
 
 Yes, Kaitai Struct compiler generates very human-readable files, which can be examined with naked eye, debugged if needed, etc. For example, reading a two-byte signed little-endian integer is usually translated into something like:
@@ -22,6 +24,7 @@ Yes, Kaitai Struct compiler generates very human-readable files, which can be ex
 field = _io.readS2Le();
 ```
 
+[[writing]]
 === Does it support writing (generation, serialization) of structures into stream, or only reading (parsing, deserialization) of structures from the stream?
 
 So far Kaitai Struct focuses on reading (parsing) only. There are plans to support writing, but don't hold your breath for it — it's a pretty major change and it'll probably happen after 1.x.
@@ -31,6 +34,7 @@ https://github.com/kaitai-io/kaitai_struct/issues/27[relevant issue in
 our issue tracker], which sports a proof-of-concept compiler branch
 that has some writing support (Java only).
 
+[[mmap]]
 === Does it support `mmap` (memory-mapped) to access files?
 
 Some languages runtimes support so-called "memory mapped" files. The
@@ -72,6 +76,7 @@ both their pros and cons, namely:
 
 == How does it compare to ...
 
+[[vs-construct]]
 === ... Python library Construct?
 
 Actually, Construct is the closest analog to Kaitai Struct. It is also a declarative and symmetric binary parsing library, but there are significant differences:
@@ -85,6 +90,7 @@ In fact, there is an open and active collaboration between Construct and Kaitai 
 
 Main documentation site: https://construct.readthedocs.io
 
+[[vs-protobuf]]
 === ... Google Protocol Buffers, ASN.1, Apache Thrift, Apache Avro, BSON, etc?
 
 They're completely different. Projects mentioned are actually different serialization specifications that map existing data into some sort of extensible binary stream, usually for easy transmission / interchange. Binary representation is driven by the data and encoded according to particular standard of a given protocol, which usually has a fixed representation for integers, for strings, for arrays, for dictionaries, etc. Most of these project allow generated formats to be automatically extensibile, carry versioning information, automatically embed typing information of some sort.
@@ -100,6 +106,7 @@ KS approaches from the other end: given some sort of existing (or planned) binar
 * BSON: http://bsonspec.org/
 ****
 
+[[vs-capn-proto]]
 === ... Cap'N Proto?
 
 Most of the arguments from the previous answer (for Google Protocol Buffers, ASN.1, Apache Thrift, Apache Avro, BSON) apply here as well. Cap'N Proto is not a tool for reading or writing arbitrary formats. Instead, it uses a couple of clever tricks to make serialization and deserialization more efficient (casting binary structures as blocks, not assigning individual fields), but, essentially, it emphasizes content, and offers very limited control over serialization format.
@@ -111,6 +118,7 @@ In theory, [Cap'N Proto encoding scheme](https://capnproto.org/encoding.html) is
 * Cap'N Proto: https://capnproto.org/
 ****
 
+[[vs-bison]]
 === ... GNU Bison, Yacc, Lex, Flex, etc?
 
 All these tools actually work on parsing text (most usually, source code) using context-free grammars. The core problem they solve is ambiguity of whatever was read. For example, a single letter `a` might be part of string literal, part of an identifier, part of a tag name, etc. In most cases, parsers that they generate have a concept of *state* and a fairly complex ruleset to change states. On the other hand, binary files are usually structured in a non-ambiguous way: there's no need to do complex backtracking, re-interpreting everything in a different fashion just because we've encountered something near the end of the file. There's usually no *state* beyond the pointer in the stream and pointer the code that does parsing.
@@ -123,6 +131,7 @@ All these tools actually work on parsing text (most usually, source code) using 
 * Flex: http://flex.sourceforge.net/
 ****
 
+[[vs-010]]
 === ... SweetScape 010 Editor, Synalysis, Hexinator, Okteta, iBored?
 
 All these tools are advanced hex editors with some sort of *template language*, which is actually pretty close to `.ksy` language. One major difference is that `.ksy` files, unlike per-editor templates, can be compiled right into parser source code in any supported language.
@@ -136,6 +145,7 @@ All these tools are advanced hex editors with some sort of *template language*, 
 * iBored: http://apps.tempel.org/iBored/
 ****
 
+[[vs-preon]]
 === ... Preon?
 
 * Both Preon and KS are declarative
@@ -151,6 +161,7 @@ All these tools are advanced hex editors with some sort of *template language*, 
 
 == Format specification: how to ...
 
+[[vlq]]
 === ... use variable-length integer quantities (AKA VLQ, varint, vint, LEB128/ULEB128, 7-bit encoded int, Base-128 encoding)?
 
 In most cases, you can just import existing implementation from our
@@ -178,6 +189,7 @@ seq:
     size: len.value
 ----
 
+[[bcd]]
 === ... binary-coded decimals (BCD)?
 
 There's lot of variety when it comes to BCD representations:
