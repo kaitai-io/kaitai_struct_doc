@@ -93,9 +93,40 @@ Main documentation site: https://construct.readthedocs.io
 [[vs-protobuf]]
 === ... Google Protocol Buffers, ASN.1, Apache Thrift, Apache Avro, BSON, etc?
 
-They're completely different. Projects mentioned are actually different serialization specifications that map existing data into some sort of extensible binary stream, usually for easy transmission / interchange. Binary representation is driven by the data and encoded according to particular standard of a given protocol, which usually has a fixed representation for integers, for strings, for arrays, for dictionaries, etc. Most of these project allow generated formats to be automatically extensibile, carry versioning information, automatically embed typing information of some sort.
+In short: these projects and Kaitai Struct solve completely different problems.
 
-KS approaches from the other end: given some sort of existing (or planned) binary representation, build a set of classes that the data inside this representation can be held in and build a parser for it. You can't read an arbitrary binary format (like, for example, `.gif`, `.wav`, or `.pdf`).
+Protobuf, ASN.1, Apache Thrift, etc, are designed to take a certain
+block of data in memory, serialize it, transfer to other system, and
+deserialize it there. Binary representation is driven by the data and
+encoded according to particular standard of a given protocol, which
+usually has a fixed representation for integers, for strings, for
+arrays, for dictionaries, etc. Most of these project allow generated
+formats to be automatically extensibile, carry versioning information,
+automatically embed typing information of some sort, etc.
+
+However, you can't read an arbitrary binary format (like, for example,
+`.gif`, `.wav`, or `.zip`) with any of these tools, and they're not
+really architected to do that job.
+
+KS approach is almost the exact opposite: given some sort of existing
+(or planned) binary representation, build a set of classes that the
+data inside this representation can be held in and generate a parser
+for it.
+
+You can totally read an arbitrary binary format (or enjoy diverse
+library of ready-made format specifications, including
+https://formats.kaitai.io/gif[.gif],
+https://formats.kaitai.io/wav[.wav] and
+https://formats.kaitai.io/zip[.zip]). To some extent, you can use KS
+in a task "send block of data from point A to point B", if you prefer
+to have more control over your serialization scheme — but, obviously,
+you'll have to add features like backwards compatibility, versioning,
+etc, in your protocol manually.
+
+So, to summarize:
+
+* "Have data in memory, need binary protocol" ⇒ use Protobuf & company
+* "Have binary protocol, need data in memory" ⇒ use Kaitai Struct
 
 .Software mentioned
 ****
