@@ -91,9 +91,10 @@ In fact, there is an open and active collaboration between Construct and Kaitai 
 Main documentation site: https://construct.readthedocs.io
 
 [[vs-protobuf]]
-=== ... Google Protocol Buffers, ASN.1, Apache Thrift, Apache Avro, BSON, etc?
+=== ... Google Protocol Buffers, ASN.1, Apache Thrift, Apache Avro, BSON, MessagePack, Microsoft Bond, Hessian, ZeroC ICE, etc?
 
-In short: these projects and Kaitai Struct solve completely different problems.
+In short: these projects and Kaitai Struct solve completely different
+problems.
 
 Protobuf, ASN.1, Apache Thrift, etc, are designed to take a certain
 block of data in memory, serialize it, transfer to other system, and
@@ -128,25 +129,46 @@ So, to summarize:
 * "Have data in memory, need binary protocol" ⇒ use Protobuf & company
 * "Have binary protocol, need data in memory" ⇒ use Kaitai Struct
 
+Note that you can actually use Kaitai Struct to parse most of the
+mentioned protocols. It will typically give you many low-level
+implementaton details, which you might care about if you're interested
+in digital forensics (DFIR) or digital preservation. You can find some
+of these protocols already specified under "Serialization Protocols"
+section in http://formats.kaitai.io/[Kaitai Struct Format Gallery].
+
 .Software mentioned
 ****
-* Google Protocol Buffers: https://github.com/google/protobuf
-* ASN.1: https://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One
-* Apache Thrift: https://thrift.apache.org/
-* Apache Avro: https://avro.apache.org/
-* BSON: http://bsonspec.org/
+* https://github.com/google/protobuf[Google Protocol Buffers]
+* https://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One[ASN.1]
+* https://thrift.apache.org/[Apache Thrift]
+* https://avro.apache.org/[Apache Avro]
+* http://bsonspec.org/[BSON]
+* http://msgpack.org/[MessagePack]
+* https://github.com/Microsoft/bond[Microsoft Bond]
+* http://hessian.caucho.com/doc/hessian-serialization.html[Hessian]
+* https://doc.zeroc.com/ice/3.7/the-ice-protocol[ZeroC ICE]
 ****
 
 [[vs-capn-proto]]
-=== ... Cap'N Proto?
+=== ... Cap'N Proto, FlatBuffers?
 
-Most of the arguments from the previous answer (for Google Protocol Buffers, ASN.1, Apache Thrift, Apache Avro, BSON) apply here as well. Cap'N Proto is not a tool for reading or writing arbitrary formats. Instead, it uses a couple of clever tricks to make serialization and deserialization more efficient (casting binary structures as blocks, not assigning individual fields), but, essentially, it emphasizes content, and offers very limited control over serialization format.
+Most of the arguments from the previous answer (for Google Protocol
+Buffers, ASN.1, Apache Thrift, Apache Avro, BSON) apply here as
+well. Both Cap'N Proto and FlatBuffers are not a tool for reading or
+writing arbitrary formats. Instead, they uses a couple of clever
+tricks to make serialization and deserialization more efficient
+(casting binary structures as blocks, not assigning individual
+fields), but, essentially, they emphasize content, and offer very
+limited control over serialization format.
 
-In theory, [Cap'N Proto encoding scheme](https://capnproto.org/encoding.html) is well documented and can be implemented in .ksy to parse Cap'N Proto encoded messages.
+In theory, [Cap'N Proto encoding
+scheme](https://capnproto.org/encoding.html) is well documented and
+can be implemented in .ksy to parse Cap'N Proto encoded messages.
 
 .Software mentioned
 ****
-* Cap'N Proto: https://capnproto.org/
+* https://capnproto.org/[Cap'N Proto]
+* https://google.github.io/flatbuffers/[FlatBuffers]
 ****
 
 [[vs-bison]]
