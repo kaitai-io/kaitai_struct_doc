@@ -22,6 +22,7 @@
 ]
 ** https://medium.com/@MorteNoir/database-reverse-engineering-part-2-main-approaches-ae9355b2d429[Database Reverse Engineering, Part 2: Main Approaches]
 ** https://medium.com/@MorteNoir/database-reverse-engineering-part-3-code-reuse-conclusion-b2145420b09b[Database Reverse Engineering, Part 3: Code Reuse, Conclusion]
+* https://matthewturk.github.io/post/kaitai-struct-scientific-data/[Kaitai Struct and Scientific Data] by https://matthewturk.github.io/[Matthew Turk]
 
 === Language-specific notes
 
