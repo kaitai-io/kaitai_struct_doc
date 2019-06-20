@@ -504,7 +504,7 @@ This one is less inconsistent, but still could be improved:
 * Abbreviations are way too short (i.e. `ph` for "program header",
   `sh` for "section header", `eh` for "ELF header") for a casual user
   to understand its meaning without a documentation lookup. This can
-  be easily remedied by using slighly more verbose names.
+  be easily remedied by using slightly more verbose names.
 
 Thus, the recommended way to represent it would be:
 
