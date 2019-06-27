@@ -87,7 +87,8 @@ automatically as well.
 === Building for JVM
 
 We use http://www.scala-sbt.org/sbt-native-packager/[sbt-native-packager] to
-build deployable formats.
+build deployable formats. Note that in order to perform the following builds,
+one must be in the `kaitai_struct/compiler` directory.
 
 ==== Building an universal (.zip) package
 
