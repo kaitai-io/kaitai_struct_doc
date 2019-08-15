@@ -680,8 +680,8 @@ For the sake of completeness, here's the full table of available integer types:
 ### Bit-size integers
 
 To specify integers having non-standard number of bits in them, one
-can use the following pattern: `b(\d+)`, where `\d+` is the number of
-bits allocated.
+can use the following pattern: `b(\d+)`, where `(\d+)` is the number of
+bits allocated. For example `b3` specifies a 3-bit integer.
 
 ### Floats
 
