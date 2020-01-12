@@ -17,6 +17,7 @@ TARGETS=\
 	out/stream_api.html \
 	out/user_guide.html \
 	out/ksy_style_guide.html \
+	out/kst.html \
 	out/index.html
 
 all: $(TARGETS)
