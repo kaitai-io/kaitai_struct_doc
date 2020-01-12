@@ -149,6 +149,32 @@ actually be JavaScript libraries, not Java jars.
   ** Attached file: `jvm/target/windows/kaitai-struct-compiler-*.msi`
 . Publish them all
 
+=== Publishing new version to oss.sonatype.org
+
+. Verify that one has OSS Sonatype login/password for `iokaitai` org.
+. Preliminary setup (needs to be done once per machine — verified for
+  sbt 1.1)
+  * Set up credentials: create `$HOME/.sbt/.credentials` with the
+    following contents (replacing XXX with username and password):
+
+    ----
+    realm=Sonatype Nexus Repository Manager
+    host=oss.sonatype.org
+    user=XXX
+    password=XXX
+    ----
+  * Set up `$HOME/.sbt/1.0/plugins/credentials.sbt` with the following
+    contents:
+
+    [source,scala]
+    ----
+    credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
+    ----
+  * Make sure GPG keys are present
+. `sbt publish`
+. Go to https://oss.sonatype.org/#stagingRepositories
+. Continue to follow Java runtime publishing instructions
+
 == Tests
 
 TODO
