@@ -221,9 +221,55 @@ credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
 . Go to https://oss.sonatype.org/#stagingRepositories
 . Continue to follow <<java,Java runtime publishing instructions>>
 
+== Developing new feature
+
+Because the tests are in your own repository, you must clone the test repository
+to test your work. To do this with one command, there is a `kaitai_struct` repository
+that contains submodules for all other project repositories. You can just clone it
+with submodules.
+
+If you have already clone the individual repository, you can just add new remote
+to submodule pointed to repository with your work. See example:
+
+[source,shell]
+  # Clone uber-repository
+  git clone --recursive https://github.com/kaitai-io/kaitai_struct.git
+  cd kaitai_struct
+  #
+  # Select subproject you want to modify
+  cd ${sub-project}
+  # See current status
+  git remote -v
+  # Add your repository as remote with name my-repo
+  git remote add ${my-repo} https://github.com/${my-repo}/${sub-project}.git
+  # Check youself
+  git remote -v
+  # Get you work
+  git fetch ${my-repo}
+  # or, if you want to fetch only one branch `my-feature`. Use local branch name,
+  # without repository name prefix, ie. just `some-feature` but not `my-repo/some-feature`
+  # git fetch ${my-repo} ${my-feature}
+  #
+  # Switch to you feature branch
+  git checkout ${my-feature}
+
 == Tests
 
-TODO
+To test changes in compiler and runtimes, run following commands (for example, for
+Java runtime):
+[source,shell]
+  # Assumed, that this will be done
+  # git clone --recursive https://github.com/kaitai-io/kaitai_struct.git
+  # cd kaitai_struct
+  cd tests
+  ./build-compiler
+  # Convert all test `.ksy` files into all target languages (including Java),
+  # which will give you tests/compiled/java
+  ./build-formats
+  # will run all tests for Java; results will be in `test_out/java`
+  ./run-java
+
+Also, see readme of https://github.com/kaitai-io/kaitai_struct_tests project.
 
 == Publishing runtime libraries
 
