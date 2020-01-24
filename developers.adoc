@@ -171,7 +171,7 @@ actually be JavaScript libraries, not Java jars.
     credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
     ----
   * Make sure GPG keys are present
-. `sbt publish`
+. `sbt publishSigned`
 . Go to https://oss.sonatype.org/#stagingRepositories
 . Continue to follow Java runtime publishing instructions
 
