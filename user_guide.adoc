@@ -3793,9 +3793,10 @@ instances:
     type: u1
 types:
   block:
-    byte_3:
-      pos: 3
-      type: u1
+    instances:
+      byte_3:
+        pos: 3
+        type: u1
 ----
 
 Given input `00 01 02 03|04 05 06 07`:
