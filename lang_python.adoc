@@ -55,7 +55,7 @@ sudo apt-get install python3-kaitaistruct
 Reference: https://packages.debian.org/buster/python3-kaitaistruct[package info for Debian], https://packages.ubuntu.com/eoan/python3-kaitaistruct[package info for Ubuntu]
 
 * If your project is using *requirements.txt* to manage your
-  dependencies, just add the following line to it:
+  dependencies, add the following line to it:
 +
 ----
 kaitaistruct
@@ -77,7 +77,21 @@ If you're using latest (unreleased AKA "unstable" AKA "snapshot") build
 of Kaitai Struct compiler, that will require latest runtime libraries as
 well:
 
-TODO
+* If your project is using *requirements.txt* to manage your
+  dependencies, add the following line to it:
++
+----
+kaitaistruct @ git+https://github.com/kaitai-io/kaitai_struct_python_runtime.git
+----
++
+and then run `pip install -r requirements.txt` to update all your
+dependencies.
+
+* Otherwise, you can just install the package manually using *pip*
+  (Python package manager):
++
+[source,shell]
+pip install --upgrade --pre git+https://github.com/kaitai-io/kaitai_struct_python_runtime.git
 
 [[add-dependencies]]
 === Adding dependencies
