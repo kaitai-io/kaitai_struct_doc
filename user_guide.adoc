@@ -3815,10 +3815,11 @@ Avoiding this pitfall is simple: there are two ways:
 ----
 types:
   block:
-    byte_3:
-      io: _root._io # <= thanks to this, always points to a byte in main stream
-      pos: 3
-      type: 3
+    instances:
+      byte_3:
+        io: _root._io # <= thanks to this, always points to a byte in main stream
+        pos: 3
+        type: 3
 ----
 
 === Not specifying size does not create a substream

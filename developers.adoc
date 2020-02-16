@@ -84,6 +84,25 @@ automatically. It shouldn't really matter even which version of sbt
 you use for bootstrap, as sbt will pull relevant sbt update packages
 automatically as well.
 
+=== Configuring proxy
+
+Note, that if you behind proxy, you need to run `sbt` with flags
+[source]
+  -Dhttp.proxyHost=<your proxy server>
+  -Dhttp.proxyPort=<your proxy server port>
+  -Dhttps.proxyHost=<your proxy server>
+  -Dhttps.proxyPort=<your proxy server port>
+
+For example
+[source,shell]
+  sbt -Dhttp.proxyHost=proxy.com -Dhttp.proxyPort=3128 -Dhttps.proxyHost=proxy.com -Dhttps.proxyPort=3128
+
+Unfortunately, `sbt` doesn't understand `http(s)_proxy` environment variable properly, if it contains
+address of proxy server in `host:port` format, so flags is necessary.
+
+This flags needed only on first run or when you want to check and upgrade dependencies. After first `sbt`
+run all dependencies will be downloaded and access to the internet not required anymore.
+
 === Building for JVM
 
 We use http://www.scala-sbt.org/sbt-native-packager/[sbt-native-packager] to
