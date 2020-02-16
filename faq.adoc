@@ -6,14 +6,29 @@
 [[fast]]
 === Is it fast?
 
-Yes, pretty much. Kaitai Struct is not a runtime interpreter, but a compiler — thus it imposes no additional runtime performance penalty. Code that it generates is about as fast as one can write in a particular language to parse a certain data format.
+Yes, pretty much. Kaitai Struct is not a runtime interpreter, but a
+compiler — thus it imposes no additional runtime performance penalty.
+Code that it generates is about as fast as one can write in a particular
+language to parse a certain data format.
 
-That said, note that Kaitai Struct is all about producing a clean API for parsing binary data. That means that general usage plan is:
+That said, note that Kaitai Struct is all about producing a clean API for
+parsing binary data. That means that general usage plan is:
 
 1. Create object (structure) in memory and parse stream into it
 2. Use it via API afterwards
 
-This pattern is generally a good fit for most applications, but for some types of workloads you might want a completely different approach: acting as soon as every particular chunk of data stream is parsed based on that chunk only. This calls for an event-based parsing model (i.e. you define some code that will be executed on each particular state of the parser) and thus, probably, you'll find that other tools like https://en.wikipedia.org/wiki/Parser_combinator[parser combinators], finite-state machine generators or even plain https://en.wikipedia.org/wiki/Comparison_of_parser_generators[lexer/parser generators] will suit that approach better than Kaitai Struct. In these cases, Kaitai Struct's approach "read-then-use" *might* be slower than event-based "read-and-act-simultaneously" approach.
+This pattern is generally a good fit for most applications, but for some
+types of workloads you might want a completely different approach: acting
+as soon as every particular chunk of data stream is parsed based on that
+chunk only. This calls for an event-based parsing model (i.e. you define
+some code that will be executed on each particular state of the parser)
+and thus, probably, you'll find that other tools like
+https://en.wikipedia.org/wiki/Parser_combinator[parser combinators],
+finite-state machine generators or even plain
+https://en.wikipedia.org/wiki/Comparison_of_parser_generators[lexer/parser
+generators] will suit that approach better than Kaitai Struct. In these
+cases, Kaitai Struct's approach "read-then-use" *might* be slower than
+event-based "read-and-act-simultaneously" approach.
 
 [[readable]]
 === Is output of KS readable?
@@ -172,9 +187,19 @@ can be implemented in .ksy to parse Cap'N Proto encoded messages.
 ****
 
 [[vs-bison]]
-=== ... GNU Bison, Yacc, Lex, Flex, etc?
+=== ... GNU Bison, Yacc, Lex, Flex, ANTLR, etc?
 
-All these tools actually work on parsing text (most usually, source code) using context-free grammars. The core problem they solve is ambiguity of whatever was read. For example, a single letter `a` might be part of string literal, part of an identifier, part of a tag name, etc. In most cases, parsers that they generate have a concept of *state* and a fairly complex ruleset to change states. On the other hand, binary files are usually structured in a non-ambiguous way: there's no need to do complex backtracking, re-interpreting everything in a different fashion just because we've encountered something near the end of the file. There's usually no *state* beyond the pointer in the stream and pointer the code that does parsing.
+All these tools actually work on parsing text (most usually, source code)
+using context-free grammars. The core problem they solve is ambiguity of
+whatever was read. For example, a single letter `a` might be part of
+string literal, part of an identifier, part of a tag name, etc. In most
+cases, parsers that they generate have a concept of *state* and a fairly
+complex ruleset to change states. On the other hand, binary files are
+usually structured in a non-ambiguous way: there's no need to do complex
+backtracking, re-interpreting everything in a different fashion just
+because we've encountered something near the end of the file. There's
+usually no *state* beyond the pointer in the stream and pointer the code
+that does parsing.
 
 .Software mentioned
 ****
@@ -182,12 +207,16 @@ All these tools actually work on parsing text (most usually, source code) using 
 * Yacc: https://en.wikipedia.org/wiki/Yacc
 * Lex: https://en.wikipedia.org/wiki/Lex_(software)
 * Flex: http://flex.sourceforge.net/
+* ANTLR: https://www.antlr.org/
 ****
 
 [[vs-010]]
 === ... SweetScape 010 Editor, Synalysis, Hexinator, Okteta, iBored?
 
-All these tools are advanced hex editors with some sort of *template language*, which is actually pretty close to `.ksy` language. One major difference is that `.ksy` files, unlike per-editor templates, can be compiled right into parser source code in any supported language.
+All these tools are advanced hex editors with some sort of *template
+language*, which is actually pretty close to `.ksy` language. One major
+difference is that `.ksy` files, unlike per-editor templates, can be
+compiled right into parser source code in any supported language.
 
 .Software mentioned
 ****
