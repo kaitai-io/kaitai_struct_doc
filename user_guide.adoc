@@ -2405,7 +2405,7 @@ library" for expression language.
 
 |`substring(from, to)`
 |String
-|Extracts a portion of a string between character at offset `from` and character at offset `to` (inclusive of characters at `from` and `to` offsets)
+|Extracts a portion of a string between character at offset `from` and character at offset `to - 1` (including `from`, excluding `to`)
 
 |`to_i`
 |Integer
