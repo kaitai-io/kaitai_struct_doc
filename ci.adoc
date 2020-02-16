@@ -6,6 +6,7 @@ Kaitai Project
 Kaitai Struct project sports a relatively complex CI (Continuous
 Integration) pipeline. This document describes how it's working.
 
+[[overview]]
 == High-level overview
 
 Kaitai Struct CI strives to be highly modular and, by design, tries
@@ -13,7 +14,7 @@ not to rely on a single CI engine provider. Currently, we use:
 
 * https://travis-ci.org/kaitai-io[Travis]
 * AppVeyor: https://ci.appveyor.com/project/GreyCat/kaitai-struct[for kaitai_struct], https://ci.appveyor.com/project/GreyCat/ci-targets[for ci_targets]
-* CircleCI: https://circleci.com/gh/kaitai-io/kaitai_struct_formats[for kaitai_struct_formats]
+* GitHub Actions: https://github.com/kaitai-io/kaitai_struct_formats/actions[for kaitai_struct_formats]
 
 With so many different jobs/flows, it's hard to rely on CI providers
 internal tools (such as job browsers, test browsers, log explorers,
@@ -66,8 +67,10 @@ On a high level, it can be summarized as:
   app which fetches and aggregates all test results from all runs on
   the fly.
 
+[[main]]
 == Main CI pipeline in details
 
+[[compiler]]
 === Compiler
 
 Compiler is the heart of everything in Kaitai Struct, so it's only
@@ -111,6 +114,7 @@ Download]
   inside compiler repo] and are supposed to test individual functions
   & methods inside the compiler.
 
+[[ci-targets-build]]
 === Building tests formats
 
 After we've got the compiler, next steps is to take "test formats" (a
@@ -128,6 +132,7 @@ https://github.com/kaitai-io/ci_targets[ci_targets repo]. One can use
 version control history in that repo to track which formats code
 generation has changed over development iterations.
 
+[[ci-targets-run]]
 === Running test formats
 
 The exact mechanism of "building and running tests" largely depends
@@ -146,10 +151,12 @@ things:
 
 == Other CI pipelines
 
+[[web-ide]]
 === Web IDE
 
 TODO
 
+[[formats]]
 === Formats gallery
 
 https://formats.kaitai.io/[Formats gallery] is a static website, which
@@ -157,8 +164,8 @@ provides user-friendly rendition of contents of our
 https://github.com/kaitai-io/kaitai_struct_formats/[formats repo].
 
 Its pipeline is very simple and consists of
-https://circleci.com/gh/kaitai-io/kaitai_struct_formats[only one job,
-running on CircleCI]:
+https://github.com/kaitai-io/kaitai_struct_formats/actions[only one job,
+running on GitHub Actions]:
 
 * It fetches latest *stable* KS compiler from
   https://bintray.com/kaitai-io/debian/kaitai-struct-compiler[our own
@@ -171,6 +178,7 @@ running on CircleCI]:
   https://github.com/kaitai-io/formats-kaitai-io.github.io[formats-kaitai-io.github.io
   repo], which is served over HTTP to everyone as https://formats.kaitai.io/
 
+[[doc]]
 === Documentation
 
 TODO
