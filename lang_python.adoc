@@ -2,7 +2,6 @@
 Kaitai Project
 v0.9
 :toc: left
-:source-highlighter: coderay
 
 [[overview]]
 == Overview

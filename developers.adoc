@@ -1,7 +1,6 @@
 = Developers memo
 Kaitai Project
 :toc: left
-:source-highlighter: coderay
 
 KS project consists of several subprojects, each of which has its own
 repository:

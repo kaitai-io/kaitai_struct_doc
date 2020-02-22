@@ -2,7 +2,6 @@
 Kaitai Project
 v0.7
 :toc: left
-:source-highlighter: coderay
 :numbered:
 
 Although .ksy files are treated as YAML files, and YAML syntax allows
