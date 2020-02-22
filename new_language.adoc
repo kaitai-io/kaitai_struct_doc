@@ -16,7 +16,7 @@ Things to check out and familiarize oneself with:
 * enums
 * processing algorithms
 
-Clone https://github.com/kaitai-io/kaitai_struct/[central KS repo], learn <<developers.adoc#,how to build a compiler from sources>>, install prerequisites, try to build the compiler and run the tests. Take a look at our http://kaitai.io/ci[CI].
+Clone https://github.com/kaitai-io/kaitai_struct/[central KS repo], learn <<developers.adoc#,how to build a compiler from sources>>, install prerequisites, try to build the compiler and run the tests. Take a look at our https://ci.kaitai.io/[CI].
 
 == Plan how to map KS concept to concepts of new target language
 

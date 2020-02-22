@@ -75,7 +75,6 @@ KST file is used:
 
 [source,yaml]
 ----
- 
 id: valid_fail_contents
 data: fixed_struct.bin
 exception: ValidationNotEqualError<bytes>
@@ -106,7 +105,7 @@ sbt publishLocal
 ----
 
 after that, one can invoke it using
-[spec-kst-to-all](https://github.com/kaitai-io/kaitai_struct_tests/blob/master/spec_kst_to_all)
+https://github.com/kaitai-io/kaitai_struct_tests/blob/master/spec_kst_to_all[spec_kst_to_all]
 script in tests:
 
 ----
@@ -125,7 +124,7 @@ in the all relevant dirs for one KST spec "foo_bar", one can run:
 [source,shell]
 ----
 cd ../tests
-./spec-kst-to-all -f foo_bar
+./spec_kst_to_all -f foo_bar
 ----
 
 == Developing KST translator

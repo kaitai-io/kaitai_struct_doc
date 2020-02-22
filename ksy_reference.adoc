@@ -81,12 +81,12 @@ Example:
 meta:
   id: foo_arc
   title: Foo Archive
-  application: Foo Archiver v1.23  
+  application: Foo Archiver v1.23
   file-extension:
     - fooarc
     - fooarcz
   license: CC0-1.0
-  ks-version: 9.9
+  ks-version: 0.9
   imports:
     - common/archive_header
     - common/compressed_file
@@ -460,7 +460,7 @@ types:          #                     │
 
 * Contents: <<expressions,expression>>, expected to be of boolean type
 * Purpose: mark the attribute as optional
-* Influences: attribute would be parsed only if condition specified in `if` key evaluates (in runtime) to true 
+* Influences: attribute would be parsed only if condition specified in `if` key evaluates (in runtime) to true
 * Mandatory: no
 
 ### Byte array keys
