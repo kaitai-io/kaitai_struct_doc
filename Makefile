@@ -23,13 +23,13 @@ TARGETS=\
 all: $(TARGETS)
 	rm -rf out/img
 	cp -r img styles js out
-	cp raw/coderay-asciidoctor.css out
+	cp raw/pygments-default.css out/styles
 
 out/%.html: raw/%.html tmpl/navbar.html postprocess-html
 	./postprocess-html $< $@
 
 raw/%.html: %.adoc styles/$(STYLESHEET).css raw/styles/$(STYLESHEET).css
-	TZ=UTC asciidoctor -a stylesheet=styles/$(STYLESHEET).css -a linkcss -D raw $<
+	TZ=UTC asciidoctor -a stylesheet=styles/$(STYLESHEET).css -a source-highlighter=pygments -a pygments-style=default -r ./pygments_init.rb -a linkcss -D raw $<
 
 raw/styles/$(STYLESHEET).css: styles/$(STYLESHEET).css
 	mkdir -p raw/styles
