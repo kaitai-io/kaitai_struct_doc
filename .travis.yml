@@ -11,13 +11,13 @@ addons:
   apt:
     packages:
       - graphviz
+      - python3-pygments
 
 cache:
   - apt
 
 before_install:
   - gem install asciidoctor pygments.rb
-  - pip install Pygments
 
 script:
   - make
