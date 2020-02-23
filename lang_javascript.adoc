@@ -1,5 +1,4 @@
 = Kaitai Struct: JavaScript notes
-:source-highlighter: coderay
 
 == Quick start
 

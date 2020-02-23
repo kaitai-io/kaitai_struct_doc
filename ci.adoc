@@ -1,7 +1,6 @@
 = Continuous Integration infrastructure
 Kaitai Project
 :toc: left
-:source-highlighter: coderay
 
 Kaitai Struct project sports a relatively complex CI (Continuous
 Integration) pipeline. This document describes how it's working.

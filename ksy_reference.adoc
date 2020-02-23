@@ -1,7 +1,6 @@
 = Kaitai Struct: KSY reference
 :toc: left
 :toclevels: 3
-:source-highlighter: coderay
 
 Kaitai Struct is a DSL (domain-specific language), designed to
 describe binary data structures in human- and machine-readable

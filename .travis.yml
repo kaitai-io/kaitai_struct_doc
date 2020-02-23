@@ -16,7 +16,8 @@ cache:
   - apt
 
 before_install:
-  - gem install asciidoctor coderay
+  - gem install asciidoctor pygments.rb
+  - pip install Pygments
 
 script:
   - make

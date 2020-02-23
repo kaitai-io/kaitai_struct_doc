@@ -1,6 +1,5 @@
 = Kaitai Struct: Java notes
 :toc: left
-:source-highlighter: coderay
 
 == Source files generation
 

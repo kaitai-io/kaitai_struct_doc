@@ -2,7 +2,6 @@
 Kaitai Project
 v0.8
 :toc: left
-:source-highlighter: coderay
 :numbered:
 
 == Introduction
@@ -2310,7 +2309,7 @@ inside strings literals. So, trying something like that would fail in
 some parsers (namely, it *will* fail using "desktop"
 kaitai-struct-compiler running under JVM):
 
-[source,java]
+[source,yaml]
 ----
 instances:
   foo:
@@ -2319,7 +2318,7 @@ instances:
 
 To ensure maximum compatibility, put quotes around such strings, i.e:
 
-[source,java]
+[source,yaml]
 ----
 instances:
   foo:
