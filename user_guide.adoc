@@ -2,7 +2,7 @@
 Kaitai Project
 v0.8
 :toc: left
-:source-highlighter: pygments
+:numbered:
 
 == Introduction
 
