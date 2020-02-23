@@ -1,4 +1,4 @@
 require 'pygments'
 
 # use a custom Pygments installation (directory that contains pygmentize)
-Pygments.start `dirname "$(which pygmentize)"`
+Pygments.start `which pygmentize`
