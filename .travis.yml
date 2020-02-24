@@ -18,7 +18,6 @@ cache:
 
 before_install:
   - gem install asciidoctor pygments.rb
-  - pygmentize -V
 
 script:
   - pygmentize -V
