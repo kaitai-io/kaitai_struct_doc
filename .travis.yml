@@ -11,7 +11,7 @@ addons:
   apt:
     packages:
       - graphviz
-      - python3-pygments
+      - python-pygments
 
 cache:
   - apt
