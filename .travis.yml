@@ -1,4 +1,4 @@
-dist: xenial
+dist: bionic
 sudo: false
 
 branches:
@@ -17,7 +17,9 @@ cache:
   - apt
 
 before_install:
+  - pygmentize -V
   - gem install asciidoctor pygments.rb
+  - pygmentize -V
 
 script:
   - make
