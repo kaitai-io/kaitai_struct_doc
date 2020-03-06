@@ -38,7 +38,7 @@ One can read integers using one of `read_$S$L$E` operations, where:
 
 * `$S` is either `u` if we want to read unsigned integer or `s` if we want signed one;
 * `$L` is length of integer type in bytes. 1, 2, 4 and 8 bytes are supported;
-* `$E` is https://en.wikipedia.org/wiki/Endianness[endianness] (order of bytes): `l` for little-endian or `b` for big-endian;
+* `$E` is https://en.wikipedia.org/wiki/Endianness[endianness] (order of bytes): `le` for little-endian or `be` for big-endian;
 
 A few examples:
 
