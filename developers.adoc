@@ -36,8 +36,8 @@ git submodule update --init --recursive
 
 == Compiler
 
-KS compiler is written in http://www.scala-lang.org/[Scala language]
-and thus uses http://www.scala-sbt.org/[SBT] for building. It can be
+KS compiler is written in https://www.scala-lang.org/[Scala language]
+and thus uses https://www.scala-sbt.org/[SBT] for building. It can be
 compiled in one of 2 ways, each of which can be packaged in one of
 several ways:
 
@@ -50,7 +50,7 @@ several ways:
 * generating JavaScript `.js` file, to be run either inside a browser
   or in node.js environment
 ** not packaged, used as a source JS file on a website
-** packaged as http://npmjs.org[npm] package
+** packaged as https://www.npmjs.com/[npm] package
 
 === Prerequisites
 
@@ -104,18 +104,18 @@ run all dependencies will be downloaded and access to the internet not required 
 
 === Building for JVM
 
-We use http://www.scala-sbt.org/sbt-native-packager/[sbt-native-packager] to
+We use https://www.scala-sbt.org/sbt-native-packager/[sbt-native-packager] to
 build deployable formats. Note that in order to perform the following builds,
 one must be in the `kaitai_struct/compiler` directory.
 
 ==== Building an universal (.zip) package
 
-http://www.scala-sbt.org/sbt-native-packager/formats/universal.html[SBT native packager: universal package docs]
+https://www.scala-sbt.org/sbt-native-packager/formats/universal.html[SBT native packager: universal package docs]
 
 . `sbt compilerJVM/universal:packageBin`
 . Get result in `jvm/target/universal/kaitai-struct-compiler-*.zip`
 
-==== Building http://www.scala-sbt.org/sbt-native-packager/formats/debian.html[Debian package]
+==== Building https://www.scala-sbt.org/sbt-native-packager/formats/debian.html[Debian package]
 
 . Install prerequisites: `sudo -i apt-get install dpkg dpkg-sig dpkg-dev lintian fakeroot`
 . `sbt compilerJVM/debian:packageBin`
@@ -123,7 +123,7 @@ http://www.scala-sbt.org/sbt-native-packager/formats/universal.html[SBT native p
 
 ==== Building Windows package
 
-http://www.scala-sbt.org/sbt-native-packager/formats/windows.html[SBT native packager: Windows package docs]
+https://www.scala-sbt.org/sbt-native-packager/formats/windows.html[SBT native packager: Windows package docs]
 
 . Install WIX
 . `sbt compilerJVM/windows:packageBin`

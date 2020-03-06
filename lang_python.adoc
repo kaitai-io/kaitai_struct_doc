@@ -99,7 +99,7 @@ pip install --upgrade --pre git+https://github.com/kaitai-io/kaitai_struct_pytho
 support as described in
 https://www.python.org/dev/peps/pep-0435/[PEP-0435]. This support is
 available out of the box in standard libraries since Python v3.4, or
-since v2.4 using https://pypi.python.org/pypi/enum34[enum34] PyPi
+since v2.4 using https://pypi.org/project/enum34/[enum34] PyPi
 compatibility layer.
 
 * On Debian / Ubuntu, this library can be installed with `sudo apt-get
@@ -114,7 +114,7 @@ standard way of building and installing python packages. This library
 allows extension with
 https://setuptools.readthedocs.io/en/latest/setuptools.html#extending-and-reusing-setuptools[plugins].
 https://github.com/KOLANICH have developed
-https://github.com/KOLANICH/kaitaiStructCompile.py[an extension to
+https://github.com/kaitaiStructCompile/kaitaiStructCompile.py[an extension to
 setuptools], allowing you to automate compilation of `*.ksy` files as the
 part of python module build process. The library provides a mostly
 declarative syntax to facilitate installation: you add a parameter
@@ -132,11 +132,11 @@ Please remember that this lib is VERY UNSTABLE and very likely to be
 improved in a way that changes API (but due to API simplicity it'd be
 easy to fix your code), but I guess it's much better to use this than to
 reinvent the wheel.
-https://github.com/KOLANICH/kaitaiStructCompile.py/issues[Contributions
+https://github.com/kaitaiStructCompile/kaitaiStructCompile.py/issues[Contributions
 are welcome!]
 
 Please note that this lib is NOT available on
-https://pypi.python.org[pypi] and if you want to install it
+https://pypi.org/[pypi] and if you want to install it
 automatically, you should add
 `git+https://github.com/KOLANICH/kaitaiStructCompile.py` into
 `dependency_links` in the config passed to `setuptools.setup`.

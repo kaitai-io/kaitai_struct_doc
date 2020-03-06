@@ -63,8 +63,8 @@ Right now, mmap support is available:
 * In Java — by using https://github.com/kaitai-io/kaitai_struct_java_runtime/blob/master/src/main/java/io/kaitai/struct/ByteBufferKaitaiStream.java[ByteBufferKaitaiStream]
 
 * in C# — by:
-** opening a file using https://msdn.microsoft.com/en-us/library/system.io.memorymappedfiles.memorymappedfile(v=vs.110).aspx[MemoryMappedFile] object
-** calling https://msdn.microsoft.com/en-us/library/dd267538(v=vs.110).aspx[MemoryMappedFile.CreateViewStream] method on it to get https://msdn.microsoft.com/en-us/library/system.io.memorymappedfiles.memorymappedviewstream(v=vs.110).aspx[MemoryMappedViewStream]
+** opening a file using https://docs.microsoft.com/en-us/dotnet/api/system.io.memorymappedfiles.memorymappedfile?view=netframework-4.8[MemoryMappedFile] object
+** calling https://docs.microsoft.com/en-us/dotnet/api/system.io.memorymappedfiles.memorymappedfile.createviewstream?view=netframework-4.8#System_IO_MemoryMappedFiles_MemoryMappedFile_CreateViewStream[MemoryMappedFile.CreateViewStream] method on it to get https://docs.microsoft.com/en-us/dotnet/api/system.io.memorymappedfiles.memorymappedviewstream?view=netframework-4.8[MemoryMappedViewStream]
 ** passing that MemoryMappedViewStream as a Stream into a KaitaiStream constructor
 
 * In all other languages — by invoking mmap operation manually
@@ -103,7 +103,7 @@ Actually, Construct is the closest analog to Kaitai Struct. It is also a declara
 
 In fact, there is an open and active collaboration between Construct and Kaitai Struct. There are (currently being implemented) import/export tools, that allow translating schemes between the two frameworks.
 
-Main documentation site: https://construct.readthedocs.io
+Main documentation site: https://construct.readthedocs.io/en/latest/
 
 [[vs-protobuf]]
 === ... Google Protocol Buffers, ASN.1, Apache Thrift, Apache Avro, BSON, MessagePack, Microsoft Bond, Hessian, ZeroC ICE, etc?
@@ -131,9 +131,9 @@ for it.
 
 You can totally read an arbitrary binary format (or enjoy diverse
 library of ready-made format specifications, including
-https://formats.kaitai.io/gif[.gif],
-https://formats.kaitai.io/wav[.wav] and
-https://formats.kaitai.io/zip[.zip]). To some extent, you can use KS
+https://formats.kaitai.io/gif/[.gif],
+https://formats.kaitai.io/wav/[.wav] and
+https://formats.kaitai.io/zip/[.zip]). To some extent, you can use KS
 in a task "send block of data from point A to point B", if you prefer
 to have more control over your serialization scheme — but, obviously,
 you'll have to add features like backwards compatibility, versioning,
@@ -153,12 +153,12 @@ section in http://formats.kaitai.io/[Kaitai Struct Format Gallery].
 
 .Software mentioned
 ****
-* https://github.com/google/protobuf[Google Protocol Buffers]
+* https://github.com/protocolbuffers/protobuf[Google Protocol Buffers]
 * https://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One[ASN.1]
 * https://thrift.apache.org/[Apache Thrift]
 * https://avro.apache.org/[Apache Avro]
 * http://bsonspec.org/[BSON]
-* http://msgpack.org/[MessagePack]
+* https://msgpack.org/[MessagePack]
 * https://github.com/Microsoft/bond[Microsoft Bond]
 * http://hessian.caucho.com/doc/hessian-serialization.html[Hessian]
 * https://doc.zeroc.com/ice/3.7/ice-protocol-and-encoding[ZeroC ICE]
@@ -220,8 +220,8 @@ compiled right into parser source code in any supported language.
 
 .Software mentioned
 ****
-* SweetScape 010 Editor: http://www.sweetscape.com/010editor/
-* Synalysis: http://www.synalysis.net/
+* SweetScape 010 Editor: https://www.sweetscape.com/010editor/
+* Synalysis: https://www.synalysis.net/
 * Hexinator: https://hexinator.com/
 * Okteta: https://docs.kde.org/trunk5/en/extragear-utils/okteta/tools-structures.html
 * iBored: http://apps.tempel.org/iBored/

@@ -166,7 +166,7 @@ Formatting:
 * Single-line documentation strings SHOULD BE formatted using raw
   unquoted string literals.
 * Multi-line SHOULD BE formatted using
-  http://www.yaml.org/spec/1.2/spec.html#id2795688[YAML literal style
+  https://yaml.org/spec/1.2/spec.html#id2795688[YAML literal style
   scalar], i.e. using `: |` syntax. An example:
 
 [source,yaml]
@@ -193,7 +193,7 @@ proper multi-line syntax.
 
 There is no formal conversion of docstrings into language-specific
 docstrings now in KS, but generally we SHOULD keep it close to
-http://commonmark.org/[CommonMark formatting], i.e.:
+https://commonmark.org/[CommonMark formatting], i.e.:
 
 * paragraphs separated by an empty line
 * bullet lists created by an asterisk `*` and a space at the beginning
