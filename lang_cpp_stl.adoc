@@ -202,9 +202,9 @@ specific defines):
 on all POSIX systems, can be linked as external library on most other
 systems (i.e. Windows)
 ** *(not implemented yet)* Use Windows API functions
-https://msdn.microsoft.com/en-us/library/windows/desktop/dd319072.aspx[MultiByteToWideChar]
+https://docs.microsoft.com/en-us/windows/win32/api/stringapiset/nf-stringapiset-multibytetowidechar[MultiByteToWideChar]
 and
-https://msdn.microsoft.com/en-us/library/windows/desktop/dd374130.aspx[WideCharToMultiByte]
+https://docs.microsoft.com/en-us/windows/win32/api/stringapiset/nf-stringapiset-widechartomultibyte[WideCharToMultiByte]
 — obviously, available only on Windows platform
 ** *(not implemented yet)* Use http://site.icu-project.org/[ICU] library
 

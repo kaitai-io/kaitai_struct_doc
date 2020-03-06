@@ -393,7 +393,7 @@ approach in naming attributes and types.
 === Windows struct
 
 For example, consider this
-https://msdn.microsoft.com/en-us/library/dd757312(v=vs.85).aspx[MMCKINFO
+https://docs.microsoft.com/en-us/windows/win32/api/mmiscapi/ns-mmiscapi-mmckinfo[MMCKINFO
 Windows structure], as specified in MSDN:
 
 [source,cpp]

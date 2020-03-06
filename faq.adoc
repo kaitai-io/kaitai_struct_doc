@@ -161,7 +161,7 @@ section in http://formats.kaitai.io/[Kaitai Struct Format Gallery].
 * http://msgpack.org/[MessagePack]
 * https://github.com/Microsoft/bond[Microsoft Bond]
 * http://hessian.caucho.com/doc/hessian-serialization.html[Hessian]
-* https://doc.zeroc.com/ice/3.7/the-ice-protocol[ZeroC ICE]
+* https://doc.zeroc.com/ice/3.7/ice-protocol-and-encoding[ZeroC ICE]
 ****
 
 [[vs-capn-proto]]
@@ -205,7 +205,7 @@ that does parsing.
 ****
 * GNU Bison: https://www.gnu.org/software/bison/
 * Yacc: https://en.wikipedia.org/wiki/Yacc
-* Lex: https://en.wikipedia.org/wiki/Lex_(software)
+* Lex: https://en.wikipedia.org/wiki/Lex_(software)[https://en.wikipedia.org/wiki/Lex_(software)]
 * Flex: http://flex.sourceforge.net/
 * ANTLR: https://www.antlr.org/
 ****
@@ -223,7 +223,7 @@ compiled right into parser source code in any supported language.
 * SweetScape 010 Editor: http://www.sweetscape.com/010editor/
 * Synalysis: http://www.synalysis.net/
 * Hexinator: https://hexinator.com/
-* Okteta: https://docs.kde.org/stable5/en/kdesdk/okteta/tools-structures.html
+* Okteta: https://docs.kde.org/trunk5/en/extragear-utils/okteta/tools-structures.html
 * iBored: http://apps.tempel.org/iBored/
 ****
 

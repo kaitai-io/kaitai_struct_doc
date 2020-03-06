@@ -21,7 +21,7 @@ repository:
 
 Technically, one can download and work with each of these subprojects
 individually, but most people just download everything by checking out
-https://github.com/kaitai_struct[our main umbrella project] that
+https://github.com/kaitai-io/kaitai_struct[our main umbrella project] that
 includes (almost) everything:
 
 [source,shell]
@@ -223,7 +223,7 @@ TODO
 * Pump version in `kaitaistruct.py`, seek `__version__ =`
 * `python3 setup.py sdist upload`
 ** (use `python3 setup.py sdist upload -r pypitest` to publish to testing server)
-* Check that new version appears at https://pypi.python.org/pypi/kaitaistruct/$VERSION
+* Check that new version appears at https://pypi.python.org/pypi/kaitaistruct[https://pypi.python.org/pypi/kaitaistruct]`/$VERSION`
 * `git tag $VERSION`
 * `git push --tags`
 
