@@ -262,8 +262,8 @@ guesswork.
 
 * For simple non-repeated fields, use a simple singular form —
   e.g. `width`, `header`, `transaction_id`, `file`.
-* For repeated files (i.e. with `repeat: something`), use plural form
-  — e.g. `files`, `transactions`.
+* For an array of objects (i.e. with `repeat: something`), use plural
+  form — e.g. `files`, `transactions`.
 * Don't be overly verbose: use commonly understood abbreviations
   liberally, if it will improve readablity — e.g. `src_mac` or
   `src_mac_addr` instead of `source_media_access_control_address`
