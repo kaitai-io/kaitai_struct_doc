@@ -159,7 +159,7 @@ the whole structure we describe. There are two important things here:
 
 * `id` specifies name of the structure
 * `endian` specifies default
-http://en.wikipedia.org/wiki/Endianness[endianness]:
+https://en.wikipedia.org/wiki/Endianness[endianness]:
 ** `be` for big-endian (AKA "network byte order", AKA Motorola, etc)
 ** `le` for little-endian (AKA Intel, AKA VAX, etc)
 
@@ -1395,7 +1395,7 @@ authors to provide good cross references of their formats:
   like "ISO/IEC 15948:2004", so value should be citing everything
   except for "ISO/IEC", i.e. `15948:2004`.
 * `justsolve` specifies article name at
-  http://fileformats.archiveteam.org/["Just Solve the File Format
+  http://fileformats.archiveteam.org/wiki/Main_Page["Just Solve the File Format
   Problem" wiki], a wiki that collects information on many file
   formats. Full link name could be generated as
   `http://fileformats.archiveteam.org/wiki/` + this value.
@@ -1414,8 +1414,8 @@ authors to provide good cross references of their formats:
   registry of media types] managed by IANA. Value must specify full
   MIME type (both parts), e.g. `image/png`.
 * `pronom` key specifies format identifier in
-  http://www.nationalarchives.gov.uk/PRONOM/Default.aspx[PRONOM
-  Technical Registry] of http://www.nationalarchives.gov.uk/[UK
+  https://www.nationalarchives.gov.uk/PRONOM/Default.aspx[PRONOM
+  Technical Registry] of https://www.nationalarchives.gov.uk/[UK
   National Archives], which is a massive file formats database that
   catalogues many file formats for digital preservation
   purposes. Value typically looks like `fmt/xxx`, where `xxx` is a
@@ -1431,7 +1431,7 @@ authors to provide good cross references of their formats:
   interoperability protocols are specified in RFCs. Value should be
   just raw RFC number, without any prefixes, e.g. `1234`.
 * `wikidata` specifies item name at
-  https://www.wikidata.org/[Wikidata], a global knowledge base. All
+  https://www.wikidata.org/wiki/Wikidata:Main_Page[Wikidata], a global knowledge base. All
   Wikimedia projects (such as language-specific Wikipedias,
   Wiktionaries, etc) use Wikidata at least for connecting various
   translations of encyclopedic articles on a particular subject, so

@@ -31,7 +31,7 @@ KS compiler gets one or several `.ksy` files for input.
 ## KSY files
 
 Kaitai Struct data structure (format) descriptions (KSY files) are
-simple http://yaml.org/[YAML] files and are usually saved using `.ksy`
+simple https://yaml.org/[YAML] files and are usually saved using `.ksy`
 extension to differentiate them from the rest of `.yaml` files.
 
 Every `.ksy` file MUST be a valid YAML file, and is expected to be
@@ -190,8 +190,8 @@ user-defined type. In most target languages, it will be used as
 docstring (i.e. a special comment which is exported as part of code
 documentation), compatible with tools like
 https://en.wikipedia.org/wiki/Javadoc[Javadoc],
-http://www.doxygen.org/[Doxygen], http://usejsdoc.org/[JSDoc],
-https://msdn.microsoft.com/en-us/library/b2s063f7.aspx[.NET XML
+http://www.doxygen.nl/[Doxygen], https://jsdoc.app/[JSDoc],
+https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/xmldoc/[.NET XML
 documentation comments], etc.
 
 * Contents: free-form string (note that multiple lines are allowed and
