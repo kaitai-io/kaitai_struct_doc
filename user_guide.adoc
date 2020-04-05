@@ -3591,7 +3591,7 @@ language, without any serialization details (like endianness, sizes,
 conversions, encodings, etc). Thus, one can't use any extra keys to
 specify that, but instead one can use:
 
-* no type to specify byte arrays
+* no type or `bytes` to specify byte arrays
 * `str` to specify strings
 * `bool` to specify booleans
 * `struct` to allow arbitrary KaitaiStruct-compatible user types
