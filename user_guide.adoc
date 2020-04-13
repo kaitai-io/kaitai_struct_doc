@@ -10,7 +10,7 @@ Kaitai Struct is a domain-specific language (DSL) that is designed
 with one particular task in mind: dealing with arbitrary binary
 formats.
 
-Parsing binary formats is hard, and that's a reason for that: such
+Parsing binary formats is hard, and there's a reason for that: such
 formats were designed to be machine-readable, not human-readable. Even
 when one's working with a clean, well-documented format, there are
 multiple pitfalls that await the developer: endianness issues,
