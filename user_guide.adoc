@@ -10,7 +10,7 @@ Kaitai Struct is a domain-specific language (DSL) that is designed
 with one particular task in mind: dealing with arbitrary binary
 formats.
 
-Parsing binary formats is hard, and that's a reason for that: such
+Parsing binary formats is hard, and there's a reason for that: such
 formats were designed to be machine-readable, not human-readable. Even
 when one's working with a clean, well-documented format, there are
 multiple pitfalls that await the developer: endianness issues,
@@ -1382,10 +1382,10 @@ There are several "well-known" keys used by convention by many spec
 authors to provide good cross references of their formats:
 
 * `forensicswiki` specifies article name at
-  https://forensicswiki.org/wiki/Main_Page[Forensics Wiki], which is a
+  https://forensicswiki.xyz/page/Main_Page[Forensics Wiki], which is a
   CC-BY-SA-licensed wiki with information on digital forensics, file
   formats and tools. Full link name could be generated as
-  `https://forensicswiki.org/wiki/` + this value.
+  `https://forensicswiki.xyz/page/` + this value.
 * `iso` key specifies ISO/IEC standard number, reference to a standard
   accepted and published by https://www.iso.org/[ISO] (International
   Organization for Standardization). Typically these standards are not
@@ -3591,7 +3591,7 @@ language, without any serialization details (like endianness, sizes,
 conversions, encodings, etc). Thus, one can't use any extra keys to
 specify that, but instead one can use:
 
-* no type to specify byte arrays
+* no type or `bytes` to specify byte arrays
 * `str` to specify strings
 * `bool` to specify booleans
 * `struct` to allow arbitrary KaitaiStruct-compatible user types
