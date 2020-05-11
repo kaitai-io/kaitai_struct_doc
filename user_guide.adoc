@@ -683,6 +683,8 @@ KS supports all these types of repetitions. In all cases, it will create
 a resizable array (or nearest equivalent available in target language)
 and populate it with elements.
 
+
+[[repeat-eos]]
 ==== Repeat until end of stream
 
 This is the simplest kind of repetition, done by specifying
@@ -1676,6 +1678,7 @@ For `comment`, we just made it to have size up until the end of
 stream. Given that we've limited it to the substream in the first
 place, this means exactly what we wanted.
 
+[[repeat-until-size-limit]]
 === Repeating until total size reaches limit
 
 The same technique might be useful for repetitions as well. If you
@@ -1709,12 +1712,13 @@ repeat until the end of that stream.
 However, note that one's naïve approach might not work:
 
 * When we're dealing with an array of elements, `size` will refer to
-the size of one particular element of the array.
-* Any repetition (and this includes `repeat: eos`) uses current
-  object's IO stream. Substreams are created individually for every
-  object inside the loop.
+  the size of one particular element of the array.
+* Any repetition (and this includes `repeat: eos`) parses the elements
+  using the current IO stream. If `size` is specified, substreams
+  are created individually for each object inside the loop.
 
-So this is wrong:
+So this is *wrong* (`total_len` determines the size
+of each individual `entry` substream here):
 
 [source,yaml]
 ----
@@ -1726,6 +1730,8 @@ seq:
     size: total_len
     repeat: eos
 ----
+
+For more information, see <<keys-repeated>>.
 
 =====
 
@@ -3637,11 +3643,37 @@ types:
         size: len_body
 ----
 
-However, if your format has that information laid out sparsely,
-i.e. separate table of file names, separate table of file offsets and
-separate table of file sizes, things become more complicated. In these
-cases, it's much more practical to use `_index` to access repetition
-index and use that to access other arrays:
+However, if your format has some information laid out sparsely, i.e.
+separate table of file sizes and their contents, you can use `_index`
+to access the repetition index and resolve the size from the size array:
+
+[source,yaml]
+----
+seq:
+  - id: num_files
+    type: u4
+  - id: len_files
+    type: u4
+    repeat: expr
+    repeat-expr: num_strings
+  - id: files
+    size: len_files[_index]
+    repeat: expr
+    repeat-expr: num_strings
+----
+
+But if a format specifies file *offsets* and you want to read
+the contents of the files present on these offsets, things become
+more complicated. You can't read all the bodies in a single
+instance with repetition, because `pos` used on a repeated attribute
+acts as an offset where to start sequentially reading all the items
+(see <<keys-repeated>> for more info). So we have to wrap the file
+body in an extra user type `file_body`, where we can do the actual
+parsing.
+
+However, `_index` is a "local variable", so we lose access to it
+as soon as we enter the subtype `file_body`. The solution is to
+pass `_index` into `file_body` using <<param-types>>:
 
 [source,yaml]
 ----
@@ -3671,10 +3703,18 @@ seq:
     repeat-expr: num_files
 instances:
   file_bodies:
-    pos: ofs_files[_index]
-    size: len_files[_index]
+    type: file_body(_index) # <= pass `_index` into file_body
     repeat: expr
     repeat-expr: num_files
+types:
+  file_body:
+    params:
+      - id: i               # => receive `_index` as `i` here
+        type: s4
+    instances:
+      body:
+        pos: _parent.ofs_files[i]
+        size: _parent.len_files[i]
 ----
 
 A more extreme example is a format that specifies only start offsets,
@@ -3708,11 +3748,19 @@ seq:
     repeat: expr
     repeat-expr: num_offsets
 instances:
-  files:
-    pos: ofs_files[_index]
-    size: ofs_files[_index + 1] - ofs_files[_index]
+  file_bodies:
+    type: file_body(_index)
     repeat: expr
     repeat-expr: num_offsets - 1
+type:
+  file_body:
+    params:
+      - id: i
+        type: s4
+    instances:
+      body:
+        pos: _parent.ofs_files[i]
+        size: _parent.ofs_files[i + 1] - _parent.ofs_files[i]
 ----
 
 In even more complicated example, we have file names interleaved with
@@ -3727,12 +3775,8 @@ offsets. There are N - 1 file names and N offsets:
 f0 02 00 00       = offset 0x2f0
 ....
 
-If we had file sizes, then we could just localize everything in
-`file_entry`, as in the first example. But in this case we'll need to
-do calculation inside `file_entry`, while `_index` is defined in
-`files` attribute in outer type. The solution is to pass `_index` into
-`file_entry` using <<param-types>> and use more complex conditional
-expressions:
+In this case we'll need to do calculation inside `file_entry`.
+Once we pass the `_index` from the parent type to it, it's easy:
 
 [source,yaml]
 ----
@@ -3879,3 +3923,65 @@ seq:
 This is because most processing algorithms require to know size of data
 to process beforehand, and final size of `some_body_type` might be
 determined only in run-time, after parsing took place.
+
+[[keys-repeated]]
+=== Keys relating to the whole array and to each element in repeated attributes
+
+If you use repetition in an attribute, it's important to understand
+which YAML keys refer to the whole array and which affect the individual
+elements instead. Here's the list:
+
+[cols="a,a", frame=none]
+|====
+|
+.Whole array
+
+* `doc`
+* `doc-ref`
+* `id`
+* `if`
+* `io`
+* `pos`
+
+|
+.Individual elements
+
+* `size`
+* `size-eos`
+* `type`
+* `enum`
+* `contents`
+* `pad-right`
+* `terminator`
+* `include`
+* `consume`
+* `eos-error`
+* `encoding`
+* `process`
+
+|====
+
+If you need some key from one group to "belong" to the other, you
+have to add an extra user-defined type. Depending on your needs,
+it may be necessary to either wrap a single item or the entire
+array in it.
+
+1. force a key relating to individual elements to apply to the whole
+array instead: create a user type that *wraps the entire array*,
+and apply the key on the attribute which uses this wrapper type.
++
+You can see the example in <<repeat-until-size-limit>>. There we know
+just the `size` of the entire array, but `size` key specified on a field
+using repetition would mean size of each item, so it's necessary to add type
+`file_entries` containing the array. Then there's no problem to create
+a substream of the total size and put this type into it, because keys `size`
+and `repeat` no longer meet in the same attribute.
+
+2. force a key relating to the entire array to apply to each
+individual item instead: create a user type that *wraps the single element*,
+and apply the key on the attribute of this wrapper with the item type itself.
++
+For instance, the second example in section <<repeat-index>> shows an archive
+file directory with separated file offsets and sizes and we need to read the
+actual file bodies. We don't want `pos` to mean the offset of the array, but
+the offset of the items, so it's necessary to wrap the item in its own type.
