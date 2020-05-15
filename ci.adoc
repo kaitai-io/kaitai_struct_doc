@@ -73,8 +73,8 @@ On a high level, it can be summarized as:
 === Compiler
 
 Compiler is the heart of everything in Kaitai Struct, so it's only
-natural that we concenrate on making compiler maintenance as automated
-as possible.
+natural that we focus on making compiler maintenance as automated as
+possible.
 
 * Everything starts with
   https://github.com/kaitai-io/kaitai_struct_compiler[compiler] repo.
