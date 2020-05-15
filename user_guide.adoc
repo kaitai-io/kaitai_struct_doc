@@ -908,6 +908,33 @@ allows you to work on TLV-like formats step-by-step, starting with
 support of only 1 or 2 types of records, and gradually adding more and
 more types.
 
+[CAUTION]
+=====
+One need to make sure that type used in `switch-on` and types used
+in `cases` are either identical or at least comparable. For example,
+comparing string against integers will yield a compile-time error:
+
+[source,yaml]
+----
+seq:
+  - id: rec_type
+    type: strz
+  - id: body
+    type:
+      switch-on: rec_type
+      cases:
+        1: rec_type_1
+        2: rec_type_2
+----
+
+Here, `rec_type` is declared as string and cases are comparing it to
+integers. So, compiler will complain:
+
+```
+/seq/1/type/cases/IntNum(1): can't compare StrFromBytesType(...) and Int1Type(true)
+```
+=====
+
 You can use "_" for the default (else) case which will match every
 other value which was not listed explicitly.
 
