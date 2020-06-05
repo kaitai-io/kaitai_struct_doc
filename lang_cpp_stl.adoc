@@ -82,10 +82,10 @@ In all modes, Kaitai Struct follows the same ownership model:
 * Everything else passed in a constructor and/or any other
   invocations, is not owned by user type (and will not be cleaned up
   automatically), namely:
-  * root object reference/pointer
-  * parent object reference/pointer
-  * IO object
-  * type parameters
+** root object reference/pointer
+** parent object reference/pointer
+** IO object
+** type parameters
 
 To illustrate these principles, using the following .ksy spec:
 
