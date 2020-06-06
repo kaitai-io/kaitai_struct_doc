@@ -2266,7 +2266,7 @@ Can be applied to strings:
 Can be applied to integers, floats and strings:
 
 * `a < b` — true if `a` is strictly less than `b`
-* `a <= b` — true if `a` is less or equal than `b`
+* `a \<= b` — true if `a` is less or equal than `b`
 * `a > b` — true if `a` is strictly greater than `b`
 * `a >= b` — true if `a` is greater or equal than `b`
 
