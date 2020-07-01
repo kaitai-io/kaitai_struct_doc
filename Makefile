@@ -8,6 +8,7 @@ TARGETS=\
 	out/developers_intro.html \
 	out/faq.html \
 	out/ksy_reference.html \
+	out/ksy_diagram.html \
 	out/lang_cpp_stl.html \
 	out/lang_java.html \
 	out/lang_javascript.html \
@@ -24,6 +25,9 @@ all: $(TARGETS)
 	rm -rf out/img
 	cp -r img styles js out
 	cp raw/pygments-default.css out/styles
+	cp -r docson/public/docson.js docson/public/lib/ out/js
+	cp -r docson/public/templates out
+	cp docson/public/css/docson.css out/styles
 
 out/%.html: raw/%.html tmpl/navbar.html postprocess-html
 	./postprocess-html $< $@

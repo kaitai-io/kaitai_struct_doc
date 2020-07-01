@@ -1,0 +1,15 @@
+<script src="js/lib/require.js"></script>
+<script>
+    require.config({ baseUrl: "js"});
+    require(["docson"], function(docson) {
+        $(function() {
+            var schemaUrl = "https://raw.githubusercontent.com/kaitai-io/ksy_schema/master/ksy_schema.json";
+            $.getJSON(schemaUrl).done(function(schema) {
+                docson.templateBaseUrl = "templates";
+                docson.doc("doc", schema).done(function() {
+                    $("#wait-for-diagram").hide(1000);
+                });
+            });
+        });
+    });
+</script>

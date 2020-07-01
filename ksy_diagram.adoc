@@ -1,0 +1,13 @@
+= Kaitai Struct: KSY syntax diagram
+
+Here you can examine the KSY syntax diagram describing all YAML keys that can be used in the Kaitai Struct YAML spec (KSY).
+
+[#wait-for-diagram]
+[NOTE]
+====
+Please wait a few seconds for the diagram below to render... [.ajax-loader]#image:img/ajax-loader.gif[Loading\..., 24, 24]#
+====
+
+++++
+<div id="doc"></div>
+++++
