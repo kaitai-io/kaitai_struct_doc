@@ -13,12 +13,8 @@ src, dst = ARGV
 doc = File.read(src)
 
 navbar_html = File.read("tmpl/navbar.html")
-footer_html = File.read("tmpl/footer.html")
-header_html = File.read("tmpl/header.html")
 
 doc.gsub!(/<div id="header">/, navbar_html + "<div id=\"header\">")
-doc.gsub!(/<div id="footer">.*$/m, footer_html)
-doc.gsub!(/<\/title>/, "</title>\n" + header_html.rstrip)
 
 FileUtils::mkdir_p(File.dirname(dst))
 File.write(dst, doc)
