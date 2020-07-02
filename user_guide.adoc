@@ -1540,7 +1540,7 @@ types:
 
 In this example, extra 6 bytes would be just skipped. Alternatively,
 if you'll somehow make `person` to be more than 20 bytes long, it will
-trigger an end-on-stream exception:
+trigger an end-of-stream exception:
 
 [source,yaml]
 ----
