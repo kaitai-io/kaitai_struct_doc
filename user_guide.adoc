@@ -36,6 +36,15 @@ ready to go:
 
 image::img/webide_png_example.png[caption="Figure 1: ", title="Kaitai Struct Web IDE (sample PNG file + png.ksy loaded)", alt="Kaitai Struct Web IDE (sample PNG file + png.ksy loaded)", width="1335", height="811"]
 
+A list of Web IDE features is available https://github.com/kaitai-io/kaitai_struct_webide/wiki/Features[on _kaitai_struct_webide_ GitHub wiki].
+
+Note that there are *two* different versions of the Web IDE:
+
+1. https://ide.kaitai.io/ — *stable* version, has the stable of the Kaitai Struct compiler (currently 0.8, released 2018-02-05)
+2. https://ide.kaitai.io/devel/ — unstable development version, has always the *latest* compiler (the most recent 0.9-SNAPSHOT)
+
+If you want to use the latest features, use the https://ide.kaitai.io/devel/[*devel* Web IDE].
+
 === Desktop / console version
 
 If you don't fancy using a hex dump in a browser, or played around
