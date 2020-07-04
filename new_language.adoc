@@ -4,7 +4,7 @@
 
 A general overview of what is needed to add support for new target language in reference KS compiler.
 
-== Get acquantied with KS as a user at least on the intermediate level
+== Get acquainted with KS as a user at least on the intermediate level
 
 Things to check out and familiarize oneself with:
 

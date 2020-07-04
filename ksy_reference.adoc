@@ -849,7 +849,7 @@ inherits all its properties), but it specifies an attribute that lies
 beyond <<seq,regular parsing sequence>>. Typically, each instance is
 compiled into a https://en.wikipedia.org/wiki/Lazy_evaluation[lazy]
 reader function/method that will parse (or calculate) requested data
-on demand, cache the result and return whatever's been parsed
+on demand, cache the result and return whatever has been parsed
 previously on subsequent calls.
 
 Everything that described in <<spec-attribute>> can be used, except

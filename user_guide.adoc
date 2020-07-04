@@ -1582,7 +1582,7 @@ Every class that KS generates carries a concept of "stream", usually
 available as `_io` member. This is the default stream it reads from
 and writes to. This stream works just as you might expect from a
 regular IO stream implementation in you average language: it
-incapsulates reading from files and memory, stores pointer to its
+encapsulates reading from files and memory, stores pointer to its
 current position, and allows reading/writing of various primitives.
 
 Declaring new user-defined type in the middle of `seq` attributes
@@ -1592,7 +1592,7 @@ in turn, needs its own IO stream. So, what are our options here?
 * In "sizeless" case, we just pass current `_io` along to the new
   object. This "reuses" the existing stream with all its properties:
   current pointer position, size, available bytes, etc.
-* In "sized" case, we know the size apriori and want the object we
+* In "sized" case, we know the size a priori and want the object we
   created to be limited within that size. So, instead of passing an
   existing stream, instead we create a new substream that will be
   shorter and will contain exact number of bytes requested.
@@ -1967,7 +1967,7 @@ of decompression). While it might be possible to do such transformation
 in declarative manner, it is usually impractical to do so.
 
 KS allows to plug-in some predefined "processing" algorithms that allow
-to do mentioned de-compression, de-obfuscation and de-cryption to get a
+to do mentioned decompression, de-obfuscation and decryption to get a
 clear stream, ready to be parsed. Consider parsing a file, in which the
 main body is obfuscated by applying XOR with 0xaa for every byte:
 
@@ -2240,7 +2240,7 @@ would trigger a compile-time error, for example, this is illegal: `[1,
 Literals can be connected using operators to make meaningful
 expressions. Operators are type-dependent: for example, same `+`
 operator applied to two integers would mean arithmetic addition, and
-applied to two strings would mean string concatentation.
+applied to two strings would mean string concatenation.
 
 ==== Arithmetic operators
 
@@ -2680,7 +2680,7 @@ file.
 === Do nothing
 
 In some rare cases, you need a type that actually does absolutely
-nothing. For example, you purposedly want to ignore parsing certain
+nothing. For example, you purposely want to ignore parsing certain
 switch case and avoid running it through default type, i.e. situation
 like that:
 
@@ -2837,7 +2837,7 @@ the_rest = ".bar."
 
 Delimited structures actually could be pretty scary: if we read until
 the terminator is encountered, what will happen if we'll never find
-one? In raw C, a typical answer is "segmentation fault" occuring in
+one? In raw C, a typical answer is "segmentation fault" occurring in
 the operation that deals with such string due to runaway reads past
 the buffer, i.e. a very bad thing and a big security hole.
 
@@ -3057,7 +3057,7 @@ IMPORTANT: Feature available since v0.8.
 As discussed in <<process>>, Kaitai Struct utilizes `process` key to
 invoke processing of the data for the purposes of "bytes in - bytes
 out" transformation. It is meant to be used to implement compression &
-decompression, encryption & decryption, obfuscation & deobfuscation,
+decompression, encryption & decryption, obfuscation & de-obfuscation,
 that kind of transformations.
 
 Kaitai Struct runtime libraries come bundled with "standard" set of
@@ -3528,7 +3528,7 @@ meta:
 ----
 
 [[param-types]]
-=== Parameteric types
+=== Parametric types
 
 IMPORTANT: Feature available since v0.8.
 
@@ -3625,7 +3625,7 @@ specify that, but instead one can use:
 * `io` to specify KaitaiStream-compatible IO streams
 * `any` to allow any type (if target language supports that)
 
-NOTE: Parameteric types with mandatory parameters can't be read from
+NOTE: Parametric types with mandatory parameters can't be read from
 file directly (as they obviously need parameter values supplied from
 somewhere), and thus typical `fromFile(...)` helper method is not
 available for them.

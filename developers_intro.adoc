@@ -67,7 +67,7 @@ library in platform-specific manner:
 
 * For JVM, it calls
   https://bitbucket.org/asomov/snakeyaml[SnakeYAML]. Everything
-  related to this step is incapsulated in `JavaKSYParser`.
+  related to this step is encapsulated in `JavaKSYParser`.
 * For JS, it calls: TODO
 
 We're working on bringing pure Scala YAML parser, but it's a
@@ -97,7 +97,7 @@ individual substeps are implemented by classes in
 
 Precompilation modifies (enriches) existing ClassSpecs
 object. Alternatively, it might throw an exception if some of the
-validaton checks failed (TODO: exception structure).
+validation checks failed (TODO: exception structure).
 
 === Compilation
 
