@@ -7,7 +7,7 @@ v0.7
 Although .ksy files are treated as YAML files, and YAML syntax allows
 quite a few representations of the same content, it is recommended to
 maintain a certain style in .ksy files to aid collaboration. This
-document serves as offical .ksy style guide. In particular, we strive
+document serves as official .ksy style guide. In particular, we strive
 to make sure that all formats in our
 https://github.com/kaitai-io/kaitai_struct_formats[formats repository]
 are using this style.
@@ -265,7 +265,7 @@ guesswork.
 * For an array of objects (i.e. with `repeat: something`), use plural
   form — e.g. `files`, `transactions`.
 * Don't be overly verbose: use commonly understood abbreviations
-  liberally, if it will improve readablity — e.g. `src_mac` or
+  liberally, if it will improve readability — e.g. `src_mac` or
   `src_mac_addr` instead of `source_media_access_control_address`
 * For fields that are designed to be used to detect file type (AKA
   "magic values"), use `magic` name, or, if there are several of them,
@@ -274,7 +274,7 @@ guesswork.
   name (or `reserved1`, `reserved2`, etc, if there are many of them)
 * For fields that designate *number / count* of something (in
   particular, number of repetitions of some other structure), use
-  `num_` prefix and plular form — i.e. `num_questions`, `num_blocks`,
+  `num_` prefix and plural form — i.e. `num_questions`, `num_blocks`,
   `num_nodes`
 * For fields that designate *offset* to some particular data structure,
   use `ofs_` prefix and name of that data structure (as it would appear
@@ -378,7 +378,7 @@ The rationale of doing so is that a lot of existing specs rely on
 particular standards and approaches of some target language and/or
 platform. Sometimes, existing specs are burdened by some legacy
 (i.e. they are obliged to maintain names of fields, even when its true
-purpose was extented since its introduction for compatibility with
+purpose was extended since its introduction for compatibility with
 older software). KS, on the other hand, is cross-platform and
 cross-language, thus it is not necessary (and in many cases, it's just
 impossible) to stick to single platform's style. And KS-provide API is
@@ -591,7 +591,7 @@ types:
         type: u4
 ----
 
-However, in KS, this is very redunant and unnecessarily complex. One
+However, in KS, this is very redundant and unnecessarily complex. One
 can just put everything in one simple type — this is easier to read,
 understand and use (and it does not make up artificial "header" entity
 where we can avoid it):

@@ -117,7 +117,7 @@ deserialize it there. Binary representation is driven by the data and
 encoded according to particular standard of a given protocol, which
 usually has a fixed representation for integers, for strings, for
 arrays, for dictionaries, etc. Most of these project allow generated
-formats to be automatically extensibile, carry versioning information,
+formats to be automatically extensible, carry versioning information,
 automatically embed typing information of some sort, etc.
 
 However, you can't read an arbitrary binary format (like, for example,
@@ -146,7 +146,7 @@ So, to summarize:
 
 Note that you can actually use Kaitai Struct to parse most of the
 mentioned protocols. It will typically give you many low-level
-implementaton details, which you might care about if you're interested
+implementation details, which you might care about if you're interested
 in digital forensics (DFIR) or digital preservation. You can find some
 of these protocols already specified under "Serialization Protocols"
 section in http://formats.kaitai.io/[Kaitai Struct Format Gallery].
@@ -176,8 +176,8 @@ tricks to make serialization and deserialization more efficient
 fields), but, essentially, they emphasize content, and offer very
 limited control over serialization format.
 
-In theory, [Cap'N Proto encoding
-scheme](https://capnproto.org/encoding.html) is well documented and
+In theory, https://capnproto.org/encoding.html[Cap'N Proto encoding
+scheme] is well documented and
 can be implemented in .ksy to parse Cap'N Proto encoded messages.
 
 .Software mentioned
@@ -203,11 +203,11 @@ that does parsing.
 
 .Software mentioned
 ****
-* GNU Bison: https://www.gnu.org/software/bison/
-* Yacc: https://en.wikipedia.org/wiki/Yacc
-* Lex: https://en.wikipedia.org/wiki/Lex_(software)[https://en.wikipedia.org/wiki/Lex_(software)]
-* Flex: http://flex.sourceforge.net/
-* ANTLR: https://www.antlr.org/
+* https://www.gnu.org/software/bison/[GNU Bison]
+* https://en.wikipedia.org/wiki/Yacc[Yacc]
+* https://en.wikipedia.org/wiki/Lex_(software)[Lex]
+* http://flex.sourceforge.net/[Flex]
+* https://www.antlr.org/[ANTLR]
 ****
 
 [[vs-010]]
@@ -220,11 +220,11 @@ compiled right into parser source code in any supported language.
 
 .Software mentioned
 ****
-* SweetScape 010 Editor: https://www.sweetscape.com/010editor/
-* Synalysis: https://www.synalysis.net/
-* Hexinator: https://hexinator.com/
-* Okteta: https://docs.kde.org/trunk5/en/extragear-utils/okteta/tools-structures.html
-* iBored: http://apps.tempel.org/iBored/
+* https://www.sweetscape.com/010editor/[SweetScape 010 Editor]
+* https://www.synalysis.net/[Synalysis]
+* https://hexinator.com/[Hexinator]
+* https://docs.kde.org/trunk5/en/extragear-utils/okteta/tools-structures.html[Okteta]
+* http://apps.tempel.org/iBored/[iBored]
 ****
 
 [[vs-preon]]
@@ -233,12 +233,12 @@ compiled right into parser source code in any supported language.
 * Both Preon and KS are declarative
 * Preon is Java-only library, KS is a cross-language tool
 * Preon's data structure definitions are done as annotations inside `.java` source files, KS keeps structure definitions in separate `.ksy` file
-* Preon interpetes data structure annotations in runtime, KS compiles `.ksy` into regular `.java` files first, then they're compiled normally by Java compiler as part of the project
+* Preon interprets data structure annotations in runtime, KS compiles `.ksy` into regular `.java` files first, then they're compiled normally by Java compiler as part of the project
 * Preon supports unaligned bit streams, KS does not (yet)
 
 .Software mentioned
 ****
-* Preon: https://github.com/preon/preon
+* https://github.com/preon/preon[Preon]
 ****
 
 == Format specification: how to ...
@@ -281,7 +281,7 @@ There's lot of variety when it comes to BCD representations:
 * Endianness: might be little or big
 
 Kaitai Struct stdlibs include a parameterized type
-http://formats.kaitai.io/bcd/[bcd] which suports majority of these BCD
+http://formats.kaitai.io/bcd/[bcd] which supports majority of these BCD
 versions using parameters (available in Kaitai Struct v0.8+):
 
 * `num_digits` — integer, number of digits (valid values: 1..8)
