@@ -3966,7 +3966,7 @@ have to add an extra user-defined type. Depending on your needs,
 it may be necessary to either wrap a single item or the entire
 array in it.
 
-1. force a key relating to individual elements to apply to the whole
+1. To force a key relating to **individual elements** to apply to the whole
 array instead: create a user type that *wraps the entire array*,
 and apply the key on the attribute which uses this wrapper type.
 +
@@ -3977,7 +3977,7 @@ using repetition would mean size of each item, so it's necessary to add type
 a substream of the total size and put this type into it, because keys `size`
 and `repeat` no longer meet in the same attribute.
 
-2. force a key relating to the entire array to apply to each
+2. To force a key relating to the **entire array** to apply to each
 individual item instead: create a user type that *wraps the single element*,
 and apply the key on the attribute of this wrapper with the item type itself.
 +
