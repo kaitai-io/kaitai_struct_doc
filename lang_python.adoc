@@ -6,6 +6,14 @@ v0.9
 [[overview]]
 == Overview
 
+[[supported-python-versions]]
+=== Supported Python versions
+
+Kaitai Struct supports Python 3.4 and later as well as Python 2.7.
+It is strongly recommended to use Python 3.5 or newer,
+because Python 3.4 and 2.7 have reached end-of-life
+and no longer receive official support from the Python developers.
+
 [[ksc]]
 === Kaitai Struct compiler invocation
 
@@ -15,9 +23,7 @@ To generate Python modules, Kaitai Struct compiler should be invoked with
 [source,shell]
 kaitai-struct-compiler -t python [--python-package .] my_spec.ksy
 
-This normally generates `my_spec.py` parser module, which is compatible
-with both Python 2 and 3. It is strongly recommended to use Python 3
-because Python 2 is EOL since 2020-01-01.
+This normally generates `my_spec.py` parser module.
 
 `--python-package` is an optional CLI arg allows you to select a parent package
 name used by one generated file to import symbols from another one.
