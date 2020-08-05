@@ -130,7 +130,7 @@ python3 -m pip install --upgrade --pre git+https://github.com/kaitai-io/kaitai_s
 [[install-dependencies]]
 === Installing dependencies for legacy Pythons manually
 
-<<ksy_reference#enums,Enums>> implementation in Python requires
+<<user_guide#enums,Enums>> implementation in Python requires
 a enum support as described in
 https://www.python.org/dev/peps/pep-0435/[PEP-0435]. This support is
 available out of the box in standard libraries since Python v3.4, or
@@ -157,7 +157,7 @@ allowing you to automate compilation of `*.ksy` files as the
 part of Python module build process. The library provides a mostly
 declarative syntax to facilitate installation: you add a section
 `[tool.kaitai]` to your `pyproject.toml` where you enumerate the files that you want
-compiled, output directory, compilation flags, source code. 
+compiled, output directory, compilation flags, source code.
 Post-compilation transformations are currently supported only via legacy syntax via `setup.py`. The links to examples can be found in the project docs.
 
 Here are
