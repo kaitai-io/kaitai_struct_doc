@@ -1,4 +1,5 @@
 = Kaitai Struct: KSY syntax diagram
+// ksy_reference.html is redirecting to this page
 
 Here you can examine the KSY syntax diagram describing all YAML keys that can be used in the Kaitai Struct YAML spec (KSY).
 
