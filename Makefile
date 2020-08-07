@@ -7,7 +7,6 @@ TARGETS=\
 	out/developers.html \
 	out/developers_intro.html \
 	out/faq.html \
-	out/ksy_reference.html \
 	out/ksy_diagram.html \
 	out/lang_cpp_stl.html \
 	out/lang_java.html \
@@ -24,6 +23,7 @@ TARGETS=\
 all: $(TARGETS)
 	rm -rf out/img
 	cp -r img styles js out
+	cp ksy_reference.html out
 	cp raw/pygments-default.css out/styles
 	cp -r docson/public/docson.js docson/public/lib/ out/js
 	cp -r docson/public/templates out
