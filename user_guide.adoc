@@ -1,6 +1,6 @@
 = Kaitai Struct User Guide
 Kaitai Project
-v0.8
+v0.9
 :toc: left
 :numbered:
 
