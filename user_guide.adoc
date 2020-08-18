@@ -2683,14 +2683,6 @@ enums:
 This runs as fast as it was originally intended, and it provides extra
 benefits of allowing more verbose FourCC value descriptions.
 
-WARNING: Until
-https://github.com/kaitai-io/kaitai_struct/issues/300[Issue #300] is
-resolved, this approach cannot be used unless you can guarantee that
-every possible FourCC value the file might contain is defined in the
-enum. Otherwise you will encounter unavoidable parse exceptions in
-Java and Python, preventing you from accessing further data from the
-file.
-
 [[do-nothing]]
 === Do nothing
 
