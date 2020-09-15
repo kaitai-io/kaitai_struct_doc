@@ -1066,9 +1066,9 @@ that packs both version and header length:
 ....
 76543210
 vvvvllll
-  |   |
-  |   +- header length
-  +----- version
+  │   |
+  │   └─ header length
+  └───── version
 ....
 
 Here's how it can be parsed with KS:
@@ -1114,15 +1114,15 @@ values:
 ....
            76543210 76543210 76543210 76543210
            nnnnnnnn 00011122 23334445 55666777 ...
-           ----+--- ---___----___---____
-               |     |  |  |   |  |   |
-num_threes ----+     |  |  |   |  |   |
-threes[0]  ----------+  |  |   |  |   |
-threes[1]  -------------+  |   |  |   |
-threes[2]  ----------------+   |  |   |
-threes[3]  --------------------+  |   |
-threes[4]  -----------------------+   |
-threes[5]  ---------------------------+
+           ________ ‾‾‾___‾‾‾‾___‾‾‾____
+               ╷     │  ╷  │   ╷  │   ╷
+num_threes ────┘     │  │  │   │  │   │
+threes[0]  ──────────┘  │  │   │  │   │
+threes[1]  ─────────────┘  │   │  │   │
+threes[2]  ────────────────┘   │  │   │
+threes[3]  ────────────────────┘  │   │
+threes[4]  ───────────────────────┘   │
+threes[5]  ───────────────────────────┘
   ...
 ....
 
@@ -1157,10 +1157,10 @@ two bytes will get parsed like that:
 ....
     76543210 76543210
     ffffff   bbbbbbbb
-    --+---   ---+----
+    ──┬───   ───┬────
       |         |
-foo --+         |
-bar ------------+
+foo ──┘         |
+bar ────────────┘
 ....
 
 i.e. two least significant bits of the first byte would be lost and
