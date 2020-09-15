@@ -1051,7 +1051,8 @@ instances:
 ----
 
 Value instance does no actual parsing, and thus do not require `pos`
-key, or `type` key (type will be derived automatically).
+key, or `type` key (type will be derived automatically). If you need
+to enforce the type of the expression, see <<typecast,typecasting>>.
 
 === Bit-sized integers
 
@@ -1378,6 +1379,7 @@ descriptions, pointers to external linked resources, etc:
 * `file-extension`
 * `xref` — used to specify <<meta-xref,cross-references>>
 * `license`
+* `tags`
 * `ks-version`
 * `ks-debug`
 * `ks-opaque-types`
@@ -2874,6 +2876,9 @@ successfully, without triggering an error:
 61 62 63 00          => my_string = "abc"
 61 62 63             => my_string = "abc"
 ....
+
+[[pad-right]]
+==== sdwefw
 
 === Importing types from other files
 
