@@ -2877,9 +2877,6 @@ successfully, without triggering an error:
 61 62 63             => my_string = "abc"
 ....
 
-[[pad-right]]
-==== sdwefw
-
 === Importing types from other files
 
 As your project grows in complexity, you might want to have multiple
