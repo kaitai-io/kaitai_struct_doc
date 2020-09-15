@@ -1178,9 +1178,9 @@ seq:
     type: u1
 instances:
   version:
-    value: packed_1 & 0b00001111
+    value: (packed_1 & 0b11110000) >> 4
   len_header:
-    value: packed_1 >> 4
+    value:  packed_1 & 0b00001111
 ----
 
 Such method is useful when you need to do more intricate bit
