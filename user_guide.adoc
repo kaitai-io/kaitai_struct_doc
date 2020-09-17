@@ -1056,8 +1056,6 @@ to enforce the type of the expression, see <<typecast,typecasting>>.
 
 === Bit-sized integers
 
-IMPORTANT: Feature available since v0.6.
-
 Quite a few protocols and file formats, especially those who aim to
 conserve space, pack multiple integers into same byte, using integer
 sizes less than 8 bits. For example, IPv4 packet starts with a byte
@@ -1071,7 +1069,30 @@ vvvvllll
   └───── version
 ....
 
-Here's how it can be parsed with KS:
+It's possible to unpack bit-packed integers using old-school
+methods with bitwise operations in value instances:
+
+[source,yaml]
+----
+seq:
+  - id: packed_1
+    type: u1
+instances:
+  version:
+    value: (packed_1 & 0b11110000) >> 4
+  len_header:
+    value:  packed_1 & 0b00001111
+----
+
+However, Kaitai Struct offers a better way to do it - using
+*bit-sized integers*.
+
+[[bit-ints-be]]
+==== Big-endian order
+
+IMPORTANT: Feature available since v0.6.
+
+Here's how the above IPv4 example can be parsed with KS:
 
 [source,yaml]
 ----
@@ -1082,17 +1103,44 @@ seq:
     type: b4
 ----
 
-NOTE: By convention, KS starts parsing bits from most significant to
-least significant, so "version" comes first here, and "len_header"
-second.
+The default bit field order is big-endian. In this mode, KS starts parsing
+bit fields from the most significant bit (MSB, 7) to the least significant
+bit (LSB, 0). In this case, "version" comes first and "len_header" second.
 
-Using `type: bX` (where X is a number of bits to read) is very
+The bit layout for the above example looks like this:
+
+....
+             x[0]
+7   6   5   4   3   2   1   0
+v3  v2  v1  v0  l3  l2  l1  l0
+───────┬──────  ───────┬──────
+    version       len_header
+....
+
+`x[0]` is the first byte of the stream, and the numbers 7-0 on the line
+below indicate the invididual bits of this byte (listed from MSB `7` to LSB `0`).
+
+The value of `version` can be retrieved as `0b{v3}{v2}{v1}{v0}`
+__(`0b...` is the binary integer literal as present in many programming
+languages, and `{v3}` is the value `0` or `1` of the corresponding bit)__,
+as well as `len_header` value can be written as `0b{l3}{l2}{l1}{l0}`.
+
+As you can see in the bit layout, `version` occupies https://en.wikipedia.org/wiki/Nibble#Low_and_high_nibbles[high nibble]
+of the byte `x[0]` and `len_header` occupies low nibble.
+
+Using `type: bX` (where `X` is a number of bits to read) is very
 versatile and can be used to read byte-unaligned data. A more complex
 example of packing, where value spans two bytes:
 
 ....
-76543210 76543210
-aaaaabbb bbbbbbcc
+               x[0]                              x[1]
+  7   6   5   4   3   2   1   0     7   6   5   4   3   2   1   0
+  a4  a3  a2  a1  a0  b8  b7  b6    b5  b4  b3  b2  b1  b0  c1  c0
+  ─────────┬────────  ─────────────────┬──────────────────  ───┬──
+           a                           b                       c
+ │ ───────────────────────────> │  │ ───────────────────────────> │
+        parsing direction       ╷  ↑
+                                └┄┄┘
 ....
 
 [source,yaml]
@@ -1102,16 +1150,44 @@ seq:
     type: b5
   - id: b
     type: b9
-    # 3 bits + 6 bits
+    # 3 bits (b{8-6}) + 6 bits (b{5-0})
   - id: c
     type: b2
 ----
+
+[NOTE]
+====
+Why is this order of bit field members called "big-endian"? Because
+the parsing results are equivalent to first reading a packed
+integer in _big-endian_ byte order and then extracting the values
+using bitwise operators (`&` and `>>`) in a sequential order.
+Here's the above example rewritten using this conventional approach:
+
+[source,yaml]
+----
+seq:
+  - id: packed
+    type: u2be
+instances:
+  a:
+    value: (packed & 0b11111000_00000000) >> (3 + 8)
+  b:
+    value: (packed & 0b00000111_11111100) >> 2
+  c:
+    value:  packed & 0b00000000_00000011
+----
+
+Using the same logic, little-endian bit integers correspond to
+unpacking a *little-endian* integer instead. See <<bit-ints-le>>
+for more info.
+====
 
 Or it can be used to parse completely unaligned bit streams with
 repetitions. In this example, we parse an arbitrary number of 3-bit
 values:
 
 ....
+             x[0]     x[1]     x[2]     x[3]
            76543210 76543210 76543210 76543210
            nnnnnnnn 00011122 23334445 55666777 ...
            ________ ‾‾‾___‾‾‾‾___‾‾‾____
@@ -1167,25 +1243,135 @@ i.e. two least significant bits of the first byte would be lost and
 not parsed due to alignment.
 ====
 
-Last, but not least, note that it's also possible to parse bit-packed
-integers using old-school methods with value instances. Here's the
-very first example with IPv4 packed start, unpacked manually:
+[[bit-ints-le]]
+==== Little-endian order
+
+IMPORTANT: Feature available since v0.9.
+
+Most formats using little-endian _byte order_ with packed multi-byte
+bit fields (e.g. http://formats.kaitai.io/android_img/[android_img],
+http://formats.kaitai.io/rar/[rar] or http://formats.kaitai.io/swf/[swf])
+assume that such bit fields are unpacked manually using bitwise operators
+from a little-endian integer parsed in advance containing the whole bit
+field. The bit layout of the field is designed accordingly.
+
+For example, consider the following bit field:
 
 [source,yaml]
 ----
 seq:
-  - id: packed_1
-    type: u1
+  - id: packed
+    type: u2le
 instances:
-  version:
-    value: (packed_1 & 0b11110000) >> 4
-  len_header:
-    value:  packed_1 & 0b00001111
+  a:
+    value: (packed & 0b11111000_00000000) >> (3 + 8)
+  b:
+    value: (packed & 0b00000111_11111100) >> 2
+  c:
+    value:  packed & 0b00000000_00000011
 ----
 
-Such method is useful when you need to do more intricate bit
-combinations, like a value with its bits scattered across several
-bytes sparsely.
+The expressions for extracting the values look exactly the same as
+for the <<bit-ints-be, big-endian order>>, but the actual bit layout
+will be different, because here the `packed` integer is read
+in little-endian (LE) byte order.
+
+Given that `x` is a 2-byte array needed to parse an unsigned 2-byte
+integer, the numeric value of a BE integer is
+`0x{x[0]}{x[1]}` __(`0x...` is the hexadecimal integer literal
+and `{x[0]}` is the hex value of byte `x[0]` as seen in hex dumps,
+e.g. `02` or `7f`)__, whereas the value of a LE integer
+would be `0x{x[1]}{x[0]}`.
+
+This follows that if we read a BE integer from a new byte array
+`[x[1], x[0]]` (i.e. `x` reversed), we'll get the same result
+as when reading a LE integer from the original `x` array.
+
+Because we've already explained how bit-integers work in
+<<bit-ints-be, big-endian order>>, let's repeat this method for the
+above bitfield on the reversed `x` byte array (`x[1] x[0]`) and then
+swap the bytes back to the original order of `x` (`x[0] x[1]`):
+
+....
+               x[1]                              x[0]
+  7   6   5   4   3   2   1   0     7   6   5   4   3   2   1   0
+  a4  a3  a2  a1  a0  b8  b7  b6    b5  b4  b3  b2  b1  b0  c1  c0
+  ──────────────┬───────────────    ───────────────┬──────────────
+                └──────────────╷   ╷───────────────┘
+                                ╲ ╱
+                                 ╳
+                                ╱ ╲
+                ┌──────────────╵   ╵──────────────┐
+               x[0]                              x[1]
+  7   6   5   4   3   2   1   0     7   6   5   4   3   2   1   0
+  b5  b4  b3  b2  b1  b0  c1  c0    a4  a3  a2  a1  a0  b8  b7  b6
+  ──────────┬───────────  ──┬───    ─────────┬────────  ────┬─────
+            b               c                a              b
+│ <──────────────────────────── │  │ <──────────────────────────── │
+╷       parsing direction                                          ↑
+└┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈>┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┘
+....
+
+As you can guess from the bit layout, you can't use <<bit-ints-be,big-endian
+bit integers>> here without splitting the `b` value into 2 separate
+members.
+
+This is because each byte in a *big-endian* bit field is gradually "filled"
+with members from the most significant bit (7) to the least significant (0),
+and if the current byte is filled up to LSB, the parsing continues on
+MSB of next byte. It follows that `b` really can't be represented
+with a single attribute using this order, because `c` and `a` are standing
+in the way.
+
+Little-endian bit fields use the reversed parsing direction: bytes are filled
+from LSB (0) to MSB (7), and after filling the byte up to MSB, values
+overflow to the next byte's LSB.
+
+For example, the above bit layout can be conveniently represented using
+little-endian bit integers:
+
+[source,yaml]
+----
+meta:
+  bit-endian: le
+seq:
+  - id: c
+    type: b2
+  - id: b
+    type: b9
+    # 6 bits (b{5-0}) + 3 bits (b{8-6})
+  - id: a
+    type: b5
+----
+
+The key `meta/bit-endian` specifies the default parsing direction
+(_bit endianness_) of bit-sized integers. It can only have the
+literal value `le` or `be` (run-time <<calc-endian,switching>>
+is *not* supported). Big-endian order (`be`) is default.
+
+As you can see in the KSY snippet, the bit field members in `seq`
+are listed from the least significant value to the most significant.
+If we look at the bit masks of bit field members (which can be
+directly used for ANDing `&` with the 2-byte little-endian unsigned
+value), they would be sorted in *ascending* order (starting with
+the _least significant_ value):
+
+....
+c    0b00000000_00000011
+b    0b00000111_11111100
+a    0b11111000_00000000
+....
+
+This may seem strange at first, but it's actually natural from the
+perspective of how little-endian bit fields work, and how they
+physically store their members.
+
+Thanks to this order, Kaitai Struct *doesn't need* to know the byte
+size of the whole bitfield in advance __(so that its members could
+be rearranged at compile-time to match their physical location)__,
+and it can normally parse the attributes on the run.
+It follows that little-endian bit-sized integers can be normally
+combined with `if` conditions and repetitions like any other KS type.
 
 [[ksy-documentation]]
 === Documenting your spec
