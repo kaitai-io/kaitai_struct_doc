@@ -1345,9 +1345,8 @@ seq:
 ----
 
 The key `meta/bit-endian` specifies the default parsing direction
-(_bit endianness_) of bit-sized integers. It can only have the
-literal value `le` or `be` (run-time <<calc-endian,switching>>
-is *not* supported). Big-endian order (`be`) is default.
+(_bit endianness_) of bit-sized integers. Default is big-endian
+order (`be`), so we need to override it.
 
 As you can see in the KSY snippet, the bit field members in `seq`
 are listed from the least significant value to the most significant.
@@ -1372,6 +1371,53 @@ be rearranged at compile-time to match their physical location)__,
 and it can normally parse the attributes on the run.
 It follows that little-endian bit-sized integers can be normally
 combined with `if` conditions and repetitions like any other KS type.
+
+==== Specifying bit endianness
+
+The key `meta/bit-endian` specifies the default parsing direction
+(_bit endianness_) of bit-sized integers. It can only have the
+literal value `le` or `be` (run-time <<calc-endian,switching>>
+is *not* supported). Big-endian order (`be`) is default.
+
+Like `meta/endian`, `meta/bit-endian` also applies to `bX` attributes
+in the current type and all subtypes, but it can be overriden
+using the `le`/`be` suffix (`bXle`/`bXbe`) for the individual bit
+integers. For example:
+
+[source,yaml]
+----
+meta:
+  bit-endian: le
+seq:
+  - id: foo
+    type: b2 # little-endian
+types:
+  my_subtype:
+    seq:
+      - id: bar
+        type: b8 # also little-endian
+      - id: baz
+        type: b16be # big-endian
+----
+
+[IMPORTANT]
+====
+_Big-endian_ and _little-endian_ bit integers can follow *only on a byte
+boundary*. They can't share the same byte. Joining them on an
+unaligned bit position is _undefined behavior_, and KSC will be throwing
+a compile-time error in the future if it detects such situation.
+
+For example, this is *illegal*:
+
+[source,yaml]
+----
+seq:
+  - id: foo
+    type: b4be
+  - id: bar
+    type: b4le
+----
+====
 
 [[ksy-documentation]]
 === Documenting your spec
