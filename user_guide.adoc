@@ -1125,9 +1125,6 @@ __(`0b...` is the binary integer literal as present in many programming
 languages, and `{v3}` is the value `0` or `1` of the corresponding bit)__,
 as well as `len_header` value can be written as `0b{l3}{l2}{l1}{l0}`.
 
-As you can see in the bit layout, `version` occupies https://en.wikipedia.org/wiki/Nibble#Low_and_high_nibbles[high nibble]
-of the byte `x[0]` and `len_header` occupies low nibble.
-
 Using `type: bX` (where `X` is a number of bits to read) is very
 versatile and can be used to read byte-unaligned data. A more complex
 example of packing, where value spans two bytes:
