@@ -1084,7 +1084,7 @@ instances:
     value:  packed_1 & 0b00001111
 ----
 
-However, Kaitai Struct offers a better way to do it - using
+However, Kaitai Struct offers a better way to do it — using
 *bit-sized integers*.
 
 [[bit-ints-be]]
