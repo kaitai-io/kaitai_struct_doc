@@ -1112,7 +1112,7 @@ The bit layout for the above example looks like this:
 ....
              x[0]
 7   6   5   4   3   2   1   0
-v3  v2  v1  v0  l3  l2  l1  l0
+v3  v2  v1  v0  h3  h2  h1  h0
 ───────┬──────  ───────┬──────
     version       len_header
 ....
@@ -1123,7 +1123,7 @@ below indicate the invididual bits of this byte (listed from MSB `7` to LSB `0`)
 The value of `version` can be retrieved as `0b{v3}{v2}{v1}{v0}`
 __(`0b...` is the binary integer literal as present in many programming
 languages, and `{v3}` is the value `0` or `1` of the corresponding bit)__,
-as well as `len_header` value can be written as `0b{l3}{l2}{l1}{l0}`.
+as well as `len_header` value can be written as `0b{h3}{h2}{h1}{h0}`.
 
 Using `type: bX` (where `X` is a number of bits to read) is very
 versatile and can be used to read byte-unaligned data. A more complex
