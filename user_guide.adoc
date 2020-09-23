@@ -1096,6 +1096,8 @@ Here's how the above IPv4 example can be parsed with KS:
 
 [source,yaml]
 ----
+meta:
+  bit-endian: be
 seq:
   - id: version
     type: b4
@@ -1103,9 +1105,10 @@ seq:
     type: b4
 ----
 
-The default bit field order is big-endian. In this mode, KS starts parsing
-bit fields from the most significant bit (MSB, 7) to the least significant
-bit (LSB, 0). In this case, "version" comes first and "len_header" second.
+Using `meta/bit-endian` key, we specify *big-endian* bit field order
+(see <<bit-endian>> for more info). In this mode, KS starts parsing bit
+fields from the most significant bit (MSB, 7) to the least significant bit
+(LSB, 0). In this case, "version" comes first and "len_header" second.
 
 The bit layout for the above example looks like this:
 
@@ -1142,6 +1145,8 @@ example of packing, where value spans two bytes:
 
 [source,yaml]
 ----
+meta:
+  bit-endian: be
 seq:
   - id: a
     type: b5
@@ -1201,6 +1206,8 @@ threes[5]  ───────────────────────
 
 [source,yaml]
 ----
+meta:
+  bit-endian: be
 seq:
   - id: num_threes
     type: u1
@@ -1218,6 +1225,8 @@ kept byte-aligned. That means if you do:
 
 [source,yaml]
 ----
+meta:
+  bit-endian: be
 seq:
   - id: foo
     type: b6
@@ -1286,7 +1295,7 @@ as when reading a LE integer from the original `d` array.
 
 Because we've already explained how bit-integers work in
 <<bit-ints-be, big-endian order>>, let's repeat this method for the
-above bitfield on the reversed `d` byte array (`d[1] d[0]`) and then
+above bitfield on the byte array `d` reversed (`d[1] d[0]`) and then
 swap the bytes back to the original order of `d` (`d[0] d[1]`):
 
 ....
@@ -1341,10 +1350,6 @@ seq:
     type: b5
 ----
 
-The key `meta/bit-endian` specifies the default parsing direction
-(_bit endianness_) of bit-sized integers. Default is big-endian
-order (`be`), so we need to override it.
-
 As you can see in the KSY snippet, the bit field members in `seq`
 are listed from the least significant value to the most significant.
 If we look at the bit masks of bit field members (which can be
@@ -1369,12 +1374,25 @@ and it can normally parse the attributes on the run.
 It follows that little-endian bit-sized integers can be normally
 combined with `if` conditions and repetitions like any other KS type.
 
+[[bit-endian]]
 ==== Specifying bit endianness
 
 The key `meta/bit-endian` specifies the default parsing direction
 (_bit endianness_) of bit-sized integers. It can only have the
 literal value `le` or `be` (run-time <<calc-endian,switching>>
-is *not* supported). Big-endian order (`be`) is default.
+is *not* supported).
+
+[IMPORTANT]
+====
+Support for `meta/bit-endian` has been added in *v0.9*
+(previously only BE direction was supported). To maintain
+backward compatibility, the big-endian order (`be`) is default.
+
+However, if you don't really need to support pre-0.9 KSC
+versions, it's recommended to state `meta/bit-endian: be`
+_explicitly_, because it raises awareness about the existence
+of LE bit endianness.
+====
 
 Like `meta/endian`, `meta/bit-endian` also applies to `bX` attributes
 in the current type and all subtypes, but it can be overriden
