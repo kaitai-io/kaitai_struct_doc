@@ -206,7 +206,7 @@ that does parsing.
 * https://www.gnu.org/software/bison/[GNU Bison]
 * https://en.wikipedia.org/wiki/Yacc[Yacc]
 * https://en.wikipedia.org/wiki/Lex_(software)[Lex]
-* http://flex.sourceforge.net/[Flex]
+* https://github.com/westes/flex[Flex]
 * https://www.antlr.org/[ANTLR]
 ****
 
