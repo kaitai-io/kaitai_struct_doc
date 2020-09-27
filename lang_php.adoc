@@ -1,6 +1,6 @@
 = Kaitai Struct: PHP notes
 
-The [Kaitai Struct: runtime for PHP](https://github.com/kaitai-io/kaitai_struct_php_runtime) requires PHP >= 7.0 and can be used in two different ways:
+The Kaitai Struct https://github.com/kaitai-io/kaitai_struct_php_runtime[runtime for PHP] requires PHP >= 7.0 and can be used in two different ways:
 
 1) As part of Kaitai Struct (recommended approach)
 

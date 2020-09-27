@@ -149,7 +149,7 @@ actually be JavaScript libraries, not Java jars.
 . Create version tag:
   * `git tag $VERSION`
   * `git push --tags`
-. Update [main repository](https://github.com/kaitai-io/kaitai_struct)
+. Update https://github.com/kaitai-io/kaitai_struct[main repository]
 . Create new version at:
   * https://bintray.com/kaitai-io/debian/kaitai-struct-compiler/new/version
   * https://bintray.com/kaitai-io/universal/kaitai-struct-compiler/new/version
