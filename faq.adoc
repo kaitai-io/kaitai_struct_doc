@@ -131,9 +131,9 @@ for it.
 
 You can totally read an arbitrary binary format (or enjoy diverse
 library of ready-made format specifications, including
-https://formats.kaitai.io/gif/[.gif],
-https://formats.kaitai.io/wav/[.wav] and
-https://formats.kaitai.io/zip/[.zip]). To some extent, you can use KS
+link://formats.kaitai.io/gif/[.gif],
+link://formats.kaitai.io/wav/[.wav] and
+link://formats.kaitai.io/zip/[.zip]). To some extent, you can use KS
 in a task "send block of data from point A to point B", if you prefer
 to have more control over your serialization scheme — but, obviously,
 you'll have to add features like backwards compatibility, versioning,
@@ -149,7 +149,7 @@ mentioned protocols. It will typically give you many low-level
 implementation details, which you might care about if you're interested
 in digital forensics (DFIR) or digital preservation. You can find some
 of these protocols already specified under "Serialization Protocols"
-section in http://formats.kaitai.io/[Kaitai Struct Format Gallery].
+section in link://formats.kaitai.io/[Kaitai Struct Format Gallery].
 
 .Software mentioned
 ****
@@ -249,10 +249,10 @@ compiled right into parser source code in any supported language.
 In most cases, you can just import existing implementation from our
 stdlib:
 
-* http://formats.kaitai.io/vlq_base128_be/[vlq_base128_be] for
+* link://formats.kaitai.io/vlq_base128_be/[vlq_base128_be] for
   big-endian VLQ (as used in ASN.1 BER encoding, standard MIDI file
   format, etc)
-* http://formats.kaitai.io/vlq_base128_le/[vlq_base128_le] for
+* link://formats.kaitai.io/vlq_base128_le/[vlq_base128_le] for
   little-endian VLQ (as used in DWARF debugging info, Google Protocol
   Buffers, Apache Lucene, Apache Avro, etc)
 
@@ -281,7 +281,7 @@ There's lot of variety when it comes to BCD representations:
 * Endianness: might be little or big
 
 Kaitai Struct stdlibs include a parameterized type
-http://formats.kaitai.io/bcd/[bcd] which supports majority of these BCD
+link://formats.kaitai.io/bcd/[bcd] which supports majority of these BCD
 versions using parameters (available in Kaitai Struct v0.8+):
 
 * `num_digits` — integer, number of digits (valid values: 1..8)

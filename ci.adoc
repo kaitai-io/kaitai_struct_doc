@@ -17,7 +17,7 @@ not to rely on a single CI engine provider. Currently, we use:
 
 With so many different jobs/flows, it's hard to rely on CI providers
 internal tools (such as job browsers, test browsers, log explorers,
-etc), so we're using our own https://ci.kaitai.io/[CI dashboard] to
+etc), so we're using our own link://ci.kaitai.io/[CI dashboard] to
 unify all the data coming from different test runs/sources and monitor
 current status of the compiler.
 
@@ -62,7 +62,7 @@ On a high level, it can be summarized as:
   https://github.com/kaitai-io/ci_artifacts/tree/ruby/1.9[ruby/1.9
   branch] keeps results of `ruby/1.9` test run.
 * Finally, these test results can be viewed online at our
-  https://ci.kaitai.io/[CI dashboard], which is a simple JavaScript
+  link://ci.kaitai.io/[CI dashboard], which is a simple JavaScript
   app which fetches and aggregates all test results from all runs on
   the fly.
 
@@ -104,7 +104,7 @@ possible.
    npm package]
 
 NOTE: Direct links / instructions how to reach these downloads are
-available as "unstable" at https://kaitai.io/[Kaitai homepage /
+available as "unstable" at link://kaitai.io/[Kaitai homepage /
 Download]
 
 * After compiler builds are finished, we run the internal compiler
@@ -158,7 +158,7 @@ TODO
 [[formats]]
 === Formats gallery
 
-https://formats.kaitai.io/[Formats gallery] is a static website, which
+link://formats.kaitai.io/[Formats gallery] is a static website, which
 provides user-friendly rendition of contents of our
 https://github.com/kaitai-io/kaitai_struct_formats/[formats repo].
 
