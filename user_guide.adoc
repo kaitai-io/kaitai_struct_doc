@@ -54,7 +54,7 @@ course, Kaitai Struct offers that as well.
 
 ==== Installation
 
-Please refer to http://kaitai.io/#download[official website] for
+Please refer to link://kaitai.io/#download[official website] for
 installation instructions. After installation, you're expected to
 have:
 
@@ -1255,8 +1255,8 @@ not parsed due to alignment.
 IMPORTANT: Feature available since v0.9.
 
 Most formats using little-endian _byte order_ with packed multi-byte
-bit fields (e.g. http://formats.kaitai.io/android_img/[android_img],
-http://formats.kaitai.io/rar/[rar] or http://formats.kaitai.io/swf/[swf])
+bit fields (e.g. link://formats.kaitai.io/android_img/[android_img],
+link://formats.kaitai.io/rar/[rar] or link://formats.kaitai.io/swf/[swf])
 assume that such bit fields are unpacked manually using bitwise operators
 from a little-endian integer parsed in advance containing the whole bit
 field. The bit layout of the field is designed accordingly.
@@ -3715,16 +3715,16 @@ to a crash / segfault / security problem.
 
 IMPORTANT: Feature available since v0.8.
 
-Most formats (like http://formats.kaitai.io/zip/[zip],
-http://formats.kaitai.io/gif/[gif], and many others) stick to a single
+Most formats (like link://formats.kaitai.io/zip/[zip],
+link://formats.kaitai.io/gif/[gif], and many others) stick to a single
 fixed endianness: they always use either big-endian or little-endian
 integers. Usually it stems from the architecture where the format was
 developed: this way format is relatively easy and quick to parse on
 its "native" architecture, and requires some extra operations (and
 parsing time) on non-native architectures.
 
-Some formats (like http://formats.kaitai.io/elf/[ELF] or
-http://formats.kaitai.io/mach_o/[Mach-O]), however, take alternative
+Some formats (like link://formats.kaitai.io/elf/[ELF] or
+link://formats.kaitai.io/mach_o/[Mach-O]), however, take alternative
 approach: they come in two versions (with big-endian integers and
 little-endian integers) and they add some sort of header field that
 helps to distinguish between two.

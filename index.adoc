@@ -34,7 +34,7 @@
 
 == Want to contribute to KS development?
 
-* https://ci.kaitai.io/[CI (Continuous Integration) dashboard]
+* link://ci.kaitai.io/[CI (Continuous Integration) dashboard]
 * <<developers.adoc#,Developers memo>> — basic information on how to build, test and release KS
 * <<developers_intro.adoc#,Developers intro>> — gentle introduction to KS reference compiler architecture
 * <<new_language.adoc#,Adding support for new target language>>

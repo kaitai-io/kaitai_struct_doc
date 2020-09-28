@@ -15,7 +15,7 @@ mkdir kaitai-test
 cd kaitai-test
 
 #######################################################################################
-# Download Kaitai Struct Compiler, link can be found at http://kaitai.io/#download page
+# Download Kaitai Struct Compiler, link can be found at https://kaitai.io/#download page
 
 curl -OL https://bintray.com/artifact/download/kaitai-io/universal/0.6/kaitai-struct-compiler-0.6.zip
 

@@ -17,7 +17,7 @@ digraph {
 
 	build_compiler_appveyor [label="appveyor:\nbuild_compiler",fillcolor="#d0d0d0",href="https://ci.appveyor.com/project/GreyCat/kaitai-struct",target="_blank"];
 
-	dashboard [label="https://ci.kaitai.io/",href="https://ci.kaitai.io/",fillcolor="#ffb86c",target="_blank"];
+	dashboard [label="http://ci.kaitai.io/",href="//ci.kaitai.io/",fillcolor="#ffb86c",target="_blank"];
 	web_ide_unstable [label="https://ide.kaitai.io/devel/",href="https://ide.kaitai.io/devel/",fillcolor="#ffb86c",target="_blank"];
 
 	abridged_1 [label="...", style=none];

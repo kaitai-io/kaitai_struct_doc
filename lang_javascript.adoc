@@ -10,7 +10,7 @@ Create an empty directory and install the https://www.npmjs.com/package/kaitai-s
 npm i kaitai-struct
 ```
 
-Copy your compiled .ksy parser into this directory or download one http://formats.kaitai.io/[parser from the format gallery] (eg. http://formats.kaitai.io/elf/javascript.html[Elf.js]).
+Copy your compiled .ksy parser into this directory or download one link://formats.kaitai.io/[parser from the format gallery] (eg. link://formats.kaitai.io/elf/javascript.html[Elf.js]).
 
 Create `index.js` with the following content:
 
@@ -57,7 +57,7 @@ Create an `index.html` with the following content:
 </html>
 ```
 
-Copy your compiled .ksy parser into this directory or download one http://formats.kaitai.io/[parser from the format gallery] (eg. http://formats.kaitai.io/elf/javascript.html[Elf.js]).
+Copy your compiled .ksy parser into this directory or download one link://formats.kaitai.io/[parser from the format gallery] (eg. link://formats.kaitai.io/elf/javascript.html[Elf.js]).
 
 Also deploy the Kaitai Struct JavaScript Runtime (`KaitaiStream.js`)  https://github.com/koczkatamas/kaitai_struct_javascript_runtime/blob/master/KaitaiStream.js[from Github] or https://www.npmjs.com/package/kaitai-struct[npm] and a `sample.elf` file.
 
