@@ -1255,8 +1255,8 @@ not parsed due to alignment.
 IMPORTANT: Feature available since v0.9.
 
 Most formats using little-endian _byte order_ with packed multi-byte
-bit fields (e.g. http://formats.kaitai.io/android_img/[android_img],
-http://formats.kaitai.io/rar/[rar] or http://formats.kaitai.io/swf/[swf])
+bit fields (e.g. link://formats.kaitai.io/android_img/[android_img],
+link://formats.kaitai.io/rar/[rar] or link://formats.kaitai.io/swf/[swf])
 assume that such bit fields are unpacked manually using bitwise operators
 from a little-endian integer parsed in advance containing the whole bit
 field. The bit layout of the field is designed accordingly.

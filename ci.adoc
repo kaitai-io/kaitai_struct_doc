@@ -175,7 +175,7 @@ running on GitHub Actions]:
   ultimately, static website.
 * Static website gets published into
   https://github.com/kaitai-io/formats-kaitai-io.github.io[formats-kaitai-io.github.io
-  repo], which is served over HTTP to everyone as https://formats.kaitai.io/
+  repo], which is served over HTTP to everyone as link://formats.kaitai.io/[\http://formats.kaitai.io/]
 
 [[doc]]
 === Documentation
