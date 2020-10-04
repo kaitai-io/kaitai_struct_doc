@@ -64,9 +64,6 @@ and object population:
   all.
 * You want to reuse the same object and thus want to repeatedly call
   `_read()` on several times manually.
-* If you're not using smart pointers (see below), any exception (data
-  validation, IO error, etc) during object creation might result in
-  memory leak, as destructor will NOT be executed.
 
 === Ownership model
 
