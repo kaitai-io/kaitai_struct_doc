@@ -174,20 +174,20 @@ actually be JavaScript libraries, not Java jars.
   sbt 1.1)
   * Set up credentials: create `$HOME/.sbt/.credentials` with the
     following contents (replacing XXX with username and password):
-
-    ----
-    realm=Sonatype Nexus Repository Manager
-    host=oss.sonatype.org
-    user=XXX
-    password=XXX
-    ----
++
+....
+realm=Sonatype Nexus Repository Manager
+host=oss.sonatype.org
+user=XXX
+password=XXX
+....
   * Set up `$HOME/.sbt/1.0/plugins/credentials.sbt` with the following
     contents:
-
-    [source,scala]
-    ----
-    credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
-    ----
++
+[source,scala]
+----
+credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
+----
   * Make sure GPG keys are present
 . `sbt publishSigned`
 . Go to https://oss.sonatype.org/#stagingRepositories
