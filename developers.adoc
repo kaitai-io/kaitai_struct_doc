@@ -191,7 +191,7 @@ credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
   * Make sure GPG keys are present
 . `sbt publishSigned`
 . Go to https://oss.sonatype.org/#stagingRepositories
-. Continue to follow Java runtime publishing instructions
+. Continue to follow <<java,Java runtime publishing instructions>>
 
 == Tests
 
@@ -199,6 +199,7 @@ TODO
 
 == Runtimes
 
+[[java]]
 === Java
 
 ==== Publishing
