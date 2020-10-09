@@ -2845,9 +2845,8 @@ as `switch`-style statement, or, if it does not, ksc will fall back to
 ==== Switching over enums
 
 One can use enums as well. To match against enum values, you would
-have to specify enum literals (i.e. `enum_name::some_value`), and,
-given that it involves semicolons, we'll have to use YAML quotes
-again:
+have to specify enum literals (i.e. `enum_name::some_value`). Since
+there are colons in them, we'll have to use YAML quotes again:
 
 [source,yaml]
 ----
