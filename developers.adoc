@@ -197,12 +197,10 @@ credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
 
 TODO
 
-== Runtimes
+== Publishing runtime libraries
 
 [[java]]
 === Java
-
-==== Publishing
 
 * Pump version, set version to `$VERSION`, without `-SNAPSHOT`
 * `mvn deploy`
@@ -217,10 +215,29 @@ TODO
 ** Confirm
 * After some time, check https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22kaitai-struct-runtime%22 to have new version
 
+=== JavaScript
+
+* Pump version in `package.json` and `package-lock.json` (search for `"version": `)
+to `X.Y.Z` format (e.g. `0.9.0` for 0.9 release)
+* Make a commit with the changes and tag it `$VERSION`
+* `npm login` - fill npmjs.org login credentials
+* `npm publish --tag latest`
+
 === Python
 
-==== Publishing
+* Create a `~/.pypirc` file with this:
++
+[source,ini]
+----
+[distutils]
+index-servers =
+    pypi
 
+[pypi]
+repository: https://pypi.python.org/pypi
+username: <login>
+password: <pass>
+----
 * Pump version in `kaitaistruct.py`, seek `__version__ =`
 * `python3 setup.py sdist upload`
 ** (use `python3 setup.py sdist upload -r pypitest` to publish to testing server)
@@ -229,8 +246,6 @@ TODO
 * `git push --tags`
 
 === Ruby
-
-==== Publishing
 
 * Pump version in `lib/kaitai/struct/struct.rb`, seek `VERSION = `
 * `gem build kaitai-struct.gemspec`
