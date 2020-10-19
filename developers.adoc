@@ -225,7 +225,7 @@ to `X.Y.Z` format (e.g. `0.9.0` for 0.9 release)
 
 === Python
 
-* Create a `~/.pypirc` file with this:
+* Create a `~/.pypirc` file with this (https://github.com/pypa/setuptools/issues/941#issuecomment-279123202[source]):
 +
 [source,ini]
 ----
