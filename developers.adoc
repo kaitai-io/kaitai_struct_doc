@@ -254,6 +254,23 @@ password: <pass>
 * `git tag $VERSION`
 * `git push --tags`
 
+[[csharp]]
+=== C#
+
+* Pump versions in `kaitai_struct_runtime_csharp.csproj`, commit and put `$VERSION` tag on it
+* `dotnet build`
+* `dotnet pack` -> get resulting `.nupkg` file in `bin/Debug/` folder
+* Create API key on https://www.nuget.org/account/apikeys
+* Publish the package:
++
+[source,bash]
+----
+dotnet nuget push bin/Debug/*.nupkg \
+    -k <API key> \
+    -s https://api.nuget.org/v3/index.json \
+    --force-english-output
+----
+
 == Adding new language
 
 Overall routine for adding new language is described in
