@@ -261,14 +261,7 @@ password: <pass>
 * `dotnet build`
 * `dotnet pack` -> get resulting `.nupkg` file in `bin/Debug/` folder
 * Create API key on https://www.nuget.org/account/apikeys
-* Publish the package:
-+
-[source,bash]
-----
-dotnet nuget push bin/Debug/*.nupkg \
-    -k <API key> \
-    -s https://api.nuget.org/v3/index.json
-----
+* `dotnet nuget push bin/Debug/*.nupkg -k <API key> -s \https://api.nuget.org/v3/index.json`
 
 == Adding new language
 
