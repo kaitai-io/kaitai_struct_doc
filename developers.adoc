@@ -267,8 +267,7 @@ password: <pass>
 ----
 dotnet nuget push bin/Debug/*.nupkg \
     -k <API key> \
-    -s https://api.nuget.org/v3/index.json \
-    --force-english-output
+    -s https://api.nuget.org/v3/index.json
 ----
 
 == Adding new language
