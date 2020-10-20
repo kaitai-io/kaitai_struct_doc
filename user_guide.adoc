@@ -29,7 +29,7 @@ chapter will give an overview of the options available.
 
 === Web IDE
 
-If you're going to try Kaitai Struct for the first time, then probably
+If you're going to try Kaitai Struct for the first time, probably
 the Web IDE is the easiest way to get started. Just open
 https://ide.kaitai.io/[Kaitai Struct Web IDE] and you're
 ready to go:
@@ -191,7 +191,7 @@ appending `be` or `le` — i.e. `f4be`, `f8le`, etc
 string has a concept of encoding, which must be specified using
 `encoding`
 
-The YAML-based syntax might look a little more verbose than C-like struct,
+The YAML-based syntax might look a little more verbose than C-like structs,
 but there are a few good reasons to use it. It is consistent, it is
 easily extendable, and it's easy to parse, so it's easy to make your own
 programs/scripts that work with .ksy specs.
@@ -245,7 +245,7 @@ against such blunders.
 
 To specify "magic" bytes (i.e. fixed content) in structures, KS includes
 a special `contents` key. For example, this is the beginning of a `seq`
-for Java .class file:
+for Java .class files:
 
 [source,yaml]
 ----
@@ -262,15 +262,14 @@ is done.
 
 Note that `contents` is very flexible and you can specify:
 
-* An UTF-8 string — bytes from such a string would be used to check
-against
+* A UTF-8 string — bytes from such a string would be checked against
 * An array with:
 ** bytes in decimal representation
 ** bytes in hexadecimal representation, starting with 0x
 ** UTF-8 strings
 
-In case of using an array, all elements' byte representations would be
-concatenated and expected in sequence. Few examples:
+In the case of using an array, all elements' byte representations would be
+concatenated and expected in sequence. Some examples:
 
 [source,yaml]
 ----
@@ -446,7 +445,7 @@ After the first `strcpy` operation, the buffer will look like:
 50 72 69 6e|63 65 73 73|00 ?? ?? ??|?? ?? ?? ??| |Princess.???????|
 ....
 
-And after the second `strcpy`, the the following will remain in the
+And after the second `strcpy`, the following will remain in the
 memory:
 
 ....
@@ -581,13 +580,13 @@ types:
         type: u4
 ----
 
-If `body_len` attribute was in the same type as `body`, we could just
+If the `body_len` attribute was in the same type as `body`, we could just
 use `size: body_len`. However, in this case we've decided to split the
-main header into separate subtype, so we'll have to access it using the `.`
+main header into a separate subtype, so we'll have to access it using the `.`
 operator — i.e. `size: header.body_len`.
 
 One can chain attributes with `.` to dig deeper into type
-hierarchy — i.e. `size: header.subheader_1.subsubheader_1_2.field_4`.
+hierarchy — e.g. `size: header.subheader_1.subsubheader_1_2.field_4`.
 But sometimes we need just the opposite: how do we access upper-level
 elements from lower-level types? KS provides two options here:
 
@@ -606,7 +605,7 @@ TODO
 In some cases, it would be way too impractical to write tons of
 `_parent._parent._parent._parent...` or just plain impossible (if you're
 describing a type which might be used on several different levels, thus
-different number of `_parent` would be needed). In this case, we can use
+different number of `_parent` would be needed). In this case, we can use a
 special pseudo-attribute `_root` to just start navigating from the very
 top-level type:
 
@@ -632,7 +631,7 @@ types:
 
 Some protocols and file formats have optional fields, which only exist
 in some conditions. For example, one can have some byte first that
-designates if some field exists (1) or not (0). In KS, you can do that
+designates if some other field exists (1) or not (0). In KS, you can do that
 using the `if` key:
 
 [source,yaml]
@@ -709,7 +708,9 @@ This yields an array of unsigned integers, each 4 bytes long, which
 spans till the end of the stream. Note that if we've got a number of bytes left in the
 stream that's not divisible by 4 (for example, 7), we'll end up reading
 as much as possible, and the parsing procedure will throw an
-end-of-stream exception. Of course, you can do that with any type,
+end-of-stream exception.
+
+Of course, you can do this with any type,
 including user-defined types (subtypes):
 
 [source,yaml]
@@ -784,8 +785,8 @@ seq:
 This one specifies the `width` and `height` of the matrix first, then parses
 as many `matrix` elements as needed to fill a `width` × `height` matrix
 (although note that it won't be a true 2D matrix: it would still be just
-a regular 1D array, and you'll need to convert (x, y) coordinate to
-address in that 1D array manually).
+a regular 1D array, and you'll need to convert (x, y) coordinates to
+addresses in that 1D array manually).
 
 ==== Repeat until condition is met
 
@@ -832,7 +833,7 @@ types:
 === Typical TLV implementation (switching types on an expression)
 
 "TLV" stands for "type-length-value", and it's a very common staple in
-many formats. The basic idea is that we do a modular and
+many formats. The basic idea is that we use a modular and
 reverse-compatible format. On the top level, it's very simple: we know
 that the whole format is just an array of records (`repeat: eos` or
 `repeat: expr`). Each record starts the same: there is some marker that
@@ -1417,8 +1418,8 @@ types:
 ====
 _Big-endian_ and _little-endian_ bit integers can follow *only on a byte
 boundary*. They can't share the same byte. Joining them on an
-unaligned bit position is _undefined behavior_, and KSC will be throwing
-a compile-time error in the future if it detects such situation.
+unaligned bit position is _undefined behavior_, and future versions of KSC will throw
+a compile-time error if it detects such a situation.
 
 For example, this is *illegal*:
 
@@ -1435,7 +1436,7 @@ seq:
 [[ksy-documentation]]
 === Documenting your spec
 
-We've introduced the `doc` key <<docstrings,early in this user guide>> as
+We introduced the `doc` key <<docstrings,early in this user guide>> as
 a simple way to add docstrings to the attributes. However, it's not
 only attributes that can be documented. The same `doc` key can be used
 in several different contexts:
@@ -1726,7 +1727,7 @@ authors to provide good cross references of their formats:
 
 == Streams and substreams
 
-Imagine that we're dealing with structures of known size. For sake of
+Imagine that we're dealing with a structure of known size. For the sake of
 simplicity, let's say that it's fixed to exactly 20 bytes (but all the
 following is also true if the size is defined by some arbitrarily
 complex expression):
@@ -1762,8 +1763,8 @@ seq:
     size: 20
 ----
 
-Note the subtle difference: we've skipped the `size` in first example
-and added it in the second one. From end-user's perspective, nothing
+Note the subtle difference: we've skipped the `size` in the first example
+and added it in the second one. From the end-user's perspective, nothing
 has changed. You can still access Joe's code and name equally well in
 both cases:
 
@@ -1774,7 +1775,7 @@ r.joe().name() // works
 ----
 
 However, what gets changed under the hood? It turns out that
-specifying `size` actually brings some new features: if you modify
+specifying `size` actually brings some new features: if you modify the
 `person` type to be less than 20 bytes long, it still reserves exactly
 20 bytes for `joe`:
 
@@ -1796,8 +1797,8 @@ types:
         size: 10
 ----
 
-In this example, extra 6 bytes would be just skipped. Alternatively,
-if you'll somehow make `person` to be more than 20 bytes long, it will
+In this example, the extra 6 bytes would just be skipped. Alternatively,
+if you make `person` to be more than 20 bytes long, it will
 trigger an end-of-stream exception:
 
 [source,yaml]
@@ -1818,7 +1819,9 @@ types:
         size: 96
 ----
 
-How does it work? Let's take a look under the hood. Sizeless user type
+How does it work? Let's take a look under the hood.
+
+Sizeless user type
 invocation generates the following parsing code:
 
 [source,java]
@@ -1836,24 +1839,24 @@ KaitaiStream _io__raw_joe = new KaitaiStream(_raw_joe);
 this.joe = new Person(_io__raw_joe, this, _root);
 ----
 
-Every class that KS generates carries a concept of "stream", usually
-available as `_io` member. This is the default stream it reads from
+Every class that KS generates carries a concept of a "stream", usually
+available as an `_io` member. This is the default stream it reads from
 and writes to. This stream works just as you might expect from a
-regular IO stream implementation in you average language: it
-encapsulates reading from files and memory, stores pointer to its
+regular IO stream implementation in a typical language: it
+encapsulates reading from files and memory, stores a pointer to its
 current position, and allows reading/writing of various primitives.
 
-Declaring new user-defined type in the middle of `seq` attributes
-generates new object (usually via constructor call), and this object,
+Declaring a new user-defined type in the middle of the `seq` attributes
+generates a new object (usually via a constructor call), and this object,
 in turn, needs its own IO stream. So, what are our options here?
 
-* In "sizeless" case, we just pass current `_io` along to the new
+* In the "sizeless" case, we just pass the current `_io` along to the new
   object. This "reuses" the existing stream with all its properties:
   current pointer position, size, available bytes, etc.
-* In "sized" case, we know the size a priori and want the object we
+* In the "sized" case, we know the size a priori and want the object we
   created to be limited within that size. So, instead of passing an
-  existing stream, instead we create a new substream that will be
-  shorter and will contain exact number of bytes requested.
+  existing stream, we create a new substream that will be
+  shorter and will contain the exact number of bytes requested.
 
 Implementations vary from language to language, but, for example, in
 Java, the following is done:
@@ -1862,20 +1865,20 @@ Java, the following is done:
 ----
 // First, we read as many bytes as needed from our current IO stream.
 // Note that if we don't even have 20 bytes right now, this will throw
-// an EOS exception on this line, and user type won't even be invoked.
+// an EOS exception on this line, and the user type won't even be invoked.
 this._raw_joe = this._io.readBytes(20);
 
 // Second, we wrap our bytes into a new stream, a substream
 KaitaiStream _io__raw_joe = new KaitaiStream(_raw_joe);
 
-// Finally, we pass our substream to Person class instead of
+// Finally, we pass our substream to the Person class instead of
 this.joe = new Person(_io__raw_joe, this, _root);
 ----
 
-After that, parsing of `person` type will be totally bound to limits
-of that particular substream. Anything in Person class whatsoever
-can't do a thing to original stream — it just doesn't have access to
-that object, period.
+After that, parsing of a `person` type will be totally bound to the limits
+of that particular substream. Nothing in the Person class
+can do a thing to the original stream — it just doesn't have access to
+that object.
 
 Let's check out a few use cases that demonstrate how powerful this
 practice can be.
@@ -1884,9 +1887,9 @@ practice can be.
 
 Quite often binary formats use the following technique:
 
-* First comes some integer that declares total size of the structure
-  (or structure's body, i.e. everything minus this length header).
-* Then comes structure's body, which is expected to have exactly
+* First comes some integer that declares the total size of the structure
+  (or the structure's body, i.e. everything minus this header).
+* Then comes the structure's body, which is expected to have exactly the
   declared number of bytes.
 
 Consider this example:
@@ -1927,8 +1930,8 @@ Thus:
 ----
 
 But this is very inconvenient and potentially error prone. What will
-happen if at some time in future the record contents will be updated
-and we'll forget to update this formula?
+happen if at some time in future the record contents are updated
+and we forget to update this formula?
 
 It turns out that substreams offer a much cleaner solution here. Let's
 separate our "header" and "body" into two distinct user types, and
@@ -1957,15 +1960,15 @@ types:
         size-eos: true
 ----
 
-For `comment`, we just made it to have size up until the end of
+For `comment`, we just made its size to be up until the end of
 stream. Given that we've limited it to the substream in the first
-place, this means exactly what we wanted.
+place, this is exactly what we wanted.
 
 [[repeat-until-size-limit]]
 === Repeating until total size reaches limit
 
 The same technique might be useful for repetitions as well. If you
-have an array of same-type entries, and a format declares total size
+have an array of same-type entries, and a format declares the total size
 of all entries combined, again, you can try to do this:
 
 [source,yaml]
@@ -1983,8 +1986,8 @@ And do some derivations to calculate number of entries,
 i.e. "total_len / sizeof(entry)". But, again, this is bad because:
 
 * You need to keep remembering to update this "sizeof" value when
-  entry size updates.
-* If entry size if not fixed, then you're totally out of luck here.
+  the entry size updates.
+* If the entry size if not fixed, you're totally out of luck here.
 
 Solving it using substreams is much more elegant. You just create a
 substream limited to `total_len` bytes, and then use `repeat: eos` to
@@ -2016,8 +2019,6 @@ seq:
 
 For more information, see <<keys-repeated>>.
 
-=====
-
 The proper solution is to add an extra layer of types:
 
 [source,yaml]
@@ -2040,12 +2041,13 @@ types:
     # ...
     # Now, this can even be of variable size: that's totally ok.
 ----
+=====
 
 === Relative positioning
 
-Another useful feature that's possible with substreams is the fact
-while you're in a substream, `pos` key works in context of that
-substream as well. That means it addresses data relatively to that
+Another useful feature that's possible with substreams is the fact that
+while you're in a substream, the `pos` key works in the context of that
+substream as well. That means it addresses data relative to the start of that
 substream:
 
 [source,yaml]
@@ -2072,41 +2074,18 @@ In this example, `body` allocates a substream spanning from 20th byte
 
 * `foo` would be parsed right from the beginning of that substream,
   thus taking up bytes `[20..24)`
-* `some_bytes_in_the_middle` would start parsing 16 bytes from 30th
-  byte *of a substream*, thus parsing bytes `[20 + 30 .. 20 + 46)` =
+* `some_bytes_in_the_middle` would start parsing 16 bytes from the 30th
+  byte *of that substream*, thus parsing bytes `[20 + 30 .. 20 + 46)` =
   `[50..66)` in the main stream.
 
 This comes super handy if your format's internal structures somehow
 specify offsets relative to some other structures of the format. For
-example, a typical filesystem/database often uses concept of blocks
-and offsets address stuff inside the current block. Note how KSY with
+example, a typical filesystem/database often uses a concept of blocks, 
+and offsets that address stuff inside the current block. Note how KSY with
 substreams is easier to read, more concise and less error-prone:
 
 [cols="a,a", frame=none]
 |====
-|
-.Good (w/substream)
-[source,yaml]
-----
-seq:
-  - id: len_block
-    type: u4
-instances:
-  some_block:
-    pos: 12345 * len_block
-    size: len_block
-    type: data_block
-types:
-  data_block:
-    seq:
-      - id: ofs_data
-        type: u2
-    instances:
-      data:
-        pos: ofs_data
-        # relative to data_block
-        size: 40
-----
 |
 .Bad (w/o substream)
 [source,yaml]
@@ -2130,17 +2109,40 @@ types:
         # have to calculate position manually
         size: 40
 ----
+|
+.Good (w/substream)
+[source,yaml]
+----
+seq:
+  - id: len_block
+    type: u4
+instances:
+  some_block:
+    pos: 12345 * len_block
+    size: len_block
+    type: data_block
+types:
+  data_block:
+    seq:
+      - id: ofs_data
+        type: u2
+    instances:
+      data:
+        pos: ofs_data
+        # relative to data_block
+        size: 40
+----
 |====
 
-The more levels of structure offset nesting there, the more
-complicated these `pos` expression would get without substreams.
+The more levels of structure offset nesting there are, the more
+complicated these `pos` expressions would get without substreams.
 
 === Absolute positioning
 
-If you'd ever need to "escape" the limitations of a substream when
-using a `pos` key of a parse instance and address something absolutely
-(i.e. in the main stream), it's easy to do so by adding `io` key to
-choose root's stream:
+If you ever need to "escape" the limitations of a substream by
+wishing to use a `pos` key of a parse instance to address something absolutely
+(i.e. in the main stream), it's easy to do so by adding an `io` key to
+choose the root's stream:
 
 [source,yaml]
 ----
@@ -2170,17 +2172,17 @@ types:
 That's the typical situation encountered in many file container
 formats. Here we have a list of `files`, and each of its entries has
 been limited to exactly 80 bytes. Inside each 80-byte chunk, there's a
-`file_name`, and, more importantly, pointer to absolute location of
-the file's body inside the file. `body` instance allows us to get that
+`file_name`, and, more importantly, a pointer to the absolute location of
+the file's body inside the stream. The `body` instance allows us to get that
 file's body contents quickly and easily. Note that if there was no
 `io: _root._io` key there, that `body` would have been parsed inside a
 80-byte substream (and most likely that would result in an exception
-trying to read outside of 80 byte limit), and that's not what we want
+trying to read outside of the 80 byte limit), and that's not what we want
 here.
 
 === Choosing a substream
 
-Of course, the technique above is not limited to just the root
+The technique above is not limited to just the root
 object's stream. You can address any other object's stream as well,
 for example:
 
@@ -2219,17 +2221,17 @@ types:
 === Processing: dealing with compressed, obfuscated and encrypted data
 
 Some formats obscure the data fully or partially with techniques like
-compression, obfuscation or encryption. In this cases, incoming data
-should be pre-processed before actual parsing would take place, or we'll
-just end up with the garbage getting parsed. All such pre-processing
-algorithms has one thing in common: they're done by some function that
-takes a stream of bytes and return the stream of bytes (note that number
-of incoming and resulting bytes might be different, especially in case
+compression, obfuscation or encryption. In theses cases, incoming data
+should be pre-processed before actual parsing takess place, or we'll
+just end up with garbage getting parsed. All such pre-processing
+algorithms have one thing in common: they're done by some function that
+takes a stream of bytes and returns another stream of bytes (note that the number
+of incoming and resulting bytes might be different, especially in the case
 of decompression). While it might be possible to do such transformation
-in declarative manner, it is usually impractical to do so.
+in a declarative manner, it is usually impractical to do so.
 
-KS allows to plug-in some predefined "processing" algorithms that allow
-to do mentioned decompression, de-obfuscation and decryption to get a
+KS allows you to plug-in some predefined "processing" algorithms
+to do decompression, de-obfuscation and decryption to get a
 clear stream, ready to be parsed. Consider parsing a file, in which the
 main body is obfuscated by applying XOR with 0xaa for every byte:
 
@@ -2249,13 +2251,13 @@ Note that:
 * Applying `process: ...` is available only to raw byte arrays or user
 types.
 * One might use expression language inside `xor(...)`, thus referencing
-XOR obfuscation key read in the same format into some other field
-previously
+the XOR obfuscation key read into some other field
+previously.
 
 == Expression language
 
 Expression language is a powerful internal tool inside Kaitai
-Struct. In a nutshell, it is a simple object-oriented, statically-type
+Struct. In a nutshell, it is a simple object-oriented, statically-typed
 language that gets translated/compiled (AKA "transpiled") into any
 supported target programming language.
 
@@ -2306,20 +2308,20 @@ Expression language operates on the following primitive data types:
 or instance attributes (i.e. `u1`, `u4le`, `s8`, `b3`, etc), or can be
 specified literally. One can use:
 
-* normal decimal form (i.e. `123`)
-* hexadecimal form using `0x` prefix (i.e. `0xcafe` — both upper case and lower case letters are legal, i.e. `0XcAfE` or `0xCAfe` will do as well)
-* binary form using `0b` prefix (i.e. `0b00111011`)
-* octal form using `0o` prefix (i.e. `0o755`)
+* decimal form (e.g. `123`)
+* hexadecimal form using `0x` prefix (e.g. `0xcafe` — both upper case and lower case letters are legal, i.e. `0XcAfE` or `0xCAfe` will do as well)
+* binary form using `0b` prefix (e.g. `0b00111011`)
+* octal form using `0o` prefix (e.g. `0o755`)
 
-It's possible to use `_` as a visual separator in literals — it would
-be completely ignored by parser. This could be useful, for example,
+It's possible to use `_` as a visual separator in literals — it will
+be completely ignored by the parser. This could be useful, for example,
 to:
 
 * visually separate thousands in decimal numbers: `123_456_789`
 * show individual bytes/words in hex: `0x1234_5678_abcd`
 * show nibbles/bytes in binary: `0b1101_0111`
 
-*Floating point numbers* also follow the normal notation used in vast
+*Floating point numbers* also follow the normal notation used in the vast
 majority of languages: `123.456` will work, as well as exponential
 notation: `123.456e-55`. Use `123.0` to enforce floating point type to
 an otherwise integer literal.
@@ -2332,17 +2334,17 @@ parse flag bitfields, as you can omit `flag_foo != 0` syntax and just
 use something more concise, such as `is_foo`.
 
 *Byte arrays* are defined in the attribute syntax when you don't
-specify anything as `type`. Size of byte array is thus determined
-using `size`, `size-eos` or `terminator`, one which is mandatory in
+specify anything as `type`. The size of a byte array is thus determined
+using `size`, `size-eos` or `terminator`, one of which is mandatory in
 this case. Byte array literals use typical array syntax like the one
 used in Python, Ruby and JavaScript: i.e. `[1, 2, 3]`. There is a
 little catch here: the same syntax is used for "true" arrays of
-objects (see below), so if you'll try to do stuff like `[1, 1000, 5]`
+objects (see below), so if you try to do stuff like `[1, 1000, 5]`
 (`1000` obviously won't fit in a byte), you won't get a byte array,
-you'll get array of integers instead.
+you'll get an array of integers instead.
 
 *Strings* normally come from using `type: str` (or `type: strz`, which
-is actually a shortcut that also implicitly adds `terminator: 0`).
+is the shortcut that implicitly adds `terminator: 0`).
 Literal strings can be specified using double quotes or single
 quotes. The meaning of single and double quotes is similar to those of
 Ruby, PHP and Shell script:
@@ -2353,9 +2355,9 @@ Ruby, PHP and Shell script:
   string. Everything between single quotes is interpreted literally,
   i.e. there is no way one can include a single quote inside a single
   quoted string.
-* Double quoted strings support escape sequences and thus allow to
+* Double quoted strings support escape sequences and thus allow you to
   specify any characters. The supported escape sequences are as
-  following:
+  follows:
 
 [cols="1,1,1,3", options="header"]
 |===
@@ -2445,10 +2447,10 @@ escape sequence.
 TODO: Enums
 
 *Streams* are internal objects that track the byte stream that we
-parse and state of parsing (i.e. where's the pointer at). There is no
+parse and the state of parsing (i.e. where the pointer is). There is no
 way to declare a stream-type attribute directly by parsing
-instructions or specify it as a literal. Typical way to get stream
-objects is to query `_io` attribute from a user-defined object: that
+instructions or specify it as a literal. The typical way to get stream
+objects is to query the `_io` attribute from a user-defined object: that
 will give us a stream associated with this particular object.
 
 === Composite data types
@@ -2458,32 +2460,32 @@ There are two composite data types in the expression language
 
 ==== User-defined types
 
-Basically, that's the types one defines using `.ksy` syntax -
-i.e. top-level structure and all substructures defined in `types` key.
+User-defined types are the types one defines using `.ksy` syntax —
+i.e. the top-level structure and all substructures defined in the `types` key.
 
 Normally, they are translated into classes (or their closest available
-equivalent — i.e. storage structure with members + access members) in
+equivalent — i.e. a storage structure with members + access members) in the
 target language.
 
 ==== Arrays
 
-Array types are just what one might expect from all-purpose, generic
+Array types are just what one might expect from an all-purpose, generic
 array type. Arrays come from either using the repetition syntax
-(`repeat: ...`) in attribute specification, or by specifying a literal
-array. In any case, all KS arrays have underlying data type that they
+(`repeat: ...`) in an attribute specification, or by specifying a literal
+array. In any case, all KS arrays have an underlying data type that they
 store, i.e. one can't put strings and integers into the same
 array. One can do arrays based on any primitive data type or composite
 data type.
 
 NOTE: "True" array types (described in this section) and "byte arrays"
-share the same literal syntax and lots of method API, but they are
+share the same literal syntax and lots of method APIs, but they are
 actually very different types. This is done on purpose, because many
 target languages use very different types for byte arrays and arrays
 of objects for performance reasons.
 
 One can use array literals syntax to declare an array (very similar to
-syntax used in JavaScript, Python and Ruby). Type will be derived
-automatically based on types of values inside brackets, for example:
+the syntax used in JavaScript, Python and Ruby). Type will be derived
+automatically based on the types of values inside brackets, for example:
 
 * `[123, 456, -789]` — array of integers
 * `[123.456, 1.234e+78]` — array of floats
@@ -2500,8 +2502,8 @@ would trigger a compile-time error, for example, this is illegal: `[1,
 === Operators
 
 Literals can be connected using operators to make meaningful
-expressions. Operators are type-dependent: for example, same `+`
-operator applied to two integers would mean arithmetic addition, and
+expressions. Operators are type-dependent: for example, the `+`
+operator applied to two integers would mean arithmetic addition, while the same operator
 applied to two strings would mean string concatenation.
 
 ==== Arithmetic operators
@@ -2515,8 +2517,8 @@ Can be applied to integers and floats:
 * `a % b` — modulo; note that it's not a remainder: `-5 % 3` is `1`,
   not `-2`; the result is undefined for negative `b`.
 
-NOTE: If both operands are integer, result of arithmetic operation is
-integer, otherwise it is floating point number. For example, that
+NOTE: If both operands are integer, the result of an arithmetic operation is
+integer, otherwise it is a floating point number. For example, that
 means that `7 / 2` is `3`, and `7 / 2.0` is `3.5`.
 
 Can be applied to strings:
@@ -2540,7 +2542,7 @@ proper string value comparison):
 
 ==== Bitwise operators
 
-Can be only applied to integers.
+Can only be applied to integers.
 
 * `a << b` — left bitwise shift
 * `a >> b` — right bitwise shift
@@ -2580,21 +2582,21 @@ variable, it's generally a bad idea to do something like `foo ? 123 :
 
 It is acceptable to mix:
 
-* integer of various origins and sizes — it would result in universal
+* integers of various origins and sizes — it would result in a universal
   "one size fits all" integer for a target language
-* integers and floats — it would result in "one size fits all"
+* integers and floats — it would result in a "one size fits all"
   floating point type
-* strings of various origin and encodings
-* booleans of various origin
+* strings of various origins and encodings
+* booleans of various origins
 * objects of different user-defined types — it would result in a
   generic KaitaiStruct object
 ====
 
 [CAUTION]
 ====
-Using ternary operator inside a KSY file (which must remain a valid YAML
+Using the ternary operator inside a KSY file (which must remain a valid YAML
 file) might be tricky, as some YAML parsers do not allow colons (`:`)
-inside strings literals. So, trying something like that would fail in
+inside strings literals. So, trying something like this would fail in
 some parsers (namely, it *will* fail using "desktop"
 kaitai-struct-compiler running under JVM):
 
@@ -2622,14 +2624,14 @@ literals), and it's possible to call methods on it. The common syntax
 to use is `obj.method(param1, param2, ...)`, which can be abbreviated
 to `obj.method` if no parameters are required.
 
-Note that then `obj` in question is a user-defined type, you can
+Note that when the `obj` in question is a user-defined type, you can
 access all its attributes (both sequence and instances) using the same
-`obj.attr_name` syntax. Obviously, one can chain that to traverse a
+`obj.attr_name` syntax. One can chain that to traverse a
 chain of substructures: `obj.foo.bar.baz` (given that `obj` is a
-user-defined type that has `foo` field, which points to user-defined
-type that has `bar` field, and so on).
+user-defined type that has a `foo` field, which points to a user-defined
+type that has a `bar` field, and so on).
 
-There are a few pre-defined methods that form kind of a "standard
+There are a few pre-defined methods that form a kind of "standard
 library" for expression language.
 
 ==== Integers
@@ -2642,7 +2644,7 @@ library" for expression language.
 
 |`to_s`
 |String
-|Converts integer into a string using decimal representation
+|Converts an integer into a string using decimal representation
 |===
 
 ==== Floating point numbers
@@ -2697,11 +2699,11 @@ library" for expression language.
 
 |`to_i`
 |Integer
-|Converts string in decimal representation to an integer
+|Converts a string in decimal representation to an integer
 
 |`to_i(radix)`
 |Integer
-|Converts string with number stored in `radix` representation (i.e. use `16` to get hexadecimal representation, use `8` to get octal, etc) to an integer
+|Converts a string with a number stored in `radix` representation (i.e. use `16` to get hexadecimal representation, use `8` to get octal, etc) to an integer
 |===
 
 ==== Enums
@@ -2714,7 +2716,7 @@ library" for expression language.
 
 |`to_i`
 |Integer
-|Converts enum into corresponding integer representation
+|Converts an enum into a corresponding integer representation
 |===
 
 ==== Booleans
@@ -2735,7 +2737,7 @@ library" for expression language.
 All user-defined types can be queried to get attributes (sequence
 attributes or instances) by their name. In addition to that, there are
 a few pre-defined internal methods (they all start with an underscore
-`_`, so they can't clash with regular attribute names):
+`_`, so they don't clash with regular attribute names):
 
 [cols="3*", options="header"]
 |===
@@ -2813,14 +2815,13 @@ a few pre-defined internal methods (they all start with an underscore
 
 ==== Switching over strings
 
-One can use type switching technique over any other comparable values
-beside integers. For example, one can switch over a string value. Note
-that left side (key) of `cases` map is a full-featured KS expression,
+One can use type switching over other comparable values, not just integers. For example, one can switch over a string value. Note
+that the left side (key) of a `cases` map is a full-featured KS expression,
 thus all we need is to specify a string. Don't forget that there's
 still YAML syntax that might get in a way, so we effectively need to
 quote strings twice: once for KS expression language, and once in the
 YAML representation to save these quotes from being interpreted by
-YAML parser, i.e.:
+a YAML parser, i.e.:
 
 [source,yaml]
 ----
@@ -2836,13 +2837,13 @@ seq:
         '"GUACAMOLE"': rec_type_3
 ----
 
-If target language allows switching over strings, it will be rendered
-as `switch`-style statement, or, if it does not, ksc will fall back to
+If the target language allows switching over strings, it will be rendered
+as a `switch`-style statement, or, if it does not, ksc will fall back to an
 `if`-based rendition.
 
 ==== Switching over enums
 
-One can use enums as well. To match against enum values, you would
+One can switch over enums as well. To match against enum values, you would
 have to specify enum literals (i.e. `enum_name::some_value`). Since
 there are colons in them, we'll have to use YAML quotes again:
 
@@ -2863,11 +2864,11 @@ seq:
 
 ==== FourCC
 
-Quite a few formats (like TIFF, RIFF, AVI, etc) use a thing called
+Quite a few formats (like TIFF, RIFF, AVI, etc) use a
 "FourCC" to switch over in a typical TLV implementation. "FourCC"
 (which stands for "four character code") is essentially a 4-byte
 value, which is often made human-readable to aid debugging. It's
-usually tempting to use a fixed-size string and match it against a
+usually tempting to read a fixed-size string from the stream and match it against a
 list of strings:
 
 [source,yaml]
@@ -2901,7 +2902,7 @@ However, this is generally a bad idea:
   values are ASCII-safe, there's no guarantee that there would be no
   weird values like `C6 A2 ED 39` in future.
 
-The recommended way to handle FourCC-style types is using an enum:
+The recommended way to handle FourCC-style types is by using an enum:
 
 [source,yaml]
 ----
@@ -2926,16 +2927,16 @@ enums:
     0x38454C52: rle8
 ----
 
-This runs as fast as it was originally intended, and it provides extra
-benefits of allowing more verbose FourCC value descriptions.
+This runs as fast as it was originally intended, and it provides an extra
+benefit of allowing more verbose FourCC value descriptions.
 
 [[do-nothing]]
 === Do nothing
 
 In some rare cases, you need a type that actually does absolutely
-nothing. For example, you purposely want to ignore parsing certain
-switch case and avoid running it through default type, i.e. situation
-like that:
+nothing. For example, you purposely want to ignore parsing a certain
+switch case and avoid running it through the default type, e.g. a situation
+like this:
 
 [source,yaml]
 ----
@@ -2952,7 +2953,7 @@ seq:
         _: rec_type_others
 ----
 
-This is very easy to achieve, here are a few examples of type
+This is very easy to achieve. Here are a few examples of type
 definitions which do nothing when invoked:
 
 [source,yaml]
@@ -2961,7 +2962,7 @@ types:
   # One can use empty JSON object syntax to avoid specifying any of
   # `seq`, `instances`, etc, sections.
   dummy_1: {}
-  # One can use explicit doc to note that it's nothing there.
+  # One can use explicit doc to note that there's nothing there.
   dummy_2:
     doc: This type is intentionally left blank.
   # One can use empty `seq` or `instances` or `types` section, any
@@ -2970,7 +2971,7 @@ types:
     seq: []
     instances: {}
     types: {}
-  # Very explicit notion of the fact that we want to parse 0 bytes.
+  # One can use a very explicit notion of the fact that we want to parse 0 bytes.
   dummy_4:
     seq:
       - id: no_value
@@ -3021,9 +3022,9 @@ str2 = "bar"
 
 |====
 
-But sometimes you indeed want that dot, and it should be part of
-output. It is actually possible too, if you'll specify `include: true`
-(the default it is false):
+But sometimes you indeed want that dot, and it should be part of the
+output. This is possible, by specifying `include: true`
+(the default is false):
 
 [cols="a,a", frame=none]
 |====
@@ -3053,10 +3054,10 @@ str2 = "bar."
 
 |====
 
-Or sometimes your terminator is actually part of following structure,
-and you don't want it to be consumed — you want you next structure to
-start with that terminator byte. It's possible to do so too with
-`consume: false` (which true by default):
+Or sometimes your terminator is actually part of a following structure,
+and you don't want it to be consumed — you want the next structure to
+start with that terminator byte. This is possible with
+`consume: false` (which is true by default):
 
 [cols="a,a", frame=none]
 |====
@@ -3088,19 +3089,21 @@ the_rest = ".bar."
 [[eos-error]]
 ==== Ignoring errors in delimited structures
 
-Delimited structures actually could be pretty scary: if we read until
-the terminator is encountered, what will happen if we'll never find
-one? In raw C, a typical answer is "segmentation fault" occurring in
-the operation that deals with such string due to runaway reads past
+Delimited structures actually can be pretty scary: if we read until
+the terminator is encountered, what will happen if we never find
+one? In raw C, a typical answer is a "segmentation fault" occurring in
+the operation that deals with such strings due to runaway reads past
 the buffer, i.e. a very bad thing and a big security hole.
 
 In Kaitai Struct, however, you can control this behavior. By default,
-if you'll parse a structure awaiting for a terminator, and that
+if you parse a structure awaiting a terminator, and that
 terminator never happens, you'll get a clear error / exception similar
-to "attempted to read past end of stream". However, in some cases, you
-really want to read until the end of stream, and this should be
-considered normal encoding, not an error. For this cases, you can
-specify `eos-error`:
+to "attempted to read past end of stream".
+
+In some cases, you
+really want to read until the end of the stream, and this should be
+considered normal encoding, not an error. For these cases, you can
+specify `eos-error: false` (the default is true):
 
 [source,yaml]
 ----
@@ -3125,7 +3128,7 @@ successfully, without triggering an error:
 
 As your project grows in complexity, you might want to have multiple
 .ksy files: for example, for different file formats, structures,
-substructures, or to reuse same subformat in several places. As most
+substructures, or to reuse the same subformat in several places. As in most
 programming languages, Kaitai Struct allows you to have multiple
 source files and has `imports` functionality for that.
 
@@ -3146,7 +3149,7 @@ seq:
 ----
 
 and you want to use it in a file listing specification
-`filelist.ksy`. Here's how to do that:
+`filelist.ksy`, here's how to do that:
 
 [source,yaml]
 ----
@@ -3179,42 +3182,42 @@ Generally, you just add an array in `meta/imports` and list all you
 want to import there. There are 2 ways to address the files:
 
 Relative::
-  Uses path given as relative path to the file, starting with the same
-  directory as main .ksy file resides. It's useful to include files in
+  Uses a path given as a relative path to the file, starting with the same
+  directory in which the main .ksy file resides. This is useful to include files in
   the same directory or to navigate to somewhere in your
   project. Examples include: `foo`, `foo/bar`, `../foo/bar/baz`, etc.
 Absolute::
   Looks like `/foo` or `/foo/bar` (i.e. starting with a slash), and
   searches for the given .ksy file in module search path(s). This is
-  usually used to modules from centralized repositories / ksy
+  usually used for modules from centralized repositories / ksy
   libraries. Module search paths are determined by (in order of
   decreasing priority):
 
-  * Paths given using command-line `-I` switch.
-  * Paths given using `KSPATH` environment variable (multiple paths
+  * Paths given using the command-line `-I` switch.
+  * Paths given using a `KSPATH` environment variable (multiple paths
     can be specified separated with `:` on Linux/OS X and with `;` on
     Windows)
-  * Default Platform-dependent search paths, determined in compiler
+  * Default platform-dependent search paths, determined at compiler
     build time and/or during installation
 
-  In Web IDE you obviously don't have environment and command-line
-  switches, so absolute path imports are used to reference modules in
+NOTE: In the Web IDE you obviously don't have environment variables and command-line
+  switches, so absolute path imports are used to reference modules in the
   preloaded "kaitai.io" library.
 
 CAUTION: Please use only forward slashes `/` in import paths for
-consistency. Kaitai Struct will convert them automatically to proper
+consistency. Kaitai Struct will convert them automatically to the proper
 platform-dependent path separator (`/` or `\`).
 
 [[opaque-types]]
 === Opaque types: plugging in external code
 
-Sometimes you'd want KS-generated code to call a code in your
+Sometimes you want KS-generated code to call code in your
 application to do the parsing, for example, to parse some text- or
 state-based format. For that, you can instruct ksc to generate code
 with so-called "opaque" types.
 
-Normally, if a compiler encounters a type which is not declared either
-in current file or in one of the imported files, for example:
+Normally, if the compiler encounters a type which is not declared either
+in the current file or in one of the imported files, for example:
 
 [source,yaml]
 ----
@@ -3229,13 +3232,13 @@ seq:
 
  /seq/0: unable to find type 'custom_encrypted_object', searching from doc_container
 
-If we want to provide our own implementation of
+If we want to provide our own implementation of a
 `custom_encrypted_object` type, first we need to compile our .ksy file
-with `--opaque-types=true` option. This will avoid the error, and
+with the `--opaque-types=true` option. This will avoid the error, and the
 compiler will consider all unknown types to be "opaque", i.e. it will treat
 them as existing in some external space.
 
-Alternatively, instead of specifying command line argument
+Alternatively, instead of specifying the command line argument
 `--opaque-types=true` to the compiler, as of Kaitai Struct version 0.7,
 it is now possible to specify `meta` field `ks-opaque-types` as follows:
 
@@ -3249,7 +3252,7 @@ seq:
     type: custom_encrypted_object
 ----
 
-NOTE: Of course, compiler don't know anything about opaque types, so
+NOTE: Of course, the compiler doesn't know anything about opaque types, so
 trying to access any attributes of it (i.e. using expression language)
 will fail.
 
@@ -3266,9 +3269,9 @@ public class DocContainer extends KaitaiStruct {
 ----
 
 As you see, `CustomEncryptedObject` is instantiated here with a single
-argument: IO stream. All that's left is to create a class with a
-compatible constructor that will allow a call with single
-argument. For statically typed languages, note that constructor's
+argument: an IO stream. All that's left is to create a class with a
+compatible constructor that will allow a call with a single
+argument. For statically typed languages, note that the constructor's
 argument is of type KaitaiStream.
 
 An example of what can be done (in Java):
@@ -3297,7 +3300,7 @@ public class CustomEncryptedObject {
 
 TIP: Alternatively, opaque types can be (ab)used to connect several
 KS-generated types together without importing. If one type
-instantiates other, but does not use it in any other way (i.e. doesn't
+instantiates another, but does not use it in any other way (i.e. doesn't
 access its inner attributes using expression language), one can just
 compile two .ksy files separately, throw them into the same project
 and they shall use each other without a problem.
@@ -3307,19 +3310,19 @@ and they shall use each other without a problem.
 
 IMPORTANT: Feature available since v0.8.
 
-As discussed in <<process>>, Kaitai Struct utilizes `process` key to
+As discussed in <<process>>, Kaitai Struct utilizes the `process` key to
 invoke processing of the data for the purposes of "bytes in - bytes
-out" transformation. It is meant to be used to implement compression &
+out" transformations. It is meant to be used to implement compression &
 decompression, encryption & decryption, obfuscation & de-obfuscation,
-that kind of transformations.
+those kind of transformations.
 
-Kaitai Struct runtime libraries come bundled with "standard" set of
-such transformations, but quite often one would encounter the need to
+Kaitai Struct runtime libraries come bundled with a "standard" set of
+such transformations, but quite often one encounters the need to
 implement some custom data transformation algorithm. There are many
-thousands of encryption and compression algorithms. It's unpractical
+thousands of encryption and compression algorithms. It's impractical
 to both try to implement them in declarative form using standard
-Kaitai Struct types (because as end-user, you're most likely
-interested in decoded result, not internal structures of the
+Kaitai Struct types (because as an end-user, you're most likely
+interested in the decoded result, not internal structures of the
 algorithm/cipher), and it's next to impossible to bundle all the data
 processing algorithms in the world into Kaitai Struct runtime (not
 only it would become *very* bloated, but also quite a few such
@@ -3328,8 +3331,8 @@ restrictions).
 
 To alleviate this problem, Kaitai Struct allows one to invoke custom
 processing algorithms, implemented in imperative code in target
-languages. This acts very similar to <<opaque-types,opaque external
-types>>, but this one works for `process` invocations, not for `type`
+languages. This works very similar to <<opaque-types,opaque external
+types>>, but for `process` invocations, not for `type`
 invocations.
 
 Calling a custom process type is easy:
@@ -3345,7 +3348,7 @@ seq:
 ----
 
 This would generate something like this (example is for Java, other
-target languages use similar technique):
+target languages a use similar technique):
 
 [source,java]
 ----
@@ -3361,8 +3364,8 @@ MyCustomProcessor _process__raw_buf = new MyCustomProcessor(key());
 this.buf = _process__raw_buf.decode(this._raw_buf);
 ----
 
-Typical implementation of a custom processor would look like that
-(again, example for in Java, refer to language-specific notes for
+A typical implementation of a custom processor would look like this
+(again, example in Java; refer to language-specific notes for
 documentation on other languages):
 
 [source,java]
@@ -3389,7 +3392,7 @@ public class MyCustomProcessor implements CustomDecoder {
 }
 ----
 
-This example is mostly self-explanatory. Strong typed languages, such
+This example is mostly self-explanatory. Strongly typed languages, such
 as Java, usually provide some sort of interface that such a custom
 processor class should implement. For Java, it's named
 `CustomDecoder`. And, as outlined there, we implement:
@@ -3400,13 +3403,13 @@ processor class should implement. For Java, it's named
   this particular example, it just adds whatever we supplied as "key"
   to every byte
 
-NOTE: `decode` can return different number of bytes that it gets
-(which is perfectly normal, for example, for decompression).
+NOTE: `decode` can return a different number of bytes that it gets
+(which is perfectly normal, for example, with decompression).
 
 By default, specifying a plain name invokes a custom processing class
 in the same namespace/package where the code is generated. If you want
-to keep your generated code in separate namespace/package than your
-custom hand-made code, you can specify it like that:
+to keep your generated code in a separate namespace/package than your
+custom hand-made code, you can specify it like this:
 
 [source,yaml]
 ----
@@ -3416,16 +3419,16 @@ seq:
     process: com.example.my_rle(5, 3)
 ----
 
-For Java, this would result in invocation of `com.example.MyRle`
-class. Other languages use similar rules of translation, see
+For Java, this would result in an invocation of `com.example.MyRle`
+class. Other languages use similar rules of translation; see
 language-specific notes for details.
 
 A special namespace prefix "kaitai." is reserved for extended
-libraries provided by Kaitai project. As of 0.8, none of them were
+libraries provided by the Kaitai project. As of 0.8, none of these have been
 published, but in future you can expect implementations like
 "kaitai.crypto.aes" or "kaitai.compress.lzma" to be provided by
 libraries implemented in multiple languages that would be released
-along the minimal core Kaitai Struct runtime.
+along with the minimal core Kaitai Struct runtime.
 
 === Enforcing parent type
 
@@ -3459,7 +3462,7 @@ are different types, KS infers that the only thing they have in common
 is that they are objects generated by Kaitai Struct, and thus they
 usually implement KaitaiStruct API, so the best common type that will
 be ok for both parents is `KaitaiStruct`. Here's how it looks in any
-statically-typed language, i.e, in Java:
+statically-typed language, e.g. in Java:
 
 [source,java]
 ----
@@ -3488,7 +3491,7 @@ KaitaiStruct`, this code will compile properly.
 
 ==== Replacing parent
 
-However, in some situations, you might want to replace default `this`
+In some situations, you might want to replace the default `this`
 passed as `_parent` with something else. In some situations this will
 provide you a clean and elegant solution to relatively complex
 problems. Consider the following data structure that loosely
@@ -3519,16 +3522,16 @@ types:
         if: has_right_child != 0
 ----
 
-Everything is pretty simple here. Main `tree` type has `chunk_size`
+Everything is pretty simple here. The main `tree` type has `chunk_size`
 and a `root_node`, which is of `node` type. Each individual `node` of
-this tree carries a chunk of information (of size determined in `tree`
+this tree carries a chunk of information (of a size determined in the `tree`
 type), some flags (`has_left_child` and `has_right_child`) and then
-calls itself again to parse either left or right child nodes for
+calls itself again to parse either left or right child nodes for the
 current node if they exist, according to the flags.
 
 The only problem is how to access `chunk_size` in each node. You can't
-access tree object starting from `_root` here, as there could be many
-different trees in our file, so you need to access current one. Using
+access the tree object starting from `_root` here, as there could be many
+different trees in our file, and you need to access the current one. Using
 `_parent` directly is just impossible. True, given that `node` type is
 used both by `tree` and `node` itself, it got two different parents,
 so Kaitai Struct compiler downgrades node's parent type to
@@ -3567,25 +3570,25 @@ types:
         if: has_right_child != 0
 ----
 
-We've changed only three lines. We've enforced parent of the node in
+We've changed only three lines. We've enforced the parent of the node in the
 `left_child` and `right_child` attributes to be passed as `_parent`,
-not `this`. This, effectively, continues passing reference to original
-node's parent, which is a `tree` type object, over and over the whole
-recursive structure. This way one can access structure's root by just
+not `this`. This, effectively, continues passing a reference to the original
+node's parent, which is a `tree` type object, over and over in the whole
+recursive structure. This way one can access the structure's root by just
 using `_parent`. Naturally, we've done exactly that to get ourselves
 `chunk_size` by just using `size: _parent.chunk_size`.
 
 ==== Omitting parent
 
-In some cases, you'd rather want some object to don't have any parent
-at all. Primary use case for that is to make sure that some
-instantiation it does not affect parent type. In many cases, resorting
+In some cases, you want some object to not have any parent
+at all. The primary use case for this is to make sure that some
+instantiation of it does not affect the parent type. In many cases, resorting
 to this method is a sign that you need to stop and rethink your
 design, but for some formats, it's unavoidable and in fact simplifies
 things a lot.
 
-To omit parent (i.e. pass `null` reference or something similar as a
-parent in one particular case), use `parent: false`.
+To omit parent (i.e. pass a `null` reference or something similar as a
+parent), use `parent: false`.
 
 [NOTE]
 ====
@@ -3593,8 +3596,8 @@ Language design explanation: while it might seem logical to specify
 `parent: null`, there are two catches:
 
 * KSY is a YAML-based language, and YAML treats `parent: null` as
-  literally null value, i.e. totally the same as `parent:`. So, just
-  to allow passing solitary `null` to as a value, you'd need to wrap
+  literally a null value, i.e. totally the same as `parent:`. So, just
+  to allow passing solitary `null` as a value, you'd need to wrap
   it into quotes: `parent: 'null'`. This would be very awkward for
   beginners, as we can't even generate a good error message here, as
   we can't distinguish these two.
@@ -3614,7 +3617,7 @@ IMPORTANT: Feature available since v0.7.
 Kaitai Struct always tries its best to infer all the types
 automatically, but in some cases it would be impossible to do so in
 compile-time. For example, there could be some extra conditions known
-to format developer, but not to Kaitai Struct.
+to the format developer, but not to Kaitai Struct.
 
 Consider this example — a typical image format, implemented as
 <<tlv>>, which includes a variable number of self-describing sections:
@@ -3652,11 +3655,11 @@ types:
 ----
 
 After that, a bitmap follows, and its size is to be derived as `width
-* height`, as described in `sect_header` section. In addition to that,
-we're 100% sure (due to format constraints) that body of `sections[7]`
+* height`, as described in the `sect_header` section. In addition to that,
+we're 100% sure (due to format constraints) that the body of `sections[7]`
 is always `sect_header`. How do we access `width` and `height` in it?
 
-A naïve solution like that won't compile:
+A naïve solution like this won't compile:
 
 [source,yaml]
 ----
@@ -3670,16 +3673,16 @@ reporting the following error:
 /seq/2/size: don't know how to call anything on AnyType
 ....
 
-The reason for that is that from root type perspective, all section
+The reason for that is that from the root type perspective, all section
 bodies are alike, and in a strongly typed language, it's impossible to
 guarantee that `sections[7].body` would be the type we want, and that
 type would have `width` and `height` attributes. Not only that, but
-actually, given that we've specified `size` attribute, a `body` could
+actually, given that we've specified a `size` attribute, a `body` could
 be just a raw byte array, and not even a user type. Thus, KS decided
 that it could be `AnyType` — a type that can include anything.
 
-The best solution would be to enforce our knowledge with explicit
-typecast with `.as<...>` expression operator:
+The best solution would be to enforce our knowledge using an explicit
+typecast with the `.as<...>` expression operator:
 
 [source,yaml]
 ----
@@ -3700,7 +3703,7 @@ instances:
     value: sections[7].body.as<sect_header>
 ----
 
-CAUTION: Of course, if our assumption about `sections[7]` won't come
+CAUTION: Of course, if our assumption about `sections[7]` doesn't come
 true in run time, things will go bad. You can expect most languages to
 throw a typecasting exception on a failed casting attempt, but in very
 low-level languages, such as C++ with RTTI disabled, this would result
@@ -3715,18 +3718,18 @@ IMPORTANT: Feature available since v0.8.
 Most formats (like link://formats.kaitai.io/zip/[zip],
 link://formats.kaitai.io/gif/[gif], and many others) stick to a single
 fixed endianness: they always use either big-endian or little-endian
-integers. Usually it stems from the architecture where the format was
-developed: this way format is relatively easy and quick to parse on
-its "native" architecture, and requires some extra operations (and
+integers. Usually this stems from the architecture where the format was
+developed: the format is relatively easy and quick to parse on
+its "native" architecture, but requires some extra operations (and
 parsing time) on non-native architectures.
 
 Some formats (like link://formats.kaitai.io/elf/[ELF] or
-link://formats.kaitai.io/mach_o/[Mach-O]), however, take alternative
-approach: they come in two versions (with big-endian integers and
-little-endian integers) and they add some sort of header field that
-helps to distinguish between two.
+link://formats.kaitai.io/mach_o/[Mach-O]), however, take an alternative
+approach: they come in two versions, with big-endian integers and
+little-endian integers, and they add some sort of header field that
+helps to distinguish between the two.
 
-To help implementing such formats, Kaitai Struct supports concept of
+To help in implementing such formats, Kaitai Struct supports the concept of
 calculated endianness. Instead of using `endian: be` or `endian: le`,
 one can use a switch, similar to the one introduced in
 <<tlv>>. Consider this example of a TIFF file — it begins with either
@@ -3765,10 +3768,10 @@ endianness would use endianness determined by a switch expression in
 would also be propagated to other subtypes, declared within
 `tiff_body`.
 
-If `indicator` is neither `II` nor `MM`, i.e. both `cases` fail, then
+If `indicator` is neither `II` nor `MM`, i.e. both `cases` fail,
 this example would trigger a parsing exception. If you want to handle
 it in a manner like "II means little-endian and everything else means
-big-endian", then use normal else case (`_`):
+big-endian", use the normal else case (`_`):
 
 [source,yaml]
 ----
@@ -3816,10 +3819,10 @@ types:
 ----
 
 The only difference between `kv_pair_3` and `kv_pair_8` types is the
-length of `key`. "Short" pairs use 3-byte long key, and "long" pairs
-use 8-byte key. That's lots of duplication, and just imagine what
-would happen if you'll need 4-byte keys or 6-byte keys. To alleviate
-that, one can declare so called "parametric" type, like this one:
+length of `key`. "Short" pairs use a 3-byte long key, and "long" pairs
+use an 8-byte key. That's lots of duplication, and just imagine what
+would happen if you need 4-byte keys or 6-byte keys. To alleviate
+that, one can declare a so-called "parametric" type, like this one:
 
 [source,yaml]
 ----
@@ -3839,7 +3842,7 @@ types:
 `params` acts like `seq`, but instead of reading attributes values
 from the stream, these attributes are expected to be passed as
 parameters when one invokes this type. This is done by specifying
-parameter value in brackets after type name:
+parameter value in brackets after the type name:
 
 [source,yaml]
 ----
@@ -3854,7 +3857,7 @@ seq:
     repeat-expr: 0x100
 ----
 
-Of course, there could be more than one parameter (in this case, they
+Of course, there could be more than one parameter (in which case, they
 are to be comma-separated), and one can use a variety of types:
 
 [source,yaml]
@@ -3864,8 +3867,8 @@ seq:
     type: fancy_encrypted_number_format(3, true, [0x03, 0xb7, 0x8f])
 ----
 
-`type` specification in `params` definition is slightly different from
-normal `type` specification in `seq` or `instances`. It specifies pure
+A `type` specification in a `params` definition is slightly different from
+normal `type` specifications in `seq` or `instances`. It specifies a pure
 concept of "type", as would be used to represent data in a programming
 language, without any serialization details (like endianness, sizes,
 conversions, encodings, etc). Thus, one can't use any extra keys to
@@ -3876,11 +3879,11 @@ specify that, but instead one can use:
 * `bool` to specify booleans
 * `struct` to allow arbitrary KaitaiStruct-compatible user types
 * `io` to specify KaitaiStream-compatible IO streams
-* `any` to allow any type (if target language supports that)
+* `any` to allow any type (if the target language supports that)
 
 NOTE: Parametric types with mandatory parameters can't be read from
-file directly (as they obviously need parameter values supplied from
-somewhere), and thus typical `fromFile(...)` helper method is not
+files directly (as they obviously need parameter values supplied from
+somewhere), and thus the typical `fromFile(...)` helper method is not
 available for them.
 
 [[repeat-index]]
@@ -3888,7 +3891,7 @@ available for them.
 
 IMPORTANT: Feature available since v0.8.
 
-For majority of formats, one doesn't need to access loop iteration
+For the majority of formats, one doesn't need to access a loop iteration
 index. If you have a typical archive file directory, which lists file
 name, offset of the file body and size of the file body together, just
 use the object-oriented approach:
@@ -3917,7 +3920,7 @@ types:
         size: len_body
 ----
 
-However, if your format has some information laid out sparsely, i.e.
+However, if your format has some information laid out sparsely, i.e. a
 separate table of file sizes and their contents, you can use `_index`
 to access the repetition index and resolve the size from the size array:
 
@@ -3936,7 +3939,7 @@ seq:
     repeat-expr: num_strings
 ----
 
-But if a format specifies file *offsets* and you want to read
+If a format specifies file *offsets* and you want to read
 the contents of the files present on these offsets, things become
 more complicated. You can't read all the bodies in a single
 instance with repetition, because `pos` used on a repeated attribute
@@ -4008,9 +4011,9 @@ but does not directly specify sizes of the files:
 ....
 
 In this example, we have N = 3 offsets, which specify N - 1 = 2
-sections. Sizes of the sections must be derived as start of the
+sections. Sizes of the sections must be derived as the start of the
 following section minus start of the current section. To do such
-calculation, we can use `_index` in the expressions:
+a calculation, we can use `_index` in the expressions:
 
 [source,yaml]
 ----
@@ -4037,7 +4040,7 @@ type:
         size: _parent.ofs_files[i + 1] - _parent.ofs_files[i]
 ----
 
-In even more complicated example, we have file names interleaved with
+In an even more complicated example, we have file names interleaved with
 offsets. There are N - 1 file names and N offsets:
 
 ....
@@ -4049,7 +4052,7 @@ offsets. There are N - 1 file names and N offsets:
 f0 02 00 00       = offset 0x2f0
 ....
 
-In this case we'll need to do calculation inside `file_entry`.
+In this case we'll need to do a calculation inside `file_entry`.
 Once we pass the `_index` from the parent type to it, it's easy:
 
 [source,yaml]
@@ -4118,15 +4121,15 @@ types:
 
 Given input `00 01 02 03|04 05 06 07`:
 
-* If `size` is present, main type's `byte_3` will be `03`, and
+* If `size` is present, the main type's `byte_3` will be `03`, and
   `block.byte_3` will be `07` (due to its allocation in a substream)
-* If `size` is absent, main type's `byte_3` will be `03`, and
-  `block.byte_3` will be `03` as well (as it will be reusing root stream)
+* If `size` is absent, the main type's `byte_3` will be `03`, and
+  `block.byte_3` will be `03` as well (as it will be reusing the root stream)
 
 Avoiding this pitfall is simple: there are two ways:
 
-1. Avoid creating substream when it's not needed (i.e. drop `size` designation)
-2. Force use of a particular stream in parse instance with `io: XXX`, e.g.:
+1. Avoid creating a substream when it's not needed (i.e. drop the `size` designation)
+2. Force use of a particular stream in a parse instance with `io: XXX`, e.g.:
 
 [source,yaml]
 ----
@@ -4141,10 +4144,10 @@ types:
 
 === Not specifying size does not create a substream
 
-An opposite of previous pitfall, not specifying `size` (or `size-eos`)
+An opposite of the previous pitfall, not specifying `size` (or `size-eos`, or `terminator`)
 does not create a substream and thus accessing that element's IO will
-effectively point to main stream (and thus will be a no-op). In this
-example, the idea is to reparse `block` region twice with two different
+effectively point to the main stream (and thus will be a no-op). In this
+example, the idea is to reparse the `block` region twice with two different
 types `type1` and `type2`:
 
 [source,yaml]
@@ -4162,7 +4165,7 @@ instances:
     type: type2
 ----
 
-If that `size` will be missing, then `block_as_type2` will reuse main
+If that `size` is missing, `block_as_type2` will reuse the main
 stream and will parse a piece of data from `pos: 0`, which would likely
 be part of `header`, not the region occupied by `block_as_type1`.
 
@@ -4171,7 +4174,7 @@ To avoid this pitfall, always make sure you specify `size` / `size-eos` /
 
 === Applying `process` without a size
 
-In any cases, size of the data to process must be defined (either with
+In all cases, the size of the data to process must be defined (either with
 `size: ...` or with `size-eos: true`), i.e. this is legal (without
 process — size takes will be determined by `some_body_type`, reading
 normally from a stream):
@@ -4194,8 +4197,8 @@ seq:
     # will not compile — lacks size
 ----
 
-This is because most processing algorithms require to know size of data
-to process beforehand, and final size of `some_body_type` might be
+This is because most processing algorithms need to know the size of data
+to process beforehand, and the final size of `some_body_type` might be
 determined only in run-time, after parsing took place.
 
 [[keys-repeated]]
@@ -4245,8 +4248,8 @@ array instead: create a user type that *wraps the entire array*,
 and apply the key on the attribute which uses this wrapper type.
 +
 You can see the example in <<repeat-until-size-limit>>. There we know
-just the `size` of the entire array, but `size` key specified on a field
-using repetition would mean size of each item, so it's necessary to add type
+just the `size` of the entire array, but a `size` key specified on a field
+using repetition would mean the size of each item, so it's necessary to add type
 `file_entries` containing the array. Then there's no problem to create
 a substream of the total size and put this type into it, because keys `size`
 and `repeat` no longer meet in the same attribute.
