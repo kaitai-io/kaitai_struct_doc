@@ -2217,6 +2217,23 @@ types:
         size: len_in_big
 ----
 
+IMPORTANT: For this technique to work, you must create an actual
+object, because unparsed byte arrays do not have an `._io` property
+that can be referenced. If your file format contains something like a
+heap, and you want to be able to address instances in that stream but
+there are no fixed-location elements to parse, you need to create a
+dummy object using a technique like the following:
+
+[source,yaml]
+----
+seq:
+  - id: heap
+    size-eos: true
+    type: dummy
+types:
+  dummy: {}
+----
+
 [[process]]
 === Processing: dealing with compressed, obfuscated and encrypted data
 
