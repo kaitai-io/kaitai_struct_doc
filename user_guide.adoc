@@ -885,7 +885,7 @@ However, it's easy to see why it's not a very good solution:
 one `body` would exist — everything else would fail the `if` comparison
 and thus would be null
 * If we want to catch up the "else" branch, i.e. match everything not
-matched with our `if`s, we have to write an inverse of sum of `if`s
+matched with our ``if``s, we have to write an inverse of sum of ``if``s
 manually. For anything more than 1 or 2 types it quickly becomes a mess.
 
 That is why Kaitai Struct offers an alternative solution. We can use a switch type
