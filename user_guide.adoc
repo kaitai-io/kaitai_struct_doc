@@ -110,7 +110,7 @@ Misc options:
 The main idea
 of Kaitai Struct is that you create a description of a binary data
 structure format using a formal language, save it as a `.ksy` file, and
-then compile it with the KS compiler into a target programming language.
+then compile it with the Kaitai Struct compiler into a target programming language.
 
 TODO
 
@@ -121,7 +121,7 @@ Struct language itself.
 
 === Fixed-size structures
 
-Probably the simplest thing KS can do is reading fixed-size structures.
+Probably the simplest thing Kaitai Struct can do is reading fixed-size structures.
 You might know them as C struct definitions — consider something like
 this fictional database entry that keeps track of dog show
 participants:
@@ -243,7 +243,7 @@ signature"): for example, checking that the first bytes of the file are equal to
 their intended values provides at least some degree of protection
 against such blunders.
 
-To specify "magic" bytes (i.e. fixed content) in structures, KS includes
+To specify "magic" bytes (i.e. fixed content) in structures, Kaitai Struct includes
 a special `contents` key. For example, this is the beginning of a `seq`
 for Java .class files:
 
@@ -315,7 +315,7 @@ One of the most common methods used to mitigate this problem is to use
 some integer to designate length of the string, and store only
 designated number of bytes in the stream. Unfortunately, this yields
 variable-length structure, and it's impossible to describe such thing
-using C-style structs. However, it's not a problem for KS:
+using C-style structs. However, it's not a problem for Kaitai Struct:
 
 [source,yaml]
 ----
@@ -491,7 +491,7 @@ encode the protocol type for the payload: 6 would mean "TCP" (which gives us TCP
 It is possible to live with just raw integers, but most programming
 languages actually provide a way to program using meaningful string names
 instead. This approach is usually dubbed "enums" and it's totally
-possible to generate an enum in KS:
+possible to generate an enum in Kaitai Struct:
 
 [source,yaml]
 ----
@@ -588,7 +588,7 @@ operator — i.e. `size: header.body_len`.
 One can chain attributes with `.` to dig deeper into type
 hierarchy — e.g. `size: header.subheader_1.subsubheader_1_2.field_4`.
 But sometimes we need just the opposite: how do we access upper-level
-elements from lower-level types? KS provides two options here:
+elements from lower-level types? Kaitai Struct provides two options here:
 
 ==== `_parent`
 
@@ -631,7 +631,7 @@ types:
 
 Some protocols and file formats have optional fields, which only exist
 in some conditions. For example, one can have some byte first that
-designates if some other field exists (1) or not (0). In KS, you can do that
+designates if some other field exists (1) or not (0). In Kaitai Struct, you can do that
 using the `if` key:
 
 [source,yaml]
@@ -685,7 +685,7 @@ pattern over and over. Repetition might be:
 * element repeated while some condition is satisfied (or until some
 condition won't become true)
 
-KS supports all these types of repetitions. In all cases, it will create
+Kaitai Struct supports all these types of repetitions. In all cases, it will create
 a resizable array (or nearest equivalent available in the target language)
 and populate it with elements.
 
@@ -792,7 +792,7 @@ addresses in that 1D array manually).
 
 Some formats don't specify the number of elements in array, but instead
 just use some sort of special element as a terminator that signifies end
-of data. KS can do that as well using `repeat-until` syntax, for
+of data. Kaitai Struct can do that as well using `repeat-until` syntax, for
 example:
 
 [source,yaml]
@@ -840,7 +840,7 @@ that the whole format is just an array of records (`repeat: eos` or
 specifies the _type_ of the record and an integer that specifies the record's
 __length__. After that, the record's body follows, and the body format
 depends on the _type_ marker. One can easily specify that basic record
-outline in KS like that:
+outline in Kaitai Struct like that:
 
 [source,yaml]
 ----
@@ -888,7 +888,7 @@ and thus would be null
 matched with our `if`s, we have to write an inverse of sum of `if`s
 manually. For anything more than 1 or 2 types it quickly becomes a mess.
 
-That is why KS offers an alternative solution. We can use a switch type
+That is why Kaitai Struct offers an alternative solution. We can use a switch type
 operation:
 
 [source,yaml]
@@ -1091,7 +1091,7 @@ However, Kaitai Struct offers a better way to do it — using
 
 IMPORTANT: Feature available since v0.6.
 
-Here's how the above IPv4 example can be parsed with KS:
+Here's how the above IPv4 example can be parsed with Kaitai Struct:
 
 [source,yaml]
 ----
@@ -1105,7 +1105,7 @@ seq:
 ----
 
 Using the `meta/bit-endian` key, we specify *big-endian* bit field order
-(see <<bit-endian>> for more info). In this mode, KS starts parsing bit
+(see <<bit-endian>> for more info). In this mode, Kaitai Struct starts parsing bit
 fields from the most significant bit (MSB, 7) to the least significant bit
 (LSB, 0). In this case, "version" comes first and "len_header" second.
 
@@ -1371,7 +1371,7 @@ size of the whole bitfield in advance __(so that its members could
 be rearranged at compile-time to match their physical location)__,
 and it can normally parse the attributes on the run.
 It follows that little-endian bit-sized integers can be normally
-combined with `if` conditions and repetitions like any other KS type.
+combined with `if` conditions and repetitions like any other Kaitai Struct type.
 
 [[bit-endian]]
 ==== Specifying bit endianness
@@ -1839,7 +1839,7 @@ KaitaiStream _io__raw_joe = new KaitaiStream(_raw_joe);
 this.joe = new Person(_io__raw_joe, this, _root);
 ----
 
-Every class that KS generates carries a concept of a "stream", usually
+Every class that Kaitai Struct generates carries a concept of a "stream", usually
 available as an `_io` member. This is the default stream it reads from
 and writes to. This stream works just as you might expect from a
 regular IO stream implementation in a typical language: it
@@ -2230,7 +2230,7 @@ of incoming and resulting bytes might be different, especially in the case
 of decompression). While it might be possible to do such transformation
 in a declarative manner, it is usually impractical to do so.
 
-KS allows you to plug-in some predefined "processing" algorithms
+Kaitai Struct allows you to plug-in some predefined "processing" algorithms
 to do decompression, de-obfuscation and decryption to get a
 clear stream, ready to be parsed. Consider parsing a file, in which the
 main body is obfuscated by applying XOR with 0xaa for every byte:
@@ -2472,7 +2472,7 @@ target language.
 Array types are just what one might expect from an all-purpose, generic
 array type. Arrays come from either using the repetition syntax
 (`repeat: ...`) in an attribute specification, or by specifying a literal
-array. In any case, all KS arrays have an underlying data type that they
+array. In any case, all Kaitai Struct arrays have an underlying data type that they
 store, i.e. one can't put strings and integers into the same
 array. One can do arrays based on any primitive data type or composite
 data type.
@@ -2816,10 +2816,10 @@ a few pre-defined internal methods (they all start with an underscore
 ==== Switching over strings
 
 One can use type switching over other comparable values, not just integers. For example, one can switch over a string value. Note
-that the left side (key) of a `cases` map is a full-featured KS expression,
+that the left side (key) of a `cases` map is a full-featured Kaitai Struct expression,
 thus all we need is to specify a string. Don't forget that there's
 still YAML syntax that might get in a way, so we effectively need to
-quote strings twice: once for KS expression language, and once in the
+quote strings twice: once for Kaitai Struct expression language, and once in the
 YAML representation to save these quotes from being interpreted by
 a YAML parser, i.e.:
 
@@ -3211,7 +3211,7 @@ platform-dependent path separator (`/` or `\`).
 [[opaque-types]]
 === Opaque types: plugging in external code
 
-Sometimes you want KS-generated code to call code in your
+Sometimes you want Kaitai Struct-generated code to call code in your
 application to do the parsing, for example, to parse some text- or
 state-based format. For that, you can instruct ksc to generate code
 with so-called "opaque" types.
@@ -3299,7 +3299,7 @@ public class CustomEncryptedObject {
 ----
 
 TIP: Alternatively, opaque types can be (ab)used to connect several
-KS-generated types together without importing. If one type
+Kaitai Struct-generated types together without importing. If one type
 instantiates another, but does not use it in any other way (i.e. doesn't
 access its inner attributes using expression language), one can just
 compile two .ksy files separately, throw them into the same project
@@ -3458,7 +3458,7 @@ types:
 ----
 
 In this example, both opcodes use same type `arg`. Given that these
-are different types, KS infers that the only thing they have in common
+are different types, Kaitai Struct infers that the only thing they have in common
 is that they are objects generated by Kaitai Struct, and thus they
 usually implement KaitaiStruct API, so the best common type that will
 be ok for both parents is `KaitaiStruct`. Here's how it looks in any
@@ -3678,7 +3678,7 @@ bodies are alike, and in a strongly typed language, it's impossible to
 guarantee that `sections[7].body` would be the type we want, and that
 type would have `width` and `height` attributes. Not only that, but
 actually, given that we've specified a `size` attribute, a `body` could
-be just a raw byte array, and not even a user type. Thus, KS decided
+be just a raw byte array, and not even a user type. Thus, Kaitai Struct decided
 that it could be `AnyType` — a type that can include anything.
 
 The best solution would be to enforce our knowledge using an explicit
