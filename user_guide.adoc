@@ -1031,11 +1031,11 @@ Note that from the programming point of view (from the target
 programming languages and from internal Kaitai Struct's expression
 language), `seq` attributes and `instances` are exactly the same.
 
-=== Calculated ("value") instances
+=== Value instances
 
 Sometimes, it is useful to transform the data (using expression
 language) and store it as a named value. There's another sort of
-instances for that — calculated (AKA "value") instances. They're very
+instances for that — value instances. They're very
 simple to use, there's only one key in it — `value` — that specifies an
 expression to calculate:
 
