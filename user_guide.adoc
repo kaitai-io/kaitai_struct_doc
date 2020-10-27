@@ -485,7 +485,7 @@ This works in 2 steps:
 The nature of binary format encoding dictates that in many cases
 we'll be using some kind of integer constants to encode certain
 entities. For example, an IP packet uses a 1-byte integer to
-encode protocol type for the payload: 6 would mean "TCP" (which gives us TCP/IP), 17 would mean "UDP" (which yields UDP/IP), and 1 means
+encode the protocol type for the payload: 6 would mean "TCP" (which gives us TCP/IP), 17 would mean "UDP" (which yields UDP/IP), and 1 means
 "ICMP".
 
 It is possible to live with just raw integers, but most programming
@@ -707,7 +707,7 @@ seq:
 This yields an array of unsigned integers, each 4 bytes long, which
 spans till the end of the stream. Note that if we've got a number of bytes left in the
 stream that's not divisible by 4 (for example, 7), we'll end up reading
-as much as possible, and the parsing procedure will throw an
+as much as possible, and then the parsing procedure will throw an
 end-of-stream exception.
 
 Of course, you can do this with any type,
@@ -1609,7 +1609,7 @@ enums:
 
 In this format, instead of specifying just the identifier for every
 numeric value, you specify a YAML map, which has an `id` key for
-an identifier, and allows other regular keys (like `doc` and `doc-ref`)
+the identifier, and allows other regular keys (like `doc` and `doc-ref`)
 to specify documentation.
 
 [[meta]]
@@ -1691,7 +1691,7 @@ authors to provide good cross references of their formats:
   major effort to enumerate and document many file formats for digital
   preservation purposes. The value typically looks like `fddXXXXXX`, where
   `XXXXXX` is a 6-digit identifier.
-* `mime` specified s
+* `mime` specifies a
   https://en.wikipedia.org/wiki/Media_type[MIME (Multipurpose Internet
   Mail Extensions) type], AKA "media type" designation, a string
   typically used in various Internet protocols to specify format of
@@ -2221,8 +2221,8 @@ types:
 === Processing: dealing with compressed, obfuscated and encrypted data
 
 Some formats obscure the data fully or partially with techniques like
-compression, obfuscation or encryption. In theses cases, incoming data
-should be pre-processed before actual parsing takess place, or we'll
+compression, obfuscation or encryption. In these cases, incoming data
+should be pre-processed before actual parsing takes place, or we'll
 just end up with garbage getting parsed. All such pre-processing
 algorithms have one thing in common: they're done by some function that
 takes a stream of bytes and returns another stream of bytes (note that the number
@@ -2344,7 +2344,7 @@ objects (see below), so if you try to do stuff like `[1, 1000, 5]`
 you'll get an array of integers instead.
 
 *Strings* normally come from using `type: str` (or `type: strz`, which
-is the shortcut that implicitly adds `terminator: 0`).
+is a shortcut that implicitly adds `terminator: 0`).
 Literal strings can be specified using double quotes or single
 quotes. The meaning of single and double quotes is similar to those of
 Ruby, PHP and Shell script:
@@ -2517,8 +2517,8 @@ Can be applied to integers and floats:
 * `a % b` — modulo; note that it's not a remainder: `-5 % 3` is `1`,
   not `-2`; the result is undefined for negative `b`.
 
-NOTE: If both operands are integer, the result of an arithmetic operation is
-integer, otherwise it is a floating point number. For example, that
+NOTE: If both operands are integers, the result of an arithmetic operation is
+an integer, otherwise it is a floating point number. For example, that
 means that `7 / 2` is `3`, and `7 / 2.0` is `3.5`.
 
 Can be applied to strings:
@@ -2716,7 +2716,7 @@ library" for expression language.
 
 |`to_i`
 |Integer
-|Converts an enum into a corresponding integer representation
+|Converts an enum into the corresponding integer representation
 |===
 
 ==== Booleans
@@ -4012,7 +4012,7 @@ but does not directly specify sizes of the files:
 
 In this example, we have N = 3 offsets, which specify N - 1 = 2
 sections. Sizes of the sections must be derived as the start of the
-following section minus start of the current section. To do such
+following section minus the start of the current section. To do such
 a calculation, we can use `_index` in the expressions:
 
 [source,yaml]
