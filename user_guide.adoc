@@ -3133,7 +3133,7 @@ substructures, or to reuse the same subformat in several places. As in most
 programming languages, Kaitai Struct allows you to have multiple
 source files and has `imports` functionality for that.
 
-Using multiple files is very easy. For example, given that you have a
+Using multiple files is very easy. For example, if you have a
 `date.ksy` file that describes the date structure:
 
 [source,yaml]
