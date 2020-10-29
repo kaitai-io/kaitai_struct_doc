@@ -682,8 +682,8 @@ pattern over and over. Repetition might be:
 
 * element repeated up to the very end of the stream
 * element repeated a pre-defined number of times
-* element repeated while some condition is satisfied (or until some
-condition won't become true)
+* element repeated while some condition is not satisfied (or until some
+condition becomes true)
 
 Kaitai Struct supports all these types of repetitions. In all cases, it will create
 a resizable array (or nearest equivalent available in the target language)
