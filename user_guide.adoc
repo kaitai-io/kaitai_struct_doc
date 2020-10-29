@@ -3404,8 +3404,8 @@ processor class should implement. For Java, it's named
   this particular example, it just adds whatever we supplied as "key"
   to every byte
 
-NOTE: `decode` can return a different number of bytes that it gets
-(which is perfectly normal, for example, with decompression).
+NOTE: `decode` can return a different number of bytes than it is
+given. This is perfectly normal, for example, with decompression.
 
 By default, specifying a plain name invokes a custom processing class
 in the same namespace/package where the code is generated. If you want
