@@ -381,7 +381,7 @@ string representation in C:
 
 These 4 bytes actually represent the 3-character string "abc", plus one extra
 trailing byte "0" (AKA null) which serves as a delimiter or
-terminator. By agreement, C strings cannot include a 0 byte: every time
+terminator. By agreement, C strings cannot include a zero byte: every time
 a function in C sees that either in stream or in memory, it considers
 that as a special mark to stop processing.
 
