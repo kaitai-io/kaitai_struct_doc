@@ -3581,7 +3581,7 @@ using `_parent`. Naturally, we've done exactly that to get ourselves
 
 ==== Omitting parent
 
-In some cases, you want some object to not have any parent
+In some cases, you want some object to have no parent
 at all. The primary use case for this is to make sure that some
 instantiation of it does not affect the parent type. In many cases, resorting
 to this method is a sign that you need to stop and rethink your
