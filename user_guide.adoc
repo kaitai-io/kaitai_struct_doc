@@ -418,7 +418,8 @@ dangerous. What if we never encounter that byte?
 
 Another very widespread model is actually having *both* a fixed-sized
 buffer for a string *and* a terminator. This is typically an artifact
-of serializing structures like this from C. For example, if one would take this example structure:
+of serializing structures like this from C. For example, take this
+structure:
 
 [source,c]
 ----
