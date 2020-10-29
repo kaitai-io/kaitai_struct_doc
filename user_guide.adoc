@@ -314,7 +314,7 @@ that typically is 3-5 bytes long and only rarely can be up to 512 bytes.
 One of the most common methods used to mitigate this problem is to use
 some integer to designate length of the string, and store only
 designated number of bytes in the stream. Unfortunately, this yields
-variable-length structure, and it's impossible to describe such thing
+variable-length structure, and it's impossible to describe such a thing
 using C-style structs. However, it's not a problem for Kaitai Struct:
 
 [source,yaml]
