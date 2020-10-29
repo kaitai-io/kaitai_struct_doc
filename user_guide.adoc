@@ -29,8 +29,8 @@ chapter will give an overview of the options available.
 
 === Web IDE
 
-If you're going to try Kaitai Struct for the first time, probably
-the Web IDE is the easiest way to get started. Just open
+If you're going to try Kaitai Struct for the first time,
+the Web IDE is probably the easiest way to get started. Just open
 https://ide.kaitai.io/[Kaitai Struct Web IDE] and you're
 ready to go:
 
@@ -41,7 +41,7 @@ A list of Web IDE features is available on the https://github.com/kaitai-io/kait
 Note that there are two different versions of the Web IDE:
 
 1. https://ide.kaitai.io/ — *stable* version, has the stable of the Kaitai Struct compiler (currently 0.9, released 2020-10-16)
-2. https://ide.kaitai.io/devel/ — unstable development version, always has the *latest* compiler (the most recent 0.9-SNAPSHOT)
+2. https://ide.kaitai.io/devel/ — unstable development version, always has the *latest* compiler (the most recent 0.10-SNAPSHOT)
 
 If you want to use the latest features, use the https://ide.kaitai.io/devel/[*devel* Web IDE].
 
@@ -107,8 +107,7 @@ Misc options:
 
 == Workflow overview
 
-The main idea
-of Kaitai Struct is that you create a description of a binary data
+The main idea of Kaitai Struct is that you create a description of a binary data
 structure format using a formal language, save it as a `.ksy` file, and
 then compile it with the Kaitai Struct compiler into a target programming language.
 
@@ -256,7 +255,7 @@ seq:
 
 This reads the first 4 bytes and compares them to the 4 bytes `CA FE BA BE`. If
 there is any mismatch (or less than 4 bytes are read),
-that'll throw an exception and stop parsing at an early stage, before any
+it throws an exception and stops parsing at an early stage, before any
 damage (pointless allocation of huge structures, waste of CPU cycles)
 is done.
 
@@ -551,7 +550,7 @@ many subtypes as we want. We define just one, and inside it we nest
 the exact same syntax as we use for the type description on the top
 level — i.e. the same `seq` designation.
 
-NOTE: There's no need for `meta` here, as the type name is derived from the
+NOTE: There's no need for `meta/id` here, as the type name is derived from the
 `types` key name here.
 
 Of course, one can actually have more levels of subtypes:
@@ -786,7 +785,7 @@ This one specifies the `width` and `height` of the matrix first, then parses
 as many `matrix` elements as needed to fill a `width` × `height` matrix
 (although note that it won't be a true 2D matrix: it would still be just
 a regular 1D array, and you'll need to convert (x, y) coordinates to
-addresses in that 1D array manually).
+indices in that 1D array manually).
 
 ==== Repeat until condition is met
 
@@ -2815,7 +2814,8 @@ a few pre-defined internal methods (they all start with an underscore
 
 ==== Switching over strings
 
-One can use type switching over other comparable values, not just integers. For example, one can switch over a string value. Note
+One can use type switching over other comparable values,
+not just integers. For example, one can switch over a string value. Note
 that the left side (key) of a `cases` map is a full-featured Kaitai Struct expression,
 thus all we need is to specify a string. Don't forget that there's
 still YAML syntax that might get in a way, so we effectively need to
@@ -3023,7 +3023,7 @@ str2 = "bar"
 |====
 
 But sometimes you indeed want that dot, and it should be part of the
-output. This is possible, by specifying `include: true`
+output. This is possible by specifying `include: true`
 (the default is false):
 
 [cols="a,a", frame=none]
@@ -3103,7 +3103,7 @@ to "attempted to read past end of stream".
 In some cases, you
 really want to read until the end of the stream, and this should be
 considered normal encoding, not an error. For these cases, you can
-specify `eos-error: false` (the default is true):
+specify `eos-error: false` (the default is `true`):
 
 [source,yaml]
 ----
