@@ -11,7 +11,7 @@ Integration) pipeline. This document describes how it's working.
 Kaitai Struct CI strives to be highly modular and, by design, tries
 not to rely on a single CI engine provider. Currently, we use:
 
-* https://travis-ci.org/kaitai-io[Travis]
+* https://travis-ci.com/kaitai-io[Travis]
 * AppVeyor: https://ci.appveyor.com/project/GreyCat/kaitai-struct[for kaitai_struct], https://ci.appveyor.com/project/GreyCat/ci-targets[for ci_targets]
 * GitHub Actions: https://github.com/kaitai-io/kaitai_struct_formats/actions[for kaitai_struct_formats]
 
@@ -80,7 +80,7 @@ possible.
   https://github.com/kaitai-io/kaitai_struct_compiler[compiler] repo.
 * A new commit (or build request) for compiler repo triggers building
   of new compiler binaries. There are two builds running:
-** https://travis-ci.org/kaitai-io/kaitai_struct[compiler build at
+** https://travis-ci.com/kaitai-io/kaitai_struct[compiler build at
    Travis] runs on Linux and gets us .deb, .zip and .js builds of
    compiler
 ** https://ci.appveyor.com/project/GreyCat/kaitai-struct[compiler
