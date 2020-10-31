@@ -225,10 +225,8 @@ to `X.Y.Z` format (e.g. `0.9.0` for 0.9 release)
 
 === Python
 
-* Make sure that the needed Python packaging tools are installed and up-to-date:
-** Debian/Ubuntu/etc.: `sudo apt install python3-setuptools python3-wheel twine`
-** Other Linuxes: see https://packaging.python.org/guides/installing-using-linux-tools/[Python Packaging User Guide]
-** Everywhere else: use your system package manager, or `python3 -m pip install --upgrade setuptools twine wheel`
+* Install/update the needed Python packaging tools: `python3 -m pip install --upgrade setuptools twine wheel`
+** If this gives you permission errors, **don't use `sudo` to run `pip`**. Instead use your system package manager (e. g. `apt`) to install/update the tools, or add the `--user` option to `pip install`.
 * Pump version in `kaitaistruct.py`, seek `\\__version__ =`
 * Delete the `dist` directory (if it exists), so that built files from previous or development versions don't get uploaded by accident.
 * `python3 setup.py sdist bdist_wheel`
