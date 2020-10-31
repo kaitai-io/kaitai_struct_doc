@@ -230,32 +230,15 @@ to `X.Y.Z` format (e.g. `0.9.0` for 0.9 release)
 ** Other Linuxes: see https://packaging.python.org/guides/installing-using-linux-tools/[Python Packaging User Guide]
 ** Everywhere else: use your system package manager, or `python3 -m pip install --upgrade setuptools twine wheel`
 * Pump version in `kaitaistruct.py`, seek `\\__version__ =`
-* Build distributions and upload them to PyPI:
-+
-[source,bash]
-----
-# Delete any old previously built distributions.
-$ rm -r dist/
-# Build source and wheel distributions.
-$ python3 setup.py sdist bdist_wheel
-# Run basic correctness checks on the built distributions.
-$ twine check dist/*
-# Upload the built distributions.
-# You may want to upload to TestPyPI first as a test before uploading to the real PyPI.
-# `twine upload` will prompt for credentials,
-# or you can provide them via the environment variables TWINE_USERNAME and TWINE_PASSWORD
-# (see https://twine.readthedocs.io/en/latest/#environment-variables).
-$ twine upload --repository=testpypi dist/* # Upload to TestPyPI (https://test.pypi.org/)
-$ twine upload dist/* # Upload to live PyPI (https://pypi.org/)
-----
+* Delete the `dist` directory (if it exists), so that built files from previous or development versions don't get uploaded by accident.
+* `python3 setup.py sdist bdist_wheel`
+* `twine check dist/*`
+* `twine upload dist/*`
+** This will prompt for your PyPI credentials. See the https://twine.readthedocs.io/en/latest/#configuration[Twine docs] for info on how to preset/permanently configure the credentials.
+** To upload to https://test.pypi.org/[TestPyPI] instead: `twine upload --repository=testpypi dist/*`
 * Check that new version appears under https://pypi.org/project/kaitaistruct/#history
-* Create and push a Git tag for the new version:
-+
-[source,bash]
-----
-$ git tag $VERSION
-$ git push origin $VERSION
-----
+* `git tag $VERSION`
+* `git push origin $VERSION`
 
 === Ruby
 
