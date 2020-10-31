@@ -3882,8 +3882,8 @@ specify that, but instead one can use:
 * `io` to specify KaitaiStream-compatible IO streams
 * `any` to allow any type (if the target language supports that)
 
-NOTE: Parametric types with mandatory parameters can't be read from
-files directly (as they obviously need parameter values supplied from
+NOTE: Parametric types with mandatory parameters can't be read from a
+file directly (as they obviously need parameter values supplied from
 somewhere), and thus the typical `fromFile(...)` helper method is not
 available for them.
 
