@@ -22,11 +22,13 @@ Kaitai Struct tries to isolate the developer from all these details
 and allow them to focus on the things that matter: the data structure
 itself, not particular ways to read or write it.
 
+[[install-invoke]]
 == Installation and invocation
 
 Kaitai Struct has a somewhat diverse infrastructure around it. This
 chapter will give an overview of the options available.
 
+[[web-ide]]
 === Web IDE
 
 If you're going to try Kaitai Struct for the first time,
@@ -45,12 +47,14 @@ Note that there are two different versions of the Web IDE:
 
 If you want to use the latest features, use the https://ide.kaitai.io/devel/[*devel* Web IDE].
 
+[[ksc]]
 === Desktop / console version
 
 If you don't fancy using a hex dump in a browser, or want to integrate Kaitai Struct into your project build
 process automation, you'd want a desktop / console solution. Of
 course, Kaitai Struct offers that as well.
 
+[[ksc-install]]
 ==== Installation
 
 Please refer to the link://kaitai.io/#download[official website] for
@@ -118,6 +122,7 @@ TODO
 With the workflow issues out of the way, let's concentrate on the Kaitai
 Struct language itself.
 
+[[fixed-size-struct]]
 === Fixed-size structures
 
 Probably the simplest thing Kaitai Struct can do is reading fixed-size structures.
@@ -233,6 +238,7 @@ folded style strings for longer documentation that spans multiple lines:
 ----
 ====
 
+[[magic]]
 === Checking for "magic" signatures
 
 Many file formats use some sort of safeguard measure against using a
@@ -304,6 +310,7 @@ definitely not recommended in real-life specs):
 NOTE: There's no need to specify `type` or `size` for fixed contents
 data — it all comes naturally from the `contents`.
 
+[[var-length-struct]]
 === Variable-length structures
 
 Many protocols and file formats tend to conserve bytes, especially for
@@ -517,6 +524,7 @@ represented by that enum, instead of just being a raw integer. Note that
 such attributes must have some sort of integer type in the first place
 (i.e. `type: u*` or `type: s*`).
 
+[[types]]
 === Substructures (subtypes)
 
 What do we do if we need to use many of the strings in such a format?
@@ -1725,6 +1733,7 @@ authors to provide good cross references of their formats:
   typically follows a `Qxxx` pattern, where `xxx` is a number generated
   by Wikidata, e.g. `Q535473`.
 
+[[stream]]
 == Streams and substreams
 
 Imagine that we're dealing with a structure of known size. For the sake of
@@ -3125,6 +3134,7 @@ successfully, without triggering an error:
 61 62 63             => my_string = "abc"
 ....
 
+[[meta-imports]]
 === Importing types from other files
 
 As your project grows in complexity, you might want to have multiple
