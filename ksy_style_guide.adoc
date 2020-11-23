@@ -1,6 +1,6 @@
 = KSY Style Guide
 Kaitai Project
-v0.7
+v0.9
 :toc: left
 :numbered:
 
@@ -126,6 +126,7 @@ For top-level meta section, use the following order of keys:
    and SHOULD order extensions from most popular extension to least
    popular.
 .. `xref` — keys inside MUST be in alphabetic order
+.. `tags` — values inside MUST be in alphabetic order
 . Legal information — `license` — MUST be a valid
   https://spdx.org/licenses/[SPDX license expression]
 . Processing instructions:
