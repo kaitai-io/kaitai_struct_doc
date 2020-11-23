@@ -225,25 +225,18 @@ to `X.Y.Z` format (e.g. `0.9.0` for 0.9 release)
 
 === Python
 
-* Create a `~/.pypirc` file with this (https://github.com/pypa/setuptools/issues/941#issuecomment-279123202[source]):
-+
-[source,ini]
-----
-[distutils]
-index-servers =
-    pypi
-
-[pypi]
-repository: https://pypi.python.org/pypi
-username: <login>
-password: <pass>
-----
-* Pump version in `kaitaistruct.py`, seek `__version__ =`
-* `python3 setup.py sdist upload`
-** (use `python3 setup.py sdist upload -r pypitest` to publish to testing server)
-* Check that new version appears at https://pypi.python.org/pypi/kaitaistruct[https://pypi.python.org/pypi/kaitaistruct]`/$VERSION`
+* Install/update the needed Python packaging tools: `python3 -m pip install --upgrade setuptools twine wheel`
+** If this gives you permission errors, **don't use `sudo` to run `pip`**. Instead use your system package manager (e. g. `apt`) to install/update the tools, or add the `--user` option to `pip install`.
+* Pump version in `kaitaistruct.py`, seek `\\__version__ =`
+* Delete the `dist` directory (if it exists), so that built files from previous or development versions don't get uploaded by accident.
+* `python3 setup.py sdist bdist_wheel`
+* `twine check dist/*`
+* `twine upload dist/*`
+** This will prompt for your PyPI credentials. See the https://twine.readthedocs.io/en/latest/#configuration[Twine docs] for info on how to preset/permanently configure the credentials.
+** To upload to https://test.pypi.org/[TestPyPI] instead: `twine upload --repository=testpypi dist/*`
+* Check that new version appears under https://pypi.org/project/kaitaistruct/#history
 * `git tag $VERSION`
-* `git push --tags`
+* `git push origin $VERSION`
 
 === Ruby
 
