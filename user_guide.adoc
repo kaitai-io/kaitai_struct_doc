@@ -1427,7 +1427,7 @@ types:
 _Big-endian_ and _little-endian_ bit integers can follow *only on a byte
 boundary*. They can't share the same byte. Joining them on an
 unaligned bit position is _undefined behavior_, and future versions of KSC will throw
-a compile-time error if it detects such a situation.
+a compile-time error if they detect such a situation.
 
 For example, this is *illegal*:
 
