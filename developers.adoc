@@ -217,7 +217,7 @@ TODO
 
 === JavaScript
 
-* Pump version in `package.json` and `package-lock.json` (search for `"version": `)
+* Pump version in `package.json` and `package-lock.json` (search for ``"version": ``)
 to `X.Y.Z` format (e.g. `0.9.0` for 0.9 release)
 * Make a commit with the changes and tag it `$VERSION`
 * `npm login` - fill npmjs.org login credentials
