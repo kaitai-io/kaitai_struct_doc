@@ -1071,7 +1071,7 @@ that packs both a version number and header length:
 ....
 76543210
 vvvvllll
-  │   |
+  │   │
   │   └─ header length
   └───── version
 ....
