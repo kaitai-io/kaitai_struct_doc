@@ -117,7 +117,9 @@ https://www.scala-sbt.org/sbt-native-packager/formats/universal.html[SBT native 
 
 ==== Building https://www.scala-sbt.org/sbt-native-packager/formats/debian.html[Debian package]
 
-. Install prerequisites: `sudo -i apt-get install dpkg dpkg-sig dpkg-dev lintian fakeroot`
+. Install prerequisites:
+  * On Debian/Ubuntu host: `sudo -i apt-get install dpkg dpkg-sig dpkg-dev lintian fakeroot`
+  * On RedHat host: `sudo dnf install dpkg fakeroot`
 . `sbt compilerJVM/debian:packageBin`
 . Get result in `jvm/target/kaitai-struct-compiler_*_all.deb`
 
