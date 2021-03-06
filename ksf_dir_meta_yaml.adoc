@@ -1,0 +1,38 @@
+= YAML-based metadata for Kaitai Struct Formats directories
+
+[[rationale]]
+== Rationale
+It is needed to store some metadata for each directory in `kaitai_struc_formats` repo.
+
+[[general]]
+== General
+
+* YAML is used as a serialization format.
+
+* `JSONSchema` will also be available.
+
+[[metadata]]
+== Metadata dict
+There are 2 keys defined in a metadata dict:
+
+* `short` for summary.
+
+* `long` for more extended guidelines what goes into this dir and wat doesn't
+
+All are mandatory.
+
+[[tree]]
+== Directory tree metadata format
+
+* The file path relative to the repo root is `_build/dirMeta.yml`
+
+* Each dir name is a key in a YAML dictionary.
+
+* Metadata dict is stored in mandatory `_` subkey.
+
+[[tags]]
+== Format
+
+* The file path relative to the repo root is `_build/tags.yml`
+
+* Just a dict with keys that are tag names and values that are metadata dicts.
