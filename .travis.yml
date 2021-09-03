@@ -31,4 +31,6 @@ after_success:
       --
       --exclude=.git
       --exclude=CNAME
+      --exclude=favicon.ico
+      --exclude=favicon.ico.license
       out/
