@@ -17,7 +17,6 @@ cache:
 
 before_install:
   - gem install asciidoctor pygments.rb
-  - git clone -b 2.5.2 --depth 1 https://github.com/pygments/pygments.git
   - git clone -b v2.1.0 --depth 1 https://github.com/lbovet/docson.git
 
 script:

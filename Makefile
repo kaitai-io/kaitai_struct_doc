@@ -33,7 +33,7 @@ out/%.html: raw/%.html tmpl/navbar.html postprocess-html
 	./postprocess-html $< $@
 
 raw/%.html: %.adoc styles/$(STYLESHEET).css raw/styles/$(STYLESHEET).css
-	TZ=UTC asciidoctor -a stylesheet! -a docinfo=shared,private -a nofooter -a source-highlighter=pygments -a pygments-style=default -r ./pygments_init.rb -a linkcss -D raw $<
+	TZ=UTC asciidoctor -a stylesheet! -a docinfo=shared,private -a nofooter -a source-highlighter=pygments -a pygments-style=default -a linkcss -D raw $<
 
 raw/styles/$(STYLESHEET).css: styles/$(STYLESHEET).css
 	mkdir -p raw/styles
