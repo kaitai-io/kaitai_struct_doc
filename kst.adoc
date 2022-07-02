@@ -52,14 +52,16 @@ Here:
   https://github.com/kaitai-io/kaitai_struct_tests/tree/master/src[src]
   dir; by convention, we use ".bin" file extension for all these files.
 * `asserts` is a sequence of assertions that we'll use to check that
-  contents of parsed structure in memory match our expectations. Every
-  assertion has two parts:
-  * `actual` is a KS expression, executed in context of root element
-    of KSY file that we're tested, used to extract a certain member of
-    structure in memory to check.
-  * `expected` is normally some constant that we expect it to match
-    (but it is also a KS expression, so technically it can be
-    non-constant).
+  contents of parsed structure in memory match our expectations.
++
+Every assertion has two parts:
++
+** `actual` is a KS expression, executed in context of root element
+   of KSY file that we're tested, used to extract a certain member of
+   structure in memory to check.
+** `expected` is normally some constant that we expect it to match
+   (but it is also a KS expression, so technically it can be
+   non-constant).
 
 Assertions are expected to be fatal (i.e. first failed assertion stops
 the test process) and are specifically executed in sequence in
