@@ -3943,11 +3943,11 @@ seq:
   - id: len_files
     type: u4
     repeat: expr
-    repeat-expr: num_strings
+    repeat-expr: num_files
   - id: files
     size: len_files[_index]
     repeat: expr
-    repeat-expr: num_strings
+    repeat-expr: num_files
 ----
 
 If a format specifies file *offsets* and you want to read
