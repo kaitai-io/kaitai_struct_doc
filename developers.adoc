@@ -253,10 +253,9 @@ to `X.Y.Z` format (e.g. `0.9.0` for 0.9 release)
 === C#
 
 * Pump versions in `kaitai_struct_runtime_csharp.csproj`, commit and put `$VERSION` tag on it
-* `dotnet build`
-* `dotnet pack` -> get resulting `.nupkg` file in `bin/Debug/` folder
-* Create API key on https://www.nuget.org/account/apikeys
-* `dotnet nuget push bin/Debug/*.nupkg -k <API key> -s \https://api.nuget.org/v3/index.json`
+* `dotnet pack -o .` -> get resulting `.nupkg` and `.snupkg` files in the current directory
+* Create an API key on https://www.nuget.org/account/apikeys
+* `dotnet nuget push *.nupkg -k <API key> -s \https://api.nuget.org/v3/index.json`
 
 == Adding new language
 
