@@ -123,6 +123,13 @@ https://www.scala-sbt.org/sbt-native-packager/formats/universal.html[SBT native 
 . `sbt compilerJVM/debian:packageBin`
 . Get result in `jvm/target/kaitai-struct-compiler_*_all.deb`
 
+==== Building https://www.scala-sbt.org/sbt-native-packager/formats/rpm.html[RedHat package]
+
+. Install prerequisites:
+  * On RedHat host: `sudo dnf install rpm rpm-build`
+. `sbt compilerJVM/rpm:packageBin`
+. Get result in `jvm/target/rpm/RPMS/noarch/kaitai-struct-compiler-*.noarch.rpm`
+
 ==== Building Windows package
 
 https://www.scala-sbt.org/sbt-native-packager/formats/windows.html[SBT native packager: Windows package docs]
