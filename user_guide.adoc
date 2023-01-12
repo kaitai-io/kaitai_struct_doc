@@ -1402,7 +1402,7 @@ of LE bit endianness.
 ====
 
 Like `meta/endian`, `meta/bit-endian` also applies to `bX` attributes
-in the current type and all subtypes, but it can be overriden
+in the current type and all subtypes, but it can be overridden
 using the `le`/`be` suffix (`bXle`/`bXbe`) for the individual bit
 integers. For example:
 
@@ -2089,7 +2089,7 @@ In this example, `body` allocates a substream spanning from 20th byte
 
 This comes super handy if your format's internal structures somehow
 specify offsets relative to some other structures of the format. For
-example, a typical filesystem/database often uses a concept of blocks, 
+example, a typical filesystem/database often uses a concept of blocks,
 and offsets that address stuff inside the current block. Note how KSY with
 substreams is easier to read, more concise and less error-prone:
 
@@ -4150,7 +4150,7 @@ types:
       byte_3:
         io: _root._io # <= thanks to this, always points to a byte in main stream
         pos: 3
-        type: 3
+        type: u1
 ----
 
 === Not specifying size does not create a substream
