@@ -1,0 +1,427 @@
+= Serialization Guide
+Kaitai Project
+:toc: left
+
+NOTE: Serialization for Java and Python is made thanks to financial support https://nlnet.nl/project/Kaitai-Serialization[from the NLnet Foundation].
+
+For a long time, you could only use Kaitai Struct for parsing, not serialization (writing data to file). However, due to high user interest in this feature, we've added serialization support to Kaitai Struct.
+
+At the time of writing, it's Java only, but should already work for the vast majority of format specifications. This page explains how to use it. Support for other target languages than Java will follow.
+
+== Introduction
+
+While parsing allows you extract data from existing files or byte streams based on the format described by a .ksy specification, serialization has the opposite goal - you know the data and you need to write them to a file in the specified format, which can be read by other applications. This allows several use cases:
+
+1. Editing an existing file. You can parse a file to get the initial data, change the data programmatically and write them back to the same file or another file.
+
+2. Creating a new file from scratch. It's also possible to start by creating empty objects, then fill them with all the necessary information and finally tell Kaitai Struct to write the object to the provided stream.
+
+== Getting started
+
+Once you have the .ksy specification of the format you want to serialize, you need a version of `kaitai-struct-compiler` that supports serialization. The latest 0.10 compiler doesn't have it yet; you need to build the compiler from source at the moment.
+
+=== Building the compiler from source
+
+Don't worry, it should be straightforward:
+
+1. Install `sbt` from https://www.scala-sbt.org/download.html.
+
+2. Clone the https://github.com/kaitai-io/kaitai_struct_compiler repository, checkout the https://github.com/kaitai-io/kaitai_struct_compiler/tree/serialization[*serialization*] branch.
++
+[source,shell]
+----
+git clone -b serialization https://github.com/kaitai-io/kaitai_struct_compiler.git
+cd kaitai_struct_compiler
+----
+
+3. Build the compiler using `sbt` that you installed earlier:
++
+[source,shell]
+----
+sbt --error compilerJVM/stage
+----
++
+If no error is printed, there should be a compiler build in `jvm/target/universal/stage/bin/kaitai-struct-compiler`. If you run `jvm/target/universal/stage/bin/kaitai-struct-compiler --help`, you should see the `--read-write` option in the usage text:
++
+[source,highlight=5]
+----
+Usage: kaitai-struct-compiler [options] <file>...
+
+  <file>...                source files (.ksy)
+  -t, --target <language>  target languages (graphviz, csharp, rust, all, perl, java, go, cpp_stl, php, lua, python, nim, html, ruby, construct, javascript)
+  -w, --read-write         generate read-write support in classes (default: read-only)
+----
+
+=== Compiling a .ksy specification in read-write mode
+
+You can compile a .ksy spec to Java classes with serialization support like this:
+
+[source,shell]
+----
+jvm/target/universal/stage/bin/kaitai-struct-compiler --read-write --no-auto-read -t java <ksy-file>
+----
+
+The most important option is `--read-write`, which enables read-write mode. This adds the methods needed for serialization to the generated classes.
+
+`--no-auto-read` is explicitly specified here for demonstrative purposes. If you omit it, the compiler will still behave as if it were specified, because it's implied by `--read-write`. Normally in read-only mode, if you don't specify `--no-auto-read`, you can just use the `fromFile` static method to parse a file and get the object with the extracted data immediately:
+
+[source,java]
+----
+Gif g = Gif.fromFile("path/to/some.gif");
+System.out.println("width = " + g.logicalScreen().imageWidth());
+----
+
+Or you can instantiate the `Gif` class directly using the `new` keyword and pass the stream to read from:
+
+[source,java]
+----
+try (KaitaiStream io = new ByteBufferKaitaiStream("path/to/some.gif")) {
+    Gif g = new Gif(io);
+    System.out.println("width = " + g.logicalScreen().imageWidth());
+}
+----
+
+This is because the `_read` method (responsible for parsing the data) is automatically called from constructors of the generated classes, and is also `private` because you never need to call it explicitly.
+
+However, in read-write mode, it's no longer clear to Kaitai Struct why you're creating a particular object. The purpose may just be to create an empty object to be filled with data and later written, in which case you don't want to read from any stream. For this reason, `_read` is never called automatically in read-write mode - you need to call it explicitly if you want to read from a stream:
+
+[source,java,highlight=3]
+----
+try (KaitaiStream io = new ByteBufferKaitaiStream("path/to/some.gif")) {
+    Gif g = new Gif(io);
+    g._read();
+    System.out.println("width = " + g.logicalScreen().imageWidth());
+}
+----
+
+=== Installing the Java runtime library with serialization support
+
+As with the compiler, the latest released 0.10 KS runtime library for Java doesn't have serialization capabilities yet. You need to checkout the https://github.com/kaitai-io/kaitai_struct_java_runtime/tree/serialization[*serialization*] branch of the https://github.com/kaitai-io/kaitai_struct_java_runtime repo:
+
+[source,shell]
+----
+git clone -b serialization https://github.com/kaitai-io/kaitai_struct_java_runtime.git
+cd kaitai_struct_java_runtime
+----
+
+The runtime library is a dependency of all Java code generated by `kaitai-struct-compiler`, so you have to build it and make it available to your generated Java "format library" at compile time. If you use https://maven.apache.org/[Maven], run this command in the `kaitai_struct_java_runtime` directory to build it and install it to your local Maven repository:
+
+[source,shell]
+----
+mvn install
+----
+
+[NOTE]
+=====
+If the `gpg` command isn't available on your system, `mvn install` will fail because of `maven-gpg-plugin` used to sign artifacts when publishing. In that case, comment this plugin in `pom.xml` like this:
+
+[source,xml,highlight="2,9"]
+----
+      </plugin>
+      <!-- <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          ...
+        </executions>
+      </plugin> -->
+    </plugins>
+  </build>
+----
+=====
+
+Now you can include the serialization-capable Java runtime library in your project like this:
+
+[source,xml]
+----
+    <dependency>
+      <groupId>io.kaitai</groupId>
+      <artifactId>kaitai-struct-runtime</artifactId>
+      <version>0.11-SNAPSHOT</version>
+    </dependency>
+----
+
+But note that the `0.11-SNAPSHOT` version only exists in your local Maven repository (`~/.m2`) after you ran `mvn install` in the Java runtime library folder.
+
+== General serialization procedure
+
+Let's start with a simple example to see how the serialization can be used. First, we compile the following .ksy specification in read-write mode:
+
+[source,yaml]
+----
+meta:
+  id: hello_world
+  endian: le
+seq:
+  - id: foo
+    type: s4
+    repeat: expr
+    repeat-expr: 2
+----
+
+This will generate a `HelloWorld.java` source file with class `HelloWorld`. We want to set `foo` to `[-4, 65536]` and write the structure to bytes. This is how we do it:
+
+[source,java]
+----
+HelloWorld hw = new HelloWorld();
+hw.setFoo(new ArrayList<>(Arrays.asList(-4, 65536)));
+hw._check();
+
+byte[] output = new byte[8];
+try (KaitaiStream io = new ByteBufferKaitaiStream(output)) {
+    hw._write(io);
+}
+// output: [fc ff ff ff 00 00 01 00]
+----
+
+Note that there are essentially 4 phases of serialization:
+
+1. Initialize an object instance of a KS-generated class (which reflects a user-defined type in the source .ksy specification).
+2. Set the object properties (`seq` fields or positional `instances` in the .ksy) according to the data you want to serialize.
+3. Call the `_check` method of the KS object after setting its properties once you believe it's ready for serialization.
+4. Call the `_write` method on the top-level object and pass it the `KaitaiStream` object you want to write to.
+
+First, we create an empty instance of the top-level class `HelloWorld` and bind it to the `hw` variable. As you can see in the original .ksy spec, it has only one field called `foo`, which is a list of two `s4` (signed 4-byte) integers. We assign such list to it with the values we wanted to write using the `setFoo` setter. After that, we're convinced that the `hw` object is ready to be written, so we call `hw._check()`. When it passes, we move on to the actual writing - we'll prepare a byte array for the output, create a `ByteBufferKaitaiStream` as a wrapper around this byte array and then call the `_write` method on the top-level `hw` object, which serializes the whole thing. After the `try`-with-resources statement, `output` holds the final byte data, which we can e.g. write it to a file or transmit it over the network.
+
+=== Consistency checks: the `_check` method
+
+Let's focus on what the `_check` method does. We know that `foo` is expected to be a list of exactly 2 integers (because of `repeat-expr: 2` in the source .ksy). Every parsing of the `hello_world` type tries to read 2 integers, and in any successfully parsed `HelloWorld` object, `foo` will be always 2 elements long. However, the `setFoo` setter allows us to set __any__ integer list - even if its length is 0, 1 or greater than 2.
+
+Nevertheless, if we set `foo` to a list of length other than 2 and write the `hw` object to bytes, we won't be able to get the same state of the `HelloWorld` object by parsing these bytes again: either the parsing fails with an EOF exception if the stream was shorter than 8 bytes, or we get garbage values in `foo` (if we attempted to write `foo` with less than 2 elements) because we interpret some bytes outside `foo` as if they were `foo` values, or we may read 2 correct values, but the object we serialized had actually more. In such cases, it's generally inevitable that not only the parsed `foo` will not match the `foo` we wrote, but it would also shift the offsets of *all* fields after `foo`, which means their values would be incorrect too.
+
+This is because by setting `foo` to anything other than a 2-integer list, we violate the property of *consistency* - the data is not consistent with the constraints directly following from how the format is specified in the source .ksy file. Kaitai Struct knows these constraints, and generates assertions for them in the `_check` method whenever possible. If `_check` detects a consistency issue, it throws a `ConsistencyError`, telling you to fix the problem and try again. This protects you from proceeding to the writing phase with inconsistent values, which would inevitably result into corrupt data that cannot be faithfully decoded back to the original values.
+
+To see it in action, let's try what happens if we set `foo` to a list of length 3 and ask the `HelloWorld` class what it thinks about the consistency of this object:
+
+[source,java]
+----
+HelloWorld hw = new HelloWorld();
+hw.setFoo(new ArrayList<>(Arrays.asList(-4, 65536, 128)));
+hw._check(); // io.kaitai.struct.ConsistencyError: Check failed: foo, expected: 2, actual: 3
+----
+
+As expected, the `_check` method caught the problem and threw an exception - the expected length of field `foo` was 2, but it was 3, which doesn't match the format definition.
+
+== Section
+
+=== User-defined types
+
+Real-world .ksy specifications often define custom types in the `types` section. For example:
+
+[source,yaml]
+----
+meta:
+  id: user_types
+  endian: le
+seq:
+  - id: one
+    type: chunk
+types:
+  chunk:
+    seq:
+      - id: len_body
+        type: u4
+      - id: body
+        size: len_body
+----
+
+A typical way to serialize such format would be as follows:
+
+[source,java]
+----
+UserTypes ut = new UserTypes();
+
+UserTypes.Chunk one = new UserTypes.Chunk(null, ut, ut._root());
+one.setLenBody(2);
+one.setBody(new byte[] { 'h', 'i' });
+one._check();
+
+ut.setOne(one);
+ut._check();
+
+byte[] output = new byte[6];
+try (KaitaiStream io = new ByteBufferKaitaiStream(output)) {
+    ut._write(io);
+}
+// output: [02 00 00 00 68 69]
+----
+
+First, we instantiate the root class `UserTypes` as usual. Then we need the instance of the user-defined `chunk` type, translated as `UserTypes.Chunk` in Java. We use the `new` keyword again, but this time using the 3-argument constructor:
+
+[source,java]
+----
+        public Chunk(KaitaiStream _io, UserTypes _parent, UserTypes _root) {
+            // ...
+        }
+----
+
+The reason for that is that we must provide values for the `_parent` and `_root` parameters (see <<user_guide.adoc#usertype-methods,their description>> in the User Guide). These built-in references should be valid in all KS types so that it's possible to rely on them in expressions inside the .ksy spec when needed. When you instantiate inner types (any user-defined types other than the top-level) manually, you have to set these properties correctly. Note the generally-applicable rule of what should go there - the parent object to `_parent` (in this case, ``one``'s parent object is `ut` because we're doing `ut.setOne(one)` later) and `{parent}._root()` to `_root`.
+
+If you don't set the correct values to both `_parent` and `_root`, it's a consistency issue that will be reported in `_check` of the parent object (`ut` in this case):
+
+[source,java]
+----
+UserTypes ut = new UserTypes();
+
+UserTypes.Chunk one = new UserTypes.Chunk(null, ut, null /* should be `ut._root()` */);
+one.setLenBody(2);
+one.setBody(new byte[] { 'h', 'i' });
+one._check();
+
+ut.setOne(one);
+ut._check(); // io.kaitai.struct.ConsistencyError: Check failed: one, expected: org.example.UserTypes@539645a2, actual: null
+----
+
+[NOTE]
+====
+The error message is a bit inconcrete at the moment, because it only says there's a problem with the field `one` but doesn't specify what exactly. This will be improved in the future, but for now, check out the line where the `ConsistencyError` was thrown for more details:
+
+[source,highlight=2]
+----
+io.kaitai.struct.ConsistencyError: Check failed: one, expected: org.example.UserTypes@539645a2, actual: null
+    at org.example.UserTypes._check (UserTypes.java:48)
+    ...
+----
+
+[source,java,highlight=5]
+----
+public class UserTypes extends KaitaiStruct.ReadWrite {
+    // ...
+    public void _check() {
+        if (!Objects.equals(one()._root(), _root()))
+            throw new ConsistencyError("one", one()._root(), _root());
+        // ...
+    }
+----
+====
+
+After we create an instance of the `UserTypes.Chunk` subtype, we set its properties, and then we *call `_check`*. This is important: `_check` always works only for the one object on which you call it, it doesn't recursively descend into substructures (unlike `_read` and `_write` which do that, so you call them just on the top-level object). So *it's not enough* to call `_check` just on the top-level object - you have do it for every KS object on which you use setters.
+
+=== Fixed contents and validated fields
+
+After creating a new KS object, you have to set also fields with `contents` or `valid` on them, even if there's only one valid value they can have. Kaitai Struct doesn't set anything automatically at the moment. For example, the following `magic` field
+
+[source,yaml]
+----
+seq:
+  - id: magic
+    contents: [0x7f, "ELF"]
+----
+
+needs to be set as follows:
+
+[source,java]
+----
+Elf e = new Elf();
+
+e.setMagic(new byte[] { 0x7f, 'E', 'L', 'F' });
+// ...
+e._check();
+----
+
+The `_check` method validates such fields, so you get notified if the values are not valid.
+
+=== Value instances
+
+They don't have setters. If you need to make value instances change, you have to set their inputs (fields they depend on). For example:
+
+[source,yaml]
+----
+meta:
+  id: value_instances
+seq:
+  - id: len_data_raw
+    type: u2
+  - id: data
+    size: len_data
+instances:
+  len_data:
+    value: len_data_raw - 3
+----
+
+[source,java]
+----
+ValueInstances r = new ValueInstances();
+
+r.setData(new byte[] { 1, 2, 3, 4, 5 });
+r.setLenDataRaw(8);
+System.out.println(r.lenData()); // => 5
+----
+
+We set a 5-byte array to `data`, so for the object to be consistent, we need `len_data` to be `5`. Since it's defined as `len_data_raw - 3`, we set `len_data_raw` to `8`, which makes `len_data` to be `8 - 3 = 5`.
+
+What happens, if you want to change the length of `data` in this existing object? Instances in KS are cached, so even if you change `len_data_raw`, `len_data` will still keep returning the old cached value (`5`):
+
+[source,java]
+----
+// ...
+System.out.println(r.lenData()); // => 5
+
+r.setData(new byte[] { 1, 2, 3 });
+r.setLenDataRaw(6);
+System.out.println(r.lenData()); // => 5 (!)
+----
+
+To fix this, you need to call a special method `_invalidate{Inst}` associated with the value instance after changing `len_data_raw`:
+
+[source,java,highlight=6]
+----
+// ...
+System.out.println(r.lenData()); // => 5
+
+r.setData(new byte[] { 1, 2, 3 });
+r.setLenDataRaw(6);
+r._invalidateLenData();
+System.out.println(r.lenData()); // => 3
+----
+
+The `_invalidate{Inst}` method invalidates the cached value of the instance, so that it's recalculated on the next access.
+
+=== Parse instances
+
+They have setters and their own `_check{Inst}` method. Additionally, you can also use a special boolean setter `set{Inst}_ToWrite`, allowing you to disable writing of a specific instance (as `set{Inst}_ToWrite(false)`) in a particular KS object. This may be useful for C-like `union` members (several overlapping fields with different types, but only one applies in any object), lookaheads or other positional instances you don't want to write.
+
+=== Parameters
+
+You can give them to the constructor when instantiating the KS type and you can later change them via setters. Again, KS doesn't set anything automatically, so you're in charge of setting all parameters, even though you need to set the parameters to same values that the parent type would pass to them. The `_check` method of the parent type contains assertions whether this holds.
+
+NOTE: A known issue is that there's no setter for the built-in `_is_le` parameter used for <<user_guide.adoc#calc-endian,calculated default endianness>>, so if you want to change it, for the time being you need to recreate the object with the correct `_is_le` passed to the constructor, or use reflection to set this private field.
+
+=== Lengths and offsets
+
+Current serialization support relies on fixed-length streams, meaning that once you create a stream, it's not possible to resize it later. Therefore, you'll often need to calculate sizes "manually" in your application along with setting the object properties (at least for the root stream, which you have to provide to the `_write` method). The recommended way to do that is outlined in https://github.com/kaitai-io/kaitai_struct/issues/27#issuecomment-1358689992[this GitHub comment].
+
+=== Enums
+
+In Java, enum values not present in the enum definition are not supported right now. An attempt to write them causes a `NullPointerException`.
+
+=== Bit-sized integers
+
+Unlike the existing parser implementation of bit types which relied on explicit `alignToByte()` calls (and there were many problems connected to that, because the compiler in many cases failed in whether to insert it or not), all byte-aligned operations now perform the byte alignment automatically, and the explicit `alignToByte()` calls aren't usually needed anymore.
+
+When you write `type: bX` fields, only full bytes are written once they're known. This means that if your format ends at an unaligned bit position, the bits of the final partial byte remain in the internal "bit buffer", but the byte will not be written until you do some operation which aligns the position (e.g. `writeBytes(0)`, `seek(...)`, or explicit `writeAlignToByte()`). However, if you don't have anything else to write, it's recommended to `close()` the stream, which first automatically ensures that any remaning bits are written, and then closes the stream.
+
+This is the reason why you should use the `try`-with-resources statement to create and manage the stream, as you saw in previous examples:
+
+[source,java]
+----
+try (KaitaiStream io = new ByteBufferKaitaiStream(output)) {
+    hw._write(io);
+}
+----
+
+It calls `close()` automatically under the hood, so you don't have to think about it.
+
+=== Consistency checks that cannot be done in `_check`
+
+Sometimes, a consistency check cannot be performed in `_check` because the user expressions from the .ksy specification that the check needs to use do not allow it. A typical example is when the expression makes use of the built-in `_io` variable, for example:
+
+[source,yaml]
+----
+seq:
+  - id: rest
+    size: _io.size - _io.pos
+----
+
+Since it's a fixed-length byte array with the `size` expression denoting its length, it's necessary to check whether the length of the `rest` byte array (that might have been changed via a setter) and the value of the `size` expression `_io.size - _io.pos` match. But this expression uses `_io`, so it cannot be performed in `_check`: `_check` is meant to check pure data consistency and the `_io` may not available at this point. So this consistency check will be moved to `_write` just before the `rest` field would be written.

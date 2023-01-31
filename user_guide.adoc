@@ -2626,6 +2626,7 @@ instances:
 ----
 ====
 
+[[methods]]
 === Methods
 
 Just about every value in expression language is an object (including
@@ -2643,6 +2644,7 @@ type that has a `bar` field, and so on).
 There are a few pre-defined methods that form a kind of "standard
 library" for expression language.
 
+[[int-methods]]
 ==== Integers
 
 [cols="3*", options="header"]
@@ -2656,6 +2658,7 @@ library" for expression language.
 |Converts an integer into a string using decimal representation
 |===
 
+[[float-methods]]
 ==== Floating point numbers
 
 [cols="3*", options="header"]
@@ -2669,6 +2672,7 @@ library" for expression language.
 |Truncates a floating point number to an integer
 |===
 
+[[bytes-methods]]
 ==== Byte arrays
 
 [cols="3*", options="header"]
@@ -2686,6 +2690,7 @@ library" for expression language.
 |Decodes (converts) a byte array encoded using the specified `encoding` scheme into a string
 |===
 
+[[str-methods]]
 ==== Strings
 
 [cols="3*", options="header"]
@@ -2715,6 +2720,7 @@ library" for expression language.
 |Converts a string with a number stored in `radix` representation (i.e. use `16` to get hexadecimal representation, use `8` to get octal, etc) to an integer
 |===
 
+[[enum-methods]]
 ==== Enums
 
 [cols="3*", options="header"]
@@ -2728,6 +2734,7 @@ library" for expression language.
 |Converts an enum into the corresponding integer representation
 |===
 
+[[bool-methods]]
 ==== Booleans
 
 [cols="3*", options="header"]
@@ -2741,6 +2748,7 @@ library" for expression language.
 |Returns `0` if the boolean value is `false` or `1` if the boolean value is `true`
 |===
 
+[[usertype-methods]]
 ==== User-defined types
 
 All user-defined types can be queried to get attributes (sequence
