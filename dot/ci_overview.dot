@@ -11,11 +11,11 @@ digraph {
 	artifact_deb [label="bintray:\ncompiler .deb",fillcolor="#baffc9",href="https://bintray.com/kaitai-io/debian_unstable/kaitai-struct-compiler",target="_blank"];
 	artifact_zip [label="bintray:\ncompiler .zip",fillcolor="#baffc9",href="https://bintray.com/kaitai-io/universal_unstable/kaitai-struct-compiler",target="_blank"];
 	artifact_js [label="npm:\ncompiler .js",fillcolor="#baffc9",href="https://www.npmjs.com/package/kaitai-struct-compiler",target="_blank"];
-	artifact_msi [label="appveyor:\ncompiler .msi",fillcolor="#baffc9",href="https://ci.appveyor.com/project/GreyCat/kaitai-struct/build/artifacts",target="_blank"];
+	artifact_msi [label="appveyor:\ncompiler .msi",fillcolor="#baffc9",href="https://ci.appveyor.com/project/kaitai-io/kaitai-struct/build/artifacts",target="_blank"];
 
 	artifact_ci_targets [label="git:\nci_targets",fillcolor="#eaffe9",href="https://github.com/kaitai-io/ci_targets",target="_blank"];
 
-	build_compiler_appveyor [label="appveyor:\nbuild_compiler",fillcolor="#d0d0d0",href="https://ci.appveyor.com/project/GreyCat/kaitai-struct",target="_blank"];
+	build_compiler_appveyor [label="appveyor:\nbuild_compiler",fillcolor="#d0d0d0",href="https://ci.appveyor.com/project/kaitai-io/kaitai-struct",target="_blank"];
 
 	dashboard [label="http://ci.kaitai.io/",href="//ci.kaitai.io/",fillcolor="#ffb86c",target="_blank"];
 	web_ide_unstable [label="https://ide.kaitai.io/devel/",href="https://ide.kaitai.io/devel/",fillcolor="#ffb86c",target="_blank"];

@@ -1,6 +1,6 @@
 = KSY Style Guide
 Kaitai Project
-v0.9
+v0.10
 :toc: left
 :numbered:
 

@@ -111,7 +111,7 @@ https://github.com/kaitai-io/kaitai_struct_tests/blob/master/spec_kst_to_all[spe
 script in tests:
 
 ----
-KST translator 0.9
+KST translator 0.10
 Usage: kst_translator [options] [<test_name>...]
 
   <test_name>...           source test names (.kst)

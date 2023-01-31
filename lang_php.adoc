@@ -17,17 +17,17 @@ cd kaitai-test
 #######################################################################################
 # Download Kaitai Struct Compiler, link can be found at https://kaitai.io/#download page
 
-curl -OL https://bintray.com/artifact/download/kaitai-io/universal/0.9/kaitai-struct-compiler-0.9.zip
+curl -OL https://bintray.com/artifact/download/kaitai-io/universal/0.10/kaitai-struct-compiler-0.10.zip
 
-unzip kaitai-struct-compiler-0.9.zip
+unzip kaitai-struct-compiler-0.10.zip
 
-cd kaitai-struct-compiler-0.9
+cd kaitai-struct-compiler-0.10
 
 ###############
 # Check version
 
 bin/kaitai-struct-compiler --version
-# Shows kaitai-struct-compiler 0.9
+# Shows kaitai-struct-compiler 0.10
 
 ################################################
 # Download and compile ELF file format - elf.ksy
