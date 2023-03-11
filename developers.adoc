@@ -96,7 +96,7 @@ For example
 [source,shell]
   sbt -Dhttp.proxyHost=proxy.com -Dhttp.proxyPort=3128 -Dhttps.proxyHost=proxy.com -Dhttps.proxyPort=3128
 
-Unfortunately, `sbt` doesn't understand `http(s)_proxy` environment variable properly, if it contains
+Unfortunately, `sbt` doesn't understand `+http(s)_proxy+` environment variable properly, if it contains
 address of proxy server in `host:port` format, so flags is necessary.
 
 This flags needed only on first run or when you want to check and upgrade dependencies. After first `sbt`
@@ -121,7 +121,7 @@ https://www.scala-sbt.org/sbt-native-packager/formats/universal.html[SBT native 
   * On Debian/Ubuntu host: `sudo -i apt-get install dpkg dpkg-sig dpkg-dev lintian fakeroot`
   * On RedHat host: `sudo dnf install dpkg fakeroot`
 . `sbt compilerJVM/debian:packageBin`
-. Get result in `jvm/target/kaitai-struct-compiler_*_all.deb`
+. Get result in `+jvm/target/kaitai-struct-compiler_*_all.deb+`
 
 ==== Building https://www.scala-sbt.org/sbt-native-packager/formats/rpm.html[RedHat package]
 
@@ -167,7 +167,7 @@ actually be JavaScript libraries, not Java jars.
   ** Debian distribution: `jessie`
   ** Debian component: `main`
   ** Debian architecture: `all`
-  ** Attached file: `jvm/target/kaitai-struct-compiler_*_all.deb`
+  ** Attached file: `+jvm/target/kaitai-struct-compiler_*_all.deb+`
   * https://bintray.com/kaitai-io/universal/kaitai-struct-compiler/$VERSION/upload
   ** Target path: `$VERSION`
   ** Attached file: `jvm/target/universal/kaitai-struct-compiler-*.zip`
@@ -255,7 +255,7 @@ to `X.Y.Z` format (e.g. `0.9.0` for 0.9 release)
 
 * Install/update the needed Python packaging tools: `python3 -m pip install --upgrade setuptools twine wheel`
 ** If this gives you permission errors, **don't use `sudo` to run `pip`**. Instead use your system package manager (e. g. `apt`) to install/update the tools, or add the `--user` option to `pip install`.
-* Pump version in `kaitaistruct.py`, seek `\\__version__ =`
+* Pump version in `kaitaistruct.py`, seek `+__version__ =+`
 * Delete the `dist` directory (if it exists), so that built files from previous or development versions don't get uploaded by accident.
 * `python3 setup.py sdist bdist_wheel`
 * `twine check dist/*`

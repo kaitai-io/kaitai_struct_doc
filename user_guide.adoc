@@ -598,9 +598,9 @@ hierarchy — e.g. `size: header.subheader_1.subsubheader_1_2.field_4`.
 But sometimes we need just the opposite: how do we access upper-level
 elements from lower-level types? Kaitai Struct provides two options here:
 
-==== `_parent`
+==== `+_parent+`
 
-One can use the special pseudo-attribute `_parent` to access the parent
+One can use the special pseudo-attribute `+_parent+` to access the parent
 structure:
 
 [source,yaml]
@@ -608,13 +608,13 @@ structure:
 TODO
 ----
 
-==== `_root`
+==== `+_root+`
 
 In some cases, it would be way too impractical to write tons of
-`_parent._parent._parent._parent...` or just plain impossible (if you're
+`+_parent._parent._parent._parent...+` or just plain impossible (if you're
 describing a type which might be used on several different levels, thus
-different number of `_parent` would be needed). In this case, we can use a
-special pseudo-attribute `_root` to just start navigating from the very
+different number of `+_parent+` would be needed). In this case, we can use a
+special pseudo-attribute `+_root+` to just start navigating from the very
 top-level type:
 
 TODO
@@ -816,7 +816,7 @@ This one reads 4-byte signed integer numbers until encountering `-1`. On
 encountering `-1`, the loop will stop and further sequence elements (if
 any) will be processed. Note that `-1` would still be added to array.
 
-Underscore (`_`) is used as a special variable name that refers to the
+Underscore (`+_+`) is used as a special variable name that refers to the
 element that we've just parsed. When parsing an array of user types, it
 is possible to write a `repeat-until` expression that would reference some
 attribute inside that user type:
@@ -1849,7 +1849,7 @@ this.joe = new Person(_io__raw_joe, this, _root);
 ----
 
 Every class that Kaitai Struct generates carries a concept of a "stream", usually
-available as an `_io` member. This is the default stream it reads from
+available as an `+_io+` member. This is the default stream it reads from
 and writes to. This stream works just as you might expect from a
 regular IO stream implementation in a typical language: it
 encapsulates reading from files and memory, stores a pointer to its
@@ -1859,7 +1859,7 @@ Declaring a new user-defined type in the middle of the `seq` attributes
 generates a new object (usually via a constructor call), and this object,
 in turn, needs its own IO stream. So, what are our options here?
 
-* In the "sizeless" case, we just pass the current `_io` along to the new
+* In the "sizeless" case, we just pass the current `+_io+` along to the new
   object. This "reuses" the existing stream with all its properties:
   current pointer position, size, available bytes, etc.
 * In the "sized" case, we know the size a priori and want the object we
@@ -2184,7 +2184,7 @@ been limited to exactly 80 bytes. Inside each 80-byte chunk, there's a
 `file_name`, and, more importantly, a pointer to the absolute location of
 the file's body inside the stream. The `body` instance allows us to get that
 file's body contents quickly and easily. Note that if there was no
-`io: _root._io` key there, that `body` would have been parsed inside a
+`+io: _root._io+` key there, that `body` would have been parsed inside a
 80-byte substream (and most likely that would result in an exception
 trying to read outside of the 80 byte limit), and that's not what we want
 here.
@@ -2322,7 +2322,7 @@ specified literally. One can use:
 * binary form using `0b` prefix (e.g. `0b00111011`)
 * octal form using `0o` prefix (e.g. `0o755`)
 
-It's possible to use `_` as a visual separator in literals — it will
+It's possible to use `+_+` as a visual separator in literals — it will
 be completely ignored by the parser. This could be useful, for example,
 to:
 
@@ -2459,7 +2459,7 @@ TODO: Enums
 parse and the state of parsing (i.e. where the pointer is). There is no
 way to declare a stream-type attribute directly by parsing
 instructions or specify it as a literal. The typical way to get stream
-objects is to query the `_io` attribute from a user-defined object: that
+objects is to query the `+_io+` attribute from a user-defined object: that
 will give us a stream associated with this particular object.
 
 === Composite data types
@@ -2754,7 +2754,7 @@ library" for expression language.
 All user-defined types can be queried to get attributes (sequence
 attributes or instances) by their name. In addition to that, there are
 a few pre-defined internal methods (they all start with an underscore
-`_`, so they don't clash with regular attribute names):
+`+_+`, so they don't clash with regular attribute names):
 
 [cols="3*", options="header"]
 |===
@@ -2762,15 +2762,15 @@ a few pre-defined internal methods (they all start with an underscore
 |Return type
 |Description
 
-|`_root`
+|`+_root+`
 |User-defined type
 |Top-level user-defined structure in current file
 
-|`_parent`
+|`+_parent+`
 |User-defined type
 |Structure that produced this particular instance of user-defined type
 
-|`_io`
+|`+_io+`
 |Stream
 |Stream associated with this object of user-defined type
 |===
@@ -3503,7 +3503,7 @@ public static class Arg extends KaitaiStruct {
     public Arg(KaitaiStream _io, KaitaiStruct _parent, TopLevelClass _root) {
 ----
 
-Note that both `OpcodeJmp` and `OpcodePush` supply `this` as `_parent`
+Note that both `OpcodeJmp` and `OpcodePush` supply `this` as `+_parent+`
 argument in `Arg` constructor, and, as it is declared as
 `KaitaiStruct`. As both opcode classes are declared with `extends
 KaitaiStruct`, this code will compile properly.
@@ -3511,7 +3511,7 @@ KaitaiStruct`, this code will compile properly.
 ==== Replacing parent
 
 In some situations, you might want to replace the default `this`
-passed as `_parent` with something else. In some situations this will
+passed as `+_parent+` with something else. In some situations this will
 provide you a clean and elegant solution to relatively complex
 problems. Consider the following data structure that loosely
 represents a binary tree:
@@ -3549,12 +3549,12 @@ calls itself again to parse either left or right child nodes for the
 current node if they exist, according to the flags.
 
 The only problem is how to access `chunk_size` in each node. You can't
-access the tree object starting from `_root` here, as there could be many
+access the tree object starting from `+_root+` here, as there could be many
 different trees in our file, and you need to access the current one. Using
-`_parent` directly is just impossible. True, given that `node` type is
+`+_parent+` directly is just impossible. True, given that `node` type is
 used both by `tree` and `node` itself, it got two different parents,
 so Kaitai Struct compiler downgrades node's parent type to
-KaitaiStruct, thus trying to access `_parent.chunk_size` would result
+KaitaiStruct, thus trying to access `+_parent.chunk_size+` would result
 in a compile-time error.
 
 TODO: add more about the error
@@ -3590,12 +3590,12 @@ types:
 ----
 
 We've changed only three lines. We've enforced the parent of the node in the
-`left_child` and `right_child` attributes to be passed as `_parent`,
+`left_child` and `right_child` attributes to be passed as `+_parent+`,
 not `this`. This, effectively, continues passing a reference to the original
 node's parent, which is a `tree` type object, over and over in the whole
 recursive structure. This way one can access the structure's root by just
-using `_parent`. Naturally, we've done exactly that to get ourselves
-`chunk_size` by just using `size: _parent.chunk_size`.
+using `+_parent+`. Naturally, we've done exactly that to get ourselves
+`chunk_size` by just using `+size: _parent.chunk_size+`.
 
 ==== Omitting parent
 
@@ -3790,7 +3790,7 @@ would also be propagated to other subtypes, declared within
 If `indicator` is neither `II` nor `MM`, i.e. both `cases` fail,
 this example would trigger a parsing exception. If you want to handle
 it in a manner like "II means little-endian and everything else means
-big-endian", use the normal else case (`_`):
+big-endian", use the normal else case (`+_+`):
 
 [source,yaml]
 ----
@@ -3940,7 +3940,7 @@ types:
 ----
 
 However, if your format has some information laid out sparsely, i.e. a
-separate table of file sizes and their contents, you can use `_index`
+separate table of file sizes and their contents, you can use `+_index+`
 to access the repetition index and resolve the size from the size array:
 
 [source,yaml]
@@ -3967,9 +3967,9 @@ acts as an offset where to start sequentially reading all the items
 body in an extra user type `file_body`, where we can do the actual
 parsing.
 
-However, `_index` is a "local variable", so we lose access to it
+However, `+_index+` is a "local variable", so we lose access to it
 as soon as we enter the subtype `file_body`. The solution is to
-pass `_index` into `file_body` using <<param-types>>:
+pass `+_index+` into `file_body` using <<param-types>>:
 
 [source,yaml]
 ----
@@ -4032,7 +4032,7 @@ but does not directly specify sizes of the files:
 In this example, we have N = 3 offsets, which specify N - 1 = 2
 sections. Sizes of the sections must be derived as the start of the
 following section minus the start of the current section. To do such
-a calculation, we can use `_index` in the expressions:
+a calculation, we can use `+_index+` in the expressions:
 
 [source,yaml]
 ----
@@ -4072,7 +4072,7 @@ f0 02 00 00       = offset 0x2f0
 ....
 
 In this case we'll need to do a calculation inside `file_entry`.
-Once we pass the `_index` from the parent type to it, it's easy:
+Once we pass the `+_index+` from the parent type to it, it's easy:
 
 [source,yaml]
 ----

@@ -72,7 +72,7 @@ basic classes:
 
 * KaitaiStruct — a common superclass for all classes that represent
   user types in KS. Java implementation is very limited and basically
-  only keeps `_io` member of type KaitaiStream and provides a getter
+  only keeps `+_io+` member of type KaitaiStream and provides a getter
   for it.
 * KaitaiStream — a useful abstraction of seekable input stream that
   can be read with <<stream_api.adoc#,Kaitai Struct stream API>>
@@ -127,7 +127,7 @@ public class Parent extends KaitaiStruct {
 ----
 
 Every generated class will have 3 constructors and a static factory
-method (plus a private `_read()` method that is invoked from all the
+method (plus a private `+_read()+` method that is invoked from all the
 constructors to do actual parsing):
 
 [source,java]
@@ -140,7 +140,7 @@ public static AnExampleClass fromFile(String fileName)
 
 == Attributes
 
-Sequence attribute parsing is done in `_read()` method which is
+Sequence attribute parsing is done in `+_read()+` method which is
 typically invoked from a constructor. All parsed attributes are stored
 as private member variables.
 

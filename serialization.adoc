@@ -81,9 +81,9 @@ try (KaitaiStream io = new ByteBufferKaitaiStream("path/to/some.gif")) {
 }
 ----
 
-This is because the `_read` method (responsible for parsing the data) is automatically called from constructors of the generated classes, and is also `private` because you never need to call it explicitly.
+This is because the `+_read+` method (responsible for parsing the data) is automatically called from constructors of the generated classes, and is also `private` because you never need to call it explicitly.
 
-However, in read-write mode, it's no longer clear to Kaitai Struct why you're creating a particular object. The purpose may just be to create an empty object to be filled with data and later written, in which case you don't want to read from any stream. For this reason, `_read` is never called automatically in read-write mode - you need to call it explicitly if you want to read from a stream:
+However, in read-write mode, it's no longer clear to Kaitai Struct why you're creating a particular object. The purpose may just be to create an empty object to be filled with data and later written, in which case you don't want to read from any stream. For this reason, `+_read+` is never called automatically in read-write mode - you need to call it explicitly if you want to read from a stream:
 
 [source,java,highlight=3]
 ----
@@ -179,18 +179,18 @@ Note that there are essentially 4 phases of serialization:
 
 1. Initialize an object instance of a KS-generated class (which reflects a user-defined type in the source .ksy specification).
 2. Set the object properties (`seq` fields or positional `instances` in the .ksy) according to the data you want to serialize.
-3. Call the `_check` method of the KS object after setting its properties once you believe it's ready for serialization.
-4. Call the `_write` method on the top-level object and pass it the `KaitaiStream` object you want to write to.
+3. Call the `+_check+` method of the KS object after setting its properties once you believe it's ready for serialization.
+4. Call the `+_write+` method on the top-level object and pass it the `KaitaiStream` object you want to write to.
 
-First, we create an empty instance of the top-level class `HelloWorld` and bind it to the `hw` variable. As you can see in the original .ksy spec, it has only one field called `foo`, which is a list of two `s4` (signed 4-byte) integers. We assign such list to it with the values we wanted to write using the `setFoo` setter. After that, we're convinced that the `hw` object is ready to be written, so we call `hw._check()`. When it passes, we move on to the actual writing - we'll prepare a byte array for the output, create a `ByteBufferKaitaiStream` as a wrapper around this byte array and then call the `_write` method on the top-level `hw` object, which serializes the whole thing. After the `try`-with-resources statement, `output` holds the final byte data, which we can e.g. write it to a file or transmit it over the network.
+First, we create an empty instance of the top-level class `HelloWorld` and bind it to the `hw` variable. As you can see in the original .ksy spec, it has only one field called `foo`, which is a list of two `s4` (signed 4-byte) integers. We assign such list to it with the values we wanted to write using the `setFoo` setter. After that, we're convinced that the `hw` object is ready to be written, so we call `hw._check()`. When it passes, we move on to the actual writing - we'll prepare a byte array for the output, create a `ByteBufferKaitaiStream` as a wrapper around this byte array and then call the `+_write+` method on the top-level `hw` object, which serializes the whole thing. After the `try`-with-resources statement, `output` holds the final byte data, which we can e.g. write it to a file or transmit it over the network.
 
-=== Consistency checks: the `_check` method
+=== Consistency checks: the `+_check+` method
 
-Let's focus on what the `_check` method does. We know that `foo` is expected to be a list of exactly 2 integers (because of `repeat-expr: 2` in the source .ksy). Every parsing of the `hello_world` type tries to read 2 integers, and in any successfully parsed `HelloWorld` object, `foo` will be always 2 elements long. However, the `setFoo` setter allows us to set __any__ integer list - even if its length is 0, 1 or greater than 2.
+Let's focus on what the `+_check+` method does. We know that `foo` is expected to be a list of exactly 2 integers (because of `repeat-expr: 2` in the source .ksy). Every parsing of the `hello_world` type tries to read 2 integers, and in any successfully parsed `HelloWorld` object, `foo` will be always 2 elements long. However, the `setFoo` setter allows us to set __any__ integer list - even if its length is 0, 1 or greater than 2.
 
 Nevertheless, if we set `foo` to a list of length other than 2 and write the `hw` object to bytes, we won't be able to get the same state of the `HelloWorld` object by parsing these bytes again: either the parsing fails with an EOF exception if the stream was shorter than 8 bytes, or we get garbage values in `foo` (if we attempted to write `foo` with less than 2 elements) because we interpret some bytes outside `foo` as if they were `foo` values, or we may read 2 correct values, but the object we serialized had actually more. In such cases, it's generally inevitable that not only the parsed `foo` will not match the `foo` we wrote, but it would also shift the offsets of *all* fields after `foo`, which means their values would be incorrect too.
 
-This is because by setting `foo` to anything other than a 2-integer list, we violate the property of *consistency* - the data is not consistent with the constraints directly following from how the format is specified in the source .ksy file. Kaitai Struct knows these constraints, and generates assertions for them in the `_check` method whenever possible. If `_check` detects a consistency issue, it throws a `ConsistencyError`, telling you to fix the problem and try again. This protects you from proceeding to the writing phase with inconsistent values, which would inevitably result into corrupt data that cannot be faithfully decoded back to the original values.
+This is because by setting `foo` to anything other than a 2-integer list, we violate the property of *consistency* - the data is not consistent with the constraints directly following from how the format is specified in the source .ksy file. Kaitai Struct knows these constraints, and generates assertions for them in the `+_check+` method whenever possible. If `+_check+` detects a consistency issue, it throws a `ConsistencyError`, telling you to fix the problem and try again. This protects you from proceeding to the writing phase with inconsistent values, which would inevitably result into corrupt data that cannot be faithfully decoded back to the original values.
 
 To see it in action, let's try what happens if we set `foo` to a list of length 3 and ask the `HelloWorld` class what it thinks about the consistency of this object:
 
@@ -201,7 +201,7 @@ hw.setFoo(new ArrayList<>(Arrays.asList(-4, 65536, 128)));
 hw._check(); // io.kaitai.struct.ConsistencyError: Check failed: foo, expected: 2, actual: 3
 ----
 
-As expected, the `_check` method caught the problem and threw an exception - the expected length of field `foo` was 2, but it was 3, which doesn't match the format definition.
+As expected, the `+_check+` method caught the problem and threw an exception - the expected length of field `foo` was 2, but it was 3, which doesn't match the format definition.
 
 == Section
 
@@ -256,9 +256,9 @@ First, we instantiate the root class `UserTypes` as usual. Then we need the inst
         }
 ----
 
-The reason for that is that we must provide values for the `_parent` and `_root` parameters (see <<user_guide.adoc#usertype-methods,their description>> in the User Guide). These built-in references should be valid in all KS types so that it's possible to rely on them in expressions inside the .ksy spec when needed. When you instantiate inner types (any user-defined types other than the top-level) manually, you have to set these properties correctly. Note the generally-applicable rule of what should go there - the parent object to `_parent` (in this case, ``one``'s parent object is `ut` because we're doing `ut.setOne(one)` later) and `{parent}._root()` to `_root`.
+The reason for that is that we must provide values for the `+_parent+` and `+_root+` parameters (see <<user_guide.adoc#usertype-methods,their description>> in the User Guide). These built-in references should be valid in all KS types so that it's possible to rely on them in expressions inside the .ksy spec when needed. When you instantiate inner types (any user-defined types other than the top-level) manually, you have to set these properties correctly. Note the generally-applicable rule of what should go there - the parent object to `+_parent+` (in this case, ``one``'s parent object is `ut` because we're doing `ut.setOne(one)` later) and `{parent}._root()` to `+_root+`.
 
-If you don't set the correct values to both `_parent` and `_root`, it's a consistency issue that will be reported in `_check` of the parent object (`ut` in this case):
+If you don't set the correct values to both `+_parent+` and `+_root+`, it's a consistency issue that will be reported in `+_check+` of the parent object (`ut` in this case):
 
 [source,java]
 ----
@@ -296,7 +296,7 @@ public class UserTypes extends KaitaiStruct.ReadWrite {
 ----
 ====
 
-After we create an instance of the `UserTypes.Chunk` subtype, we set its properties, and then we *call `_check`*. This is important: `_check` always works only for the one object on which you call it, it doesn't recursively descend into substructures (unlike `_read` and `_write` which do that, so you call them just on the top-level object). So *it's not enough* to call `_check` just on the top-level object - you have do it for every KS object on which you use setters.
+After we create an instance of the `UserTypes.Chunk` subtype, we set its properties, and then we *call `+_check+`*. This is important: `+_check+` always works only for the one object on which you call it, it doesn't recursively descend into substructures (unlike `+_read+` and `+_write+` which do that, so you call them just on the top-level object). So *it's not enough* to call `+_check+` just on the top-level object - you have do it for every KS object on which you use setters.
 
 === Fixed contents and validated fields
 
@@ -320,7 +320,7 @@ e.setMagic(new byte[] { 0x7f, 'E', 'L', 'F' });
 e._check();
 ----
 
-The `_check` method validates such fields, so you get notified if the values are not valid.
+The `+_check+` method validates such fields, so you get notified if the values are not valid.
 
 === Value instances
 
@@ -363,7 +363,7 @@ r.setLenDataRaw(6);
 System.out.println(r.lenData()); // => 5 (!)
 ----
 
-To fix this, you need to call a special method `_invalidate{Inst}` associated with the value instance after changing `len_data_raw`:
+To fix this, you need to call a special method `+_invalidate{Inst}+` associated with the value instance after changing `len_data_raw`:
 
 [source,java,highlight=6]
 ----
@@ -376,21 +376,21 @@ r._invalidateLenData();
 System.out.println(r.lenData()); // => 3
 ----
 
-The `_invalidate{Inst}` method invalidates the cached value of the instance, so that it's recalculated on the next access.
+The `+_invalidate{Inst}+` method invalidates the cached value of the instance, so that it's recalculated on the next access.
 
 === Parse instances
 
-They have setters and their own `_check{Inst}` method. Additionally, you can also use a special boolean setter `set{Inst}_ToWrite`, allowing you to disable writing of a specific instance (as `set{Inst}_ToWrite(false)`) in a particular KS object. This may be useful for C-like `union` members (several overlapping fields with different types, but only one applies in any object), lookaheads or other positional instances you don't want to write.
+They have setters and their own `+_check{Inst}+` method. Additionally, you can also use a special boolean setter `set{Inst}_ToWrite`, allowing you to disable writing of a specific instance (as `set{Inst}_ToWrite(false)`) in a particular KS object. This may be useful for C-like `union` members (several overlapping fields with different types, but only one applies in any object), lookaheads or other positional instances you don't want to write.
 
 === Parameters
 
-You can give them to the constructor when instantiating the KS type and you can later change them via setters. Again, KS doesn't set anything automatically, so you're in charge of setting all parameters, even though you need to set the parameters to same values that the parent type would pass to them. The `_check` method of the parent type contains assertions whether this holds.
+You can give them to the constructor when instantiating the KS type and you can later change them via setters. Again, KS doesn't set anything automatically, so you're in charge of setting all parameters, even though you need to set the parameters to same values that the parent type would pass to them. The `+_check+` method of the parent type contains assertions whether this holds.
 
-NOTE: A known issue is that there's no setter for the built-in `_is_le` parameter used for <<user_guide.adoc#calc-endian,calculated default endianness>>, so if you want to change it, for the time being you need to recreate the object with the correct `_is_le` passed to the constructor, or use reflection to set this private field.
+NOTE: A known issue is that there's no setter for the built-in `+_is_le+` parameter used for <<user_guide.adoc#calc-endian,calculated default endianness>>, so if you want to change it, for the time being you need to recreate the object with the correct `+_is_le+` passed to the constructor, or use reflection to set this private field.
 
 === Lengths and offsets
 
-Current serialization support relies on fixed-length streams, meaning that once you create a stream, it's not possible to resize it later. Therefore, you'll often need to calculate sizes "manually" in your application along with setting the object properties (at least for the root stream, which you have to provide to the `_write` method). The recommended way to do that is outlined in https://github.com/kaitai-io/kaitai_struct/issues/27#issuecomment-1358689992[this GitHub comment].
+Current serialization support relies on fixed-length streams, meaning that once you create a stream, it's not possible to resize it later. Therefore, you'll often need to calculate sizes "manually" in your application along with setting the object properties (at least for the root stream, which you have to provide to the `+_write+` method). The recommended way to do that is outlined in https://github.com/kaitai-io/kaitai_struct/issues/27#issuecomment-1358689992[this GitHub comment].
 
 === Enums
 
@@ -413,9 +413,9 @@ try (KaitaiStream io = new ByteBufferKaitaiStream(output)) {
 
 It calls `close()` automatically under the hood, so you don't have to think about it.
 
-=== Consistency checks that cannot be done in `_check`
+=== Consistency checks that cannot be done in `+_check+`
 
-Sometimes, a consistency check cannot be performed in `_check` because the user expressions from the .ksy specification that the check needs to use do not allow it. A typical example is when the expression makes use of the built-in `_io` variable, for example:
+Sometimes, a consistency check cannot be performed in `+_check+` because the user expressions from the .ksy specification that the check needs to use do not allow it. A typical example is when the expression makes use of the built-in `+_io+` variable, for example:
 
 [source,yaml]
 ----
@@ -424,4 +424,4 @@ seq:
     size: _io.size - _io.pos
 ----
 
-Since it's a fixed-length byte array with the `size` expression denoting its length, it's necessary to check whether the length of the `rest` byte array (that might have been changed via a setter) and the value of the `size` expression `_io.size - _io.pos` match. But this expression uses `_io`, so it cannot be performed in `_check`: `_check` is meant to check pure data consistency and the `_io` may not available at this point. So this consistency check will be moved to `_write` just before the `rest` field would be written.
+Since it's a fixed-length byte array with the `size` expression denoting its length, it's necessary to check whether the length of the `rest` byte array (that might have been changed via a setter) and the value of the `size` expression `+_io.size - _io.pos+` match. But this expression uses `+_io+`, so it cannot be performed in `+_check+`: `+_check+` is meant to check pure data consistency and the `+_io+` may not available at this point. So this consistency check will be moved to `+_write+` just before the `rest` field would be written.
