@@ -15,7 +15,7 @@ cache:
   - apt
 
 before_install:
-  - gem install asciidoctor pygments.rb
+  - gem install asciidoctor pygments.rb && gem install --prerelease asciidoctor-tabs
   - git clone -b v2.1.0 --depth 1 https://github.com/lbovet/docson.git
 
 script:
