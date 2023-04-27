@@ -1061,6 +1061,18 @@ Value instances do no actual parsing, and thus do not require a `pos`
 key or a `type` key (the type will be derived automatically). If you need
 to enforce the type of the expression, see <<typecast,typecasting>>.
 
+More complex expressions and arrays can also be assigned to value, by putting expression in `'` or after `|` in new line.
+
+[source,yaml]
+----
+instances:
+  fibonacci_v1:
+    value: '[0, 1, 2, 3, 5, 8, 13]'
+  fibonacci_v2:
+    value: |
+      [0, 1, 2, 3, 5, 8, 13]
+----
+
 === Bit-sized integers
 
 Quite a few protocols and file formats, especially those which aim to
