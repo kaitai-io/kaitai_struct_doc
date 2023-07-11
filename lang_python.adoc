@@ -10,8 +10,8 @@ v0.10
 === Supported Python versions
 
 Kaitai Struct supports Python 3.4 and later as well as Python 2.7.
-It is strongly recommended to use Python 3.7 or newer,
-because Python 3.6 and 2.7 have reached end-of-life
+It is strongly recommended to use Python 3.8 or newer,
+because Python 3.7 and 2.7 have reached end-of-life
 and no longer receive official support from the Python developers.
 
 [[ksc]]
