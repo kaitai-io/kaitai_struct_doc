@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7'
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install GraphViz
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y graphviz
+      - name: Install Ruby deps
+        run: |
+          echo 'gem: --no-document' >> ~/.gemrc
+          gem install asciidoctor pygments.rb && gem install --prerelease asciidoctor-tabs
+      - name: Install Docson
+        run: git clone -b v2.1.0 --depth 1 https://github.com/lbovet/docson.git
+      - name: Build
+        run: make
+      - name: Deploy
+        env:
+          BOT_SSH_KEY: ${{secrets.BOT_SSH_KEY}}
+        run: |
+          .github/push_artifacts/git_config_kaitai_bot
+          .github/push_artifacts/publish \
+            -o kaitai-io \
+            -r doc-kaitai-io.github.io \
+            -m "Regen ${GITHUB_REF#refs/heads/*} $GITHUB_REPOSITORY@$GITHUB_SHA" -- \
+            --exclude=.git \
+            --exclude=CNAME \
+            --exclude=favicon.ico \
+            --exclude=favicon.ico.license \
+            out/
+        # NB:  ^ trailing slash in 'out/' is *very* important for rsync!
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
