@@ -35,7 +35,7 @@ out/%.html: raw/%.html tmpl/navbar.html postprocess-html
 	./postprocess-html $< $@
 
 raw/%.html: %.adoc
-	TZ=UTC asciidoctor -r asciidoctor-tabs -a stylesheet! -a docinfo=shared,private -a nofooter -a source-highlighter=pygments -a pygments-style=default -a linkcss -a copycss -a stylesdir=styles -a scriptsdir=js -D raw $<
+	TZ=UTC bundle exec asciidoctor -r asciidoctor-tabs -a stylesheet! -a docinfo=shared,private -a nofooter -a source-highlighter=pygments -a pygments-style=default -a linkcss -a copycss -a stylesdir=styles -a scriptsdir=js -D raw $<
 
 out/svg/%.svg: dot/%.dot
 	mkdir -p out/svg
