@@ -1697,7 +1697,7 @@ of `extended_file_system_%28ext%29`.
   http://fileformats.archiveteam.org/wiki/Main_Page["Just Solve the File Format
   Problem" wiki], a wiki that collects information on many file
   formats. A full link could be generated as
-  `http://fileformats.archiveteam.org/wiki/` + this value.
+  `+http://fileformats.archiveteam.org/wiki/+` + this value.
 * `loc` specifies an identifier in the
   https://www.loc.gov/preservation/digital/formats/fdd/browse_list.shtml[Digital
   Formats] database of the https://www.loc.gov/[US Library of Congress], a
