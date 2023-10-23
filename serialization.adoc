@@ -725,7 +725,7 @@ The Java's `+_invalidate{Inst}+` / Python's `+_invalidate_{inst}+` method invali
 
 === Parse instances
 
-They have setters and their own `+_check{Inst}+` (`+_check_{inst}+`) method which you should call. Additionally, you can also use a special boolean setter `set{Inst}_ToWrite` hello (in Python you'd assign a boolean to a property `+{inst}__to_write+`), allowing you to disable writing of a specific instance (as `r.set{Inst}_ToWrite(false)` in Java, or `+r.{inst}__to_write = False+` in Python) in a particular KS object. This may be useful for C-style `union` members (several overlapping fields with different types, but only one applies in any object), lookaheads or other positional instances you don't want to write.
+They have setters and their own `+_check{Inst}+` (`+_check_{inst}+`) method which you should call. Additionally, you can also use a special boolean `set{Inst}_ToWrite` setter (in Python you'd assign a boolean to a property `+{inst}__to_write+`), allowing you to disable writing of a specific instance (as `r.set{Inst}_ToWrite(false)` in Java, or `+r.{inst}__to_write = False+` in Python) in a particular KS object. This may be useful for C-style `union` members (several overlapping fields with different types, but only one applies in any object), lookaheads or other positional instances you don't want to write.
 
 === Parameters
 
