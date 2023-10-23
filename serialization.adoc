@@ -25,7 +25,7 @@ Once you have the .ksy specification of the format you want to serialize, you ne
 
 Don't worry, it should be straightforward:
 
-1. Install `sbt` from https://www.scala-sbt.org/download.html.
+1. Install `sbt` by following the steps at https://www.scala-sbt.org/1.x/docs/Setup.html.
 
 2. Clone the https://github.com/kaitai-io/kaitai_struct_compiler repository, checkout the https://github.com/kaitai-io/kaitai_struct_compiler/tree/serialization[*serialization*] branch.
 +
