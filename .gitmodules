@@ -1,3 +1,6 @@
 [submodule "push_artifacts"]
 	path = .github/push_artifacts
 	url = https://github.com/kaitai-io/push_artifacts.git
+[submodule "docson"]
+	path = docson
+	url = https://github.com/lbovet/docson.git

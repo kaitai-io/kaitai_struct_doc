@@ -23,8 +23,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y graphviz
-      - name: Install Docson
-        run: git clone -b v2.1.0 --depth 1 https://github.com/lbovet/docson.git
       - name: Build
         run: make
       - name: Deploy
