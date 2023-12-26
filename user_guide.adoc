@@ -310,6 +310,47 @@ definitely not recommended in real-life specs):
 NOTE: There's no need to specify `type` or `size` for fixed contents
 data — it all comes naturally from the `contents`.
 
+[[valid-values]]
+=== Validating attribute values
+
+To ensure attributes in your data structures adhere to expected formats and ranges, Kaitai Struct provides a mechanism for validating attribute values using the `valid` key. This key allows you to define constraints for values, enhancing the robustness of your specifications. Here's how you can enforce these constraints:
+
+* `eq` (or directly `valid: value`): Ensures the attribute value exactly matches the given value.
+* `min`: Specifies the minimum valid value for the attribute.
+* `max`: Specifies the maximum valid value for the attribute.
+* `any-of`: Defines a list of acceptable values, one of which the attribute must match.
+* `expr`: An expression that evaluates to true for the attribute to be considered valid.
+
+For most cases, the direct `valid: value` shortcut is preferred for its simplicity, effectively functioning as `valid/eq`.
+
+[source,yaml]
+----
+seq:
+  - id: exact_value
+    type: u1
+    valid: 0x42  # Shortcut for eq: The only valid value is 0x42
+
+  - id: bounded_value
+    type: u2
+    valid:
+      min: 100  # Value must be at least 100
+      max: 200  # and at most 200
+
+  - id: enum_value
+    type: u4
+    valid:
+      any-of: [3, 5, 7]  # Value must be one of 3, 5, or 7
+
+  - id: calculated_value
+    type: u4
+    valid:
+      expr: _ % 2 == 0  # Value must be even
+----
+
+When a value does not meet the specified criteria, Kaitai Struct raises a validation error, halting further parsing. This preemptive measure ensures the data being parsed is within the expected domain, providing a first layer of error handling.
+
+NOTE: The actual implementation of validation checks is language-dependent and may vary in behavior and supported features across different target languages.
+
 [[var-length-struct]]
 === Variable-length structures
 
