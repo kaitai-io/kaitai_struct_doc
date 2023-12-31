@@ -1654,6 +1654,31 @@ seq:
 ----
 ====
 
+[[affected-by]]
+==== `-affected-by`
+Sometimes your spec cannot be implemented optimally because of
+missing features and bugs in Kaitai Struct Compiler. You can
+leave a machine-readable reference to a bug, so it is possible
+to implement a bot, tracking the specs affected, generating reports
+and notifying specs authors when the bug affecting them is fixed.
+
+If the spec cannot be implemented at all because of a bug/missing
+feature, you shouldn't use `-affected-by`, instead you should use
+`-blocked-by`. It makes sense to track it only in PRs, since we
+don't accept broken specs to KSF.
+
+* Leave just an issue identifier (on GitHub it is just an issue
+number, not the internal one, but the one you usually see),
+if the bug is in kaitai_struct repo. (The type may be a string
+or integer.)
+* If the bug is in another repo in kaitai-io, leave a repo
+name and an issue number separated by a space. (The type is string.)
+* If the bug is in another repo on the same code hosting platform,
+prefix repo name with its owner name and a slash.
+* If the bug is in a repo on another platform, give its full URI.
+* If the issue is affected by multiple bugs, use an array.
+
+
 [[verbose-enums]]
 ==== Verbose enums
 
