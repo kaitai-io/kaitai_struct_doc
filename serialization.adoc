@@ -50,7 +50,7 @@ Usage: kaitai-struct-compiler [options] <file>...
 
   <file>...                source files (.ksy)
   -t, --target <language>  target languages (graphviz, csharp, rust, all, perl, java, go, cpp_stl, php, lua, python, nim, html, ruby, construct, javascript)
-  -w, --read-write         generate read-write support in classes (default: read-only)
+  -w, --read-write         generate read-write support in classes (implies `--no-auto-read --zero-copy-substream false`, Java and Python only, default: read-only)
 ----
 
 === Compiling a .ksy specification in read-write mode
@@ -164,11 +164,11 @@ As with the compiler, the latest released 0.10 KS runtime libraries don't have s
 Java::
 +
 --
-In Java, you need to checkout the https://github.com/kaitai-io/kaitai_struct_java_runtime/tree/serialization[*serialization*] branch of the https://github.com/kaitai-io/kaitai_struct_java_runtime repo:
+In Java, you need to checkout the https://github.com/kaitai-io/kaitai_struct_java_runtime repo:
 
 [source,shell]
 ----
-git clone -b serialization https://github.com/kaitai-io/kaitai_struct_java_runtime.git
+git clone https://github.com/kaitai-io/kaitai_struct_java_runtime.git
 cd kaitai_struct_java_runtime
 ----
 
@@ -216,11 +216,11 @@ But note that the `0.11-SNAPSHOT` version only exists in your local Maven reposi
 Python::
 +
 --
-In Python, you need to install the https://github.com/kaitai-io/kaitai_struct_python_runtime/tree/serialization[*serialization*] branch of the https://github.com/kaitai-io/kaitai_struct_python_runtime library. You can do it with https://pypi.org/project/pip/[pip] (package installer for Python); you also need https://git-scm.com/[Git] while running the command because the installation involves cloning the branch from GitHub:
+In Python, you need to install the runtime library from the https://github.com/kaitai-io/kaitai_struct_python_runtime repo. You can do it with https://pypi.org/project/pip/[pip] (package installer for Python); you also need https://git-scm.com/[Git] while running the command because the installation involves cloning the source code from GitHub:
 
 [source,shell]
 ----
-python -m pip install -U --pre git+https://github.com/kaitai-io/kaitai_struct_python_runtime.git@serialization
+python -m pip install -U --pre git+https://github.com/kaitai-io/kaitai_struct_python_runtime.git
 ----
 
 After that, you can import the serialization-capable `KaitaiStream` class defined in the runtime library like this (generated modules do it too):
@@ -661,7 +661,7 @@ print(r.len_data)  # => 5
 
 We set a 5-byte array to `data`, so for the object to be consistent, we need `len_data` to be `5`. Since it's defined as `len_data_raw - 3`, we set `len_data_raw` to `8`, which makes `len_data` to be `8 - 3 = 5`.
 
-What happens if you want to change the length of `data` in this existing object? Instances in KS are cached, so even if you change `len_data_raw`, `len_data` will still keep returning the old cached value (`5`):
+What happens if you want to change the length of `data` in this existing object? Instances in KS are cached, so even if you change `len_data_raw`, `len_data` will keep returning the old cached value (`5`):
 
 [tabs]
 ======
@@ -751,7 +751,7 @@ Enum values not present in the enum definition are not supported in Java or Pyth
 
 Unlike the existing parser implementation of bit types which relied on explicit `alignToByte()` calls (and this resulted in many problems, because in many cases the compiler failed in where to insert them and where not), all byte-aligned operations in Java and Python runtime libraries with serialization support now perform the byte alignment automatically, and the explicit `alignToByte()` calls shouldn't be needed anymore.
 
-When you write a structure with `X`-bit `type: bX` fields, only full bytes are written once they're known. This means that if your format ends at an unaligned bit position, the bits of the final partial byte remain in the internal "bit buffer", but they will not be written to the underlying stream until you do some operation which aligns the position to a byte boundary (e.g. `writeBytes(0)`, `seek(...)`, or explicit `writeAlignToByte()`). However, if you don't have anything else to write and don't need to work with that stream anymore, it's recommended to `close()` the stream, which automatically writes the remaning bits (if any) before closing the stream.
+When you write a structure with `X`-bit `type: bX` fields, only full bytes are written once they're known. This means that if your format ends at an unaligned bit position, the bits of the final partial byte remain in the internal "bit buffer", but they will not be written to the underlying stream until you do some operation which aligns the position to a byte boundary (e.g. `writeBytes(0)`, `seek(...)`, or explicit `writeAlignToByte()`). However, if you don't have anything else to write and don't need to work with that stream anymore, it's recommended to `close()` the stream, which automatically writes the remaining bits (if any) before closing the stream.
 
 [tabs]
 ====
@@ -830,4 +830,4 @@ seq:
     size: _io.size - _io.pos
 ----
 
-Since it's a fixed-length byte array with the `size` expression denoting its length, it's necessary to check whether the length of the `rest` byte array (that might have been changed via a setter) and the value of the `size` expression `+_io.size - _io.pos+` match. But this expression uses `+_io+`, so it cannot be performed in `+_check+`: `+_check+` is meant to check pure data consistency and the `+_io+` may not available at this point. So this consistency check will be moved to `+_write+` just before the `rest` field would be written.
+Since it's a fixed-length byte array with the `size` expression denoting its length, it's necessary to check whether the length of the `rest` byte array (that might have been changed via a setter) and the value of the `size` expression `+_io.size - _io.pos+` match. But this expression uses `+_io+`, so it cannot be performed in `+_check+`: `+_check+` is meant to check pure data consistency and the `+_io+` may not be available at this point. So this consistency check will be moved to `+_write+` just before the `rest` field would be written.
