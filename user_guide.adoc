@@ -42,10 +42,19 @@ A list of Web IDE features is available on the https://github.com/kaitai-io/kait
 
 Note that there are two different versions of the Web IDE:
 
-1. https://ide.kaitai.io/ — *stable* version, has the stable of the Kaitai Struct compiler (currently 0.10, released 2022-07-08)
-2. https://ide.kaitai.io/devel/ — unstable development version, always has the *latest* compiler (the most recent 0.11-SNAPSHOT)
+1. https://ide.kaitai.io/ — *stable* version, has the stable Kaitai Struct
+compiler (currently 0.10, released 2022-07-08)
+2. https://ide.kaitai.io/devel/ — unstable development version, has the *latest*
+compiler (the most recent 0.11-SNAPSHOT)
 
 If you want to use the latest features, use the https://ide.kaitai.io/devel/[*devel* Web IDE].
+
+NOTE: The https://ide.kaitai.io/devel/[*devel* Web IDE] follows the default
+https://github.com/kaitai-io/kaitai_struct_webide/tree/master[`master` branch]
+of the https://github.com/kaitai-io/kaitai_struct_webide[kaitai_struct_webide]
+repository — it is automatically updated when the
+https://github.com/kaitai-io/kaitai_struct_webide/tree/master[`master` branch]
+is updated.
 
 [[ksc]]
 === Desktop / console version
