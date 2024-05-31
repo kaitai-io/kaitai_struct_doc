@@ -63,10 +63,18 @@ For Debian/Ubuntu, this should be enough to download every
 prerequisite (JRE is pulled automatically by sbt):
 
 [source,shell]
-echo "deb https://dl.bintray.com/sbt/debian /" | sudo tee -a /etc/apt/sources.list.d/sbt.list
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823
+echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list
+echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | sudo tee /etc/apt/sources.list.d/sbt_old.list
+curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo apt-key add
 sudo apt-get update
 sudo apt-get install sbt
+
+For RedHat-based systems, use the following:
+
+[source,shell]
+curl -L https://www.scala-sbt.org/sbt-rpm.repo > sbt-rpm.repo
+sudo mv sbt-rpm.repo /etc/yum.repos.d/
+sudo yum install sbt
 
 Manual installation:
 
@@ -86,6 +94,7 @@ automatically as well.
 === Configuring proxy
 
 Note, that if you behind proxy, you need to run `sbt` with flags
+
 [source]
   -Dhttp.proxyHost=<your proxy server>
   -Dhttp.proxyPort=<your proxy server port>
@@ -93,6 +102,7 @@ Note, that if you behind proxy, you need to run `sbt` with flags
   -Dhttps.proxyPort=<your proxy server port>
 
 For example
+
 [source,shell]
   sbt -Dhttp.proxyHost=proxy.com -Dhttp.proxyPort=3128 -Dhttps.proxyHost=proxy.com -Dhttps.proxyPort=3128
 
