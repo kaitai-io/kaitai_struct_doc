@@ -251,10 +251,9 @@ KS enforces specific identifier style in the language -
 styles of identifier spelling, like `UpperCamelCase` or
 `lowerCamelCase`, which some target languages use).
 
-KS allows omitting `id`. One MUST omit `id` to mark up attributes of
-unknown/undetermined purpose, i.e. unfinished reverse engineering
-work. One MUST NOT omit `id` to mark up reserved/unused attributes and
-padding, i.e. placeholder that are known to be empty and unused.
+KS allows omitting `id`. One MUST NOT omit `id` to mark up reserved/unused
+attributes and padding, i.e. placeholder that are  known to be empty
+and unused.
 
 One SHOULD use the following rules to maintain consistency across
 various KSY files. Doing that would maintain the "principle of least
@@ -263,28 +262,37 @@ guesswork.
 
 * For simple non-repeated fields, use a simple singular form —
   e.g. `width`, `header`, `transaction_id`, `file`.
-* For an array of objects (i.e. with `repeat: something`), use plural
+* For a sequence of objects (i.e. with `repeat: something`), use plural
   form — e.g. `files`, `transactions`.
 * Don't be overly verbose: use commonly understood abbreviations
   liberally, if it will improve readability — e.g. `src_mac` or
   `src_mac_addr` instead of `source_media_access_control_address`
+* Repeated fields which cannot be packed into a sequence should
+  have `id`s containing a number in the end. Numbers may have a
+  visually-obvious structure, like "the first digit is major, the second
+  one is minor".
 * For fields that are designed to be used to detect file type (AKA
-  "magic values"), use `magic` name, or, if there are several of them,
-  `magic1`, `magic2`, etc.
+  "magic values"), use `signature` or `magic` name, or, if there are
+  several of them, like `signature` or `magic0`, `magic1`, etc.
 * For reserved fields which are *known* to be unused, use `reserved`
-  name (or `reserved1`, `reserved2`, etc, if there are many of them)
+  name (or `reserved0`, `reserved1`, etc, if there are many of them)
 * For fields that designate *number / count* of something (in
-  particular, number of repetitions of some other structure), use
-  `num_` prefix and plural form — i.e. `num_questions`, `num_blocks`,
-  `num_nodes`
+  particular, number of repetitions of some other structure), use either
+  `_count` suffix and a plural form, contrary to prescribed by English
+  grammar, — i.e. `questions_count`, `blocks_count`, `nodes_count`
+  (mentally replace `_count` by `.count` to understand the logic
+  behind that).
 * For fields that designate *offset* to some particular data structure,
-  use `ofs_` prefix and name of that data structure (as it would appear
-  in the file) — i.e. `ofs_block`, `ofs_queries`, `ofs_path`
+  use `_offset` suffix and name of that data structure (as it would
+  appear in the file) — i.e. `block_offset`, `queries_offset`, `path_offset`
 * For fields that designate *size* of some particular data structure
-  (in bytes or some other fixed units), use `len_` prefix and name of
-  that data structure — i.e. `len_block` (length of a single `block`
-  entry), `len_blocks` (total length of whole `blocks` array, made of
+  (in bytes or some other fixed units), use `_size` suffix and name of
+  that data structure — i.e. `block_size` (length of a single `block`
+  entry), `blocks_size` (total length of whole `blocks` array, made of
   `block` entries).
+* Fields of unknown/undetermined purpose, i.e. unfinished reverse
+  engineering work SHOULD either NOT HAVE an `id` or HAVE an
+  `id` matching the `/unkn(?:own)?(_\w+)?\d*/` regular expression.
 
 [NOTE]
 See <<transcribing>> for more info on preserving / renaming
@@ -366,6 +374,13 @@ here as well. Keys MUST appear in this order:
 . `pos` or `value`
 . All other keys (except for `id` and `-orig-id`), in order specified
   in <<seq-attr>>
+
+[[enum-attr]]
+== Enum attributes
+
+* In the case of multiple enums with the same name it's usually
+  better to append the integer value rather than a sequence
+  number to its `id`.
 
 [[transcribing]]
 == Transcribing existing specs
