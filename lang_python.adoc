@@ -1,6 +1,6 @@
 = Kaitai Struct: Python notes
 Kaitai Project
-v0.10
+v0.11
 :toc: left
 
 [[overview]]
@@ -10,9 +10,12 @@ v0.10
 === Supported Python versions
 
 Kaitai Struct supports Python 3.4 and later as well as Python 2.7.
-It is strongly recommended to use Python 3.8 or newer,
-because Python 3.7 and 2.7 have reached end-of-life
+It is strongly recommended to use Python 3.9 or newer,
+because Python 3.8 and 2.7 have reached end-of-life
 and no longer receive official support from the Python developers.
+
+Please note that Kaitai Struct 0.11 is the last version to support Python 2.7.
+Versions 0.12 and above will only work on Python 3.
 
 [[ksc]]
 === Kaitai Struct compiler invocation

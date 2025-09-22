@@ -1,6 +1,6 @@
 = Kaitai Struct User Guide
 Kaitai Project
-v0.10
+v0.11
 :toc: left
 :numbered:
 
@@ -43,9 +43,9 @@ A list of Web IDE features is available on the https://github.com/kaitai-io/kait
 Note that there are two different versions of the Web IDE:
 
 1. https://ide.kaitai.io/ — *stable* version, has the stable Kaitai Struct
-compiler (currently 0.10, released 2022-07-08)
+compiler (currently 0.11, released 2025-09-07)
 2. https://ide.kaitai.io/devel/ — unstable development version, has the *latest*
-compiler (the most recent 0.11-SNAPSHOT)
+compiler (the most recent 0.12-SNAPSHOT)
 
 If you want to use the latest features, use the https://ide.kaitai.io/devel/[*devel* Web IDE].
 

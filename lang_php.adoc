@@ -1,6 +1,6 @@
 = Kaitai Struct: PHP notes
 
-The Kaitai Struct https://github.com/kaitai-io/kaitai_struct_php_runtime[runtime for PHP] requires PHP >= 7.0 and can be used in two different ways:
+The Kaitai Struct https://github.com/kaitai-io/kaitai_struct_php_runtime[runtime library for PHP] requires PHP >= 7.0 and can be used in two different ways:
 
 1) As part of Kaitai Struct (recommended approach)
 
@@ -17,22 +17,22 @@ cd kaitai-test
 #######################################################################################
 # Download Kaitai Struct Compiler, link can be found at https://kaitai.io/#download page
 
-curl -OL https://bintray.com/artifact/download/kaitai-io/universal/0.10/kaitai-struct-compiler-0.10.zip
+curl -fLO https://github.com/kaitai-io/kaitai_struct_compiler/releases/download/0.11/kaitai-struct-compiler-0.11.zip
 
-unzip kaitai-struct-compiler-0.10.zip
+unzip kaitai-struct-compiler-0.11.zip
 
-cd kaitai-struct-compiler-0.10
+cd kaitai-struct-compiler-0.11
 
 ###############
 # Check version
 
 bin/kaitai-struct-compiler --version
-# Shows kaitai-struct-compiler 0.10
+# Shows kaitai-struct-compiler 0.11
 
 ################################################
 # Download and compile ELF file format - elf.ksy
 
-curl -OL https://raw.githubusercontent.com/kaitai-io/kaitai_struct_formats/master/executable/elf.ksy
+curl -fLO https://raw.githubusercontent.com/kaitai-io/kaitai_struct_formats/master/executable/elf.ksy
 
 bin/kaitai-struct-compiler --target php --outdir my-elf-parser --php-namespace 'My\Parser' elf.ksy
 
