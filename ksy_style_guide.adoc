@@ -96,9 +96,12 @@ Use the following order of sections:
 . `meta`, if present, MUST go first
 . `doc`
 . `doc-ref`
+. `to-string`
+. `params`
 . `seq`
-. `instances`, `types`, `enums` — use one's best judgement to order
-  these 3 to maximize readability
+. `instances`
+. `types`, `enums` — use one's best judgement to order these two to
+  maximize readability
 
 [[meta]]
 == Meta section (`meta`)
@@ -136,12 +139,14 @@ For top-level meta section, use the following order of keys:
 . Defaults (in alphabetic order):
 .. `encoding`
 .. `endian`
+.. `bit-endian`
 
 For intermediate-level meta sections, use the following order of keys:
 
 . Defaults (in alphabetic order):
 .. `encoding`
 .. `endian`
+.. `bit-endian`
 
 NOTE: KS syntax allows usage of some top-level elements deep inside
 the hierarchy — this can be useful during development, for example,
@@ -223,14 +228,14 @@ When specifying an attribute, one MUST use the following order of keys:
 . `type`
 . Type-related keys:
 .. `enum`
-.. `contents`
-.. `pad-right`
 .. `terminator`
 .. `include`
 .. `consume`
 .. `eos-error`
+.. `pad-right`
 .. `encoding`
 . `process`
+. `valid`, `contents`
 . Repetition-related keys:
 .. `repeat`
 .. `repeat-expr`, `repeat-until`
