@@ -233,7 +233,7 @@ When specifying an attribute, one MUST use the following order of keys:
 . `process`
 . Repetition-related keys:
 .. `repeat`
-.. `repeat-eos`, `repeat-expr`, `repeat-until`
+.. `repeat-expr`, `repeat-until`
 . `if`
 . `doc`
 . `doc-ref`
