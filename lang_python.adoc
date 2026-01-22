@@ -72,21 +72,26 @@ If you are using snapshot KSC, you should also use snapshot runtime.
 With stable version of Kaitai Struct compiler, one can use the following
 methods:
 
-* On Debian / Ubuntu, one can install it from apt repositories:
+* On Ubuntu / Debian, one can install it from apt repositories:
 
 ** For Python 3.x:
 +
 [source,shell]
 sudo apt-get install python3-kaitaistruct
 +
-Reference: https://packages.debian.org/unstable/python3-kaitaistruct[image:https://repology.org/badge/version-for-repo/debian_unstable/kaitai-struct.svg[package info for Debian]], https://packages.ubuntu.com/jammy/python3-kaitaistruct[image:https://repology.org/badge/version-for-repo/ubuntu_22_04/kaitai-struct.svg[package info for Ubuntu]]
-
-** For Python 2.x:
+References:
 +
-[source,shell]
-sudo apt-get install python-kaitaistruct
+--
+*** https://packages.ubuntu.com/noble/python3-kaitaistruct[image:https://repology.org/badge/version-for-repo/ubuntu_24_04/kaitai-struct.svg[Ubuntu 24.04 package]] -- Ubuntu 24.04 "`Noble Numbat`" (LTS)
+*** https://packages.debian.org/trixie/python3-kaitaistruct[image:https://repology.org/badge/version-for-repo/debian_13/kaitai-struct.svg[Debian 13 package]] -- Debian 13 "`Trixie`" (current "`stable`")
+--
 +
-Reference: https://packages.debian.org/buster/python-kaitaistruct[image:https://repology.org/badge/version-for-repo/debian_10/kaitai-struct.svg[package info for Debian]], https://packages.ubuntu.com/bionic/python-kaitaistruct[image:https://repology.org/badge/version-for-repo/ubuntu_18_04/kaitai-struct.svg[package info for Ubuntu]]
+'''
++
+--
+*** https://packages.ubuntu.com/resolute/python3-kaitaistruct[image:https://repology.org/badge/version-for-repo/ubuntu_26_04/kaitai-struct.svg[Ubuntu 26.04 package]] -- Ubuntu 26.04 "`Resolute Raccoon`" (upcoming LTS)
+*** https://packages.debian.org/forky/python3-kaitaistruct[image:https://repology.org/badge/version-for-repo/debian_14/kaitai-struct.svg[Debian 14 package]] -- Debian 14 "`Forky`" (current "`testing`")
+--
 
 * Add the following dependency specifier into the package configuration
 of the packaging tool you use:
