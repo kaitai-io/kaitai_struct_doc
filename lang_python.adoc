@@ -14,7 +14,7 @@ It is strongly recommended to use Python 3.10 or newer,
 because Python 3.9 and 2.7 have reached end-of-life
 and no longer receive official support from the Python developers.
 
-Please note that Kaitai Struct 0.11 is the last version that supports Python 2.7.
+Note that Kaitai Struct 0.11 is the last version that supports Python 2.7.
 Versions 0.12 and above will only work on Python 3.8 and above.
 
 [[ksc]]
@@ -139,15 +139,14 @@ python3 -m pip install --upgrade --pre git+https://github.com/kaitai-io/kaitai_s
 
 <<user_guide#enums,Enums>> implementation in Python requires
 enum support as described in
-https://www.python.org/dev/peps/pep-0435/[PEP-0435]. This support is
-available out of the box in standard libraries since Python v3.4, or
-since v2.4 using https://pypi.org/project/enum34/[enum34] polyfill.
+https://www.python.org/dev/peps/pep-0435/[PEP 435]. This support is
+available in the standard library since Python 3.4, or
+in Python 2.7 using the https://pypi.org/project/enum34/[enum34] polyfill.
 
 * One usually doesn't need to install this lib manually, `pip` will install it
-   automatically if it is needed.
+  automatically if it is needed.
 * One can also install it manually:
-** One can use just `python -m pip install enum34`. Don't do it on
-     later Pythons or the apps using just `enum` will be broken!
+** One can simply use `python -m pip install enum34` (only makes sense in Python 2)
 ** On Debian / Ubuntu, this library can be installed with
     `sudo apt-get install -y python-enum34`.
 
