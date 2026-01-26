@@ -34,6 +34,8 @@ You can compile a .ksy spec to Java classes with serialization support like this
 ----
 kaitai-struct-compiler --read-write --no-auto-read -t java <ksy-file>
 ----
+
+If you need to integrate the generated classes into your project, you will probably also want to specify the package using the `--java-package <package>` option.
 --
 
 Python::
