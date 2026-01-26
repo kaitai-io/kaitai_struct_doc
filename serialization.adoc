@@ -67,7 +67,7 @@ Python::
 [source,python]
 ----
 g = Gif.from_file("path/to/some.gif")
-print("width = %d" % (g.logical_screen.image_width))
+print(f"width = {g.logical_screen.image_width}")
 ----
 ======
 
@@ -91,7 +91,7 @@ Python::
 ----
 with KaitaiStream(open("path/to/some.gif", 'rb')) as _io:
     g = Gif(_io)
-    print("width = %d" % (g.logical_screen.image_width))
+    print(f"width = {g.logical_screen.image_width}")
 ----
 ======
 
@@ -119,7 +119,7 @@ Python::
 with KaitaiStream(open("path/to/some.gif", 'rb')) as _io:
     g = Gif(_io)
     g._read()
-    print("width = %d" % (g.logical_screen.image_width))
+    print(f"width = {g.logical_screen.image_width}")
 ----
 ======
 
@@ -204,7 +204,7 @@ hw = HelloWorld()
 hw.foo = [-4, 65536]
 hw._check()
 
-_io = KaitaiStream(io.BytesIO(bytearray(8)))
+_io = KaitaiStream(io.BytesIO(bytes(8)))
 hw._write(_io)
 
 output = _io.to_byte_array()
@@ -331,7 +331,7 @@ one._check()
 ut.one = one
 ut._check()
 
-_io = KaitaiStream(io.BytesIO(bytearray(6)))
+_io = KaitaiStream(io.BytesIO(bytes(6)))
 ut._write(_io)
 
 output = _io.to_byte_array()
@@ -725,7 +725,7 @@ So from the KS perspective, the recommendations are the following:
 +
 [source,python]
 ----
-_io = KaitaiStream(io.BytesIO(bytearray(8)))
+_io = KaitaiStream(io.BytesIO(bytes(8)))
 hw._write(_io)
 
 output = _io.to_byte_array()
@@ -737,7 +737,7 @@ This method works even if the format ends at an unaligned bit position - the `to
 +
 [source,python]
 ----
-f = open('path/to/file.bin', 'wb')  # use io.open() instead if you care about Python 2 compatibility
+f = open('path/to/file.bin', 'wb')
 f.truncate(8)
 
 with KaitaiStream(f) as _io:
