@@ -418,7 +418,7 @@ Java::
 [source,highlight=2]
 ----
 io.kaitai.struct.ConsistencyError: Check failed: one, expected: org.example.UserTypes@539645a2, actual: null
-    at org.example.UserTypes._check (UserTypes.java:48)
+    at org.example.UserTypes._check (UserTypes.java:50)
     ...
 ----
 
@@ -427,8 +427,8 @@ io.kaitai.struct.ConsistencyError: Check failed: one, expected: org.example.User
 public class UserTypes extends KaitaiStruct.ReadWrite {
     // ...
     public void _check() {
-        if (!Objects.equals(one()._root(), _root()))
-            throw new ConsistencyError("one", one()._root(), _root());
+        if (!Objects.equals(this.one._root(), _root()))
+            throw new ConsistencyError("one", _root(), this.one._root());
         // ...
     }
 ----
@@ -447,14 +447,13 @@ Traceback (most recent call last):
 kaitaistruct.ConsistencyError: Check failed: one, expected: <user_types.UserTypes object at 0x0000017A19626610>, actual: None
 ----
 
-[source,python,highlight=6]
+[source,python,highlight=5]
 ----
 class UserTypes(ReadWriteKaitaiStruct):
     # ...
     def _check(self):
-        pass
         if self.one._root != self._root:
-            raise kaitaistruct.ConsistencyError(u"one", self.one._root, self._root)
+            raise kaitaistruct.ConsistencyError(u"one", self._root, self.one._root)
         # ...
 ----
 --
@@ -654,7 +653,7 @@ The Java's `+_invalidate{Inst}+` / Python's `+_invalidate_{inst}+` method invali
 
 === Parse instances
 
-They have setters. Additionally, you can also use a special boolean `set{Inst}_ToWrite` setter (in Python you'd assign a boolean to a property `+{inst}__to_write+`), allowing you to disable writing of a specific instance (as `r.set{Inst}_ToWrite(false)` in Java, or `+r.{inst}__to_write = False+` in Python) in a particular KS object. This may be useful for C-style `union` members (several overlapping fields with different types, but only one applies in any object), lookaheads or other positional instances you don't want to write.
+They have setters. Additionally, you can also use a special boolean `set{Inst}_Enabled` setter (in Python you'd assign a boolean to a property `+{inst}__enabled+`), allowing you to disable both writing and checking of a specific instance (as `r.set{Inst}_Enabled(false)` in Java, or `+r.{inst}__enabled = False+` in Python) in a particular KS object. This may be useful for C-style `union` members (several overlapping fields with different types, but only one applies in any object), lookaheads or other positional instances you don't want to write.
 
 === Parameters
 
