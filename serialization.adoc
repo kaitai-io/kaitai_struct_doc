@@ -271,6 +271,8 @@ hw._check()  # kaitaistruct.ConsistencyError: Check failed: foo, expected: 2, ac
 
 As expected, the `+_check+` method caught the problem and threw an exception - the expected length of field `foo` was 2, but it was 3, which doesn't match the format definition.
 
+Note that not all consistency checks are performed in `+_check+`. Data inconsistencies may also manifest as `ConsistencyError` or other errors raised by the `+_write+` method -- see <<checks-outside-check>>.
+
 == Notes on individual features
 
 === User-defined types
@@ -749,9 +751,24 @@ Note that it's not necessary to manage the file object using the `with` keyword 
 --
 ====
 
+[[checks-outside-check]]
 === Consistency checks that cannot be done in `+_check+`
 
-Sometimes a consistency check cannot be performed in `+_check+` because the user expressions from the .ksy specification that the check needs to use do not allow it. A typical example is when the expression makes use of the built-in `+_io+` variable, for example:
+Not all consistency checks can be evaluated in `+_check+`. The `+_check+` method is intentionally restricted to *pure, stream-independent* consistency checks. It treats the object as a standalone entity without assuming the existence of any stream.
+
+This is necessary because when `+_check+` is invoked on objects created programmatically from scratch (i.e. not parsed from a stream), the current I/O stream `+_io+` is typically `null` or `None`. This makes stream-dependent validation impossible at that stage. As a consequence, the built-in `+_io+` variable can never be used in `+_check+`.
+
+Broadly speaking, there are two reasons why a consistency check might need access to the stream:
+
+* The check requires evaluating a user-specified expression that explicitly refers to the stream (typically via `+_io+`) -- see <<checks-with-io-exprs>>.
+* Accessing the stream is inherent in the nature of the check itself -- see <<checks-with-inherent-io>>.
+
+In both cases, the consistency check is automatically moved out of `+_check+` and performed during writing instead. The check is emitted at exactly the same point in the write sequence where the corresponding consistency property emerges during parsing. This guarantees that the stream state (position and length) is the same as when reading, and thus that the check has the same meaning.
+
+[[checks-with-io-exprs]]
+==== Checks with user expressions that refer to streams
+
+The following .ksy snippet defines a field which implies a consistency check that must use a user expression with `+_io+`:
 
 [source,yaml]
 ----
@@ -760,4 +777,108 @@ seq:
     size: _io.size - _io.pos
 ----
 
-Since it's a fixed-length byte array with the `size` expression denoting its length, it's necessary to check whether the length of the `rest` byte array (that might have been changed via a setter) and the value of the `size` expression `+_io.size - _io.pos+` match. But this expression uses `+_io+`, so it cannot be performed in `+_check+`: `+_check+` is meant to check pure data consistency and the `+_io+` may not be available at this point. So this consistency check will be moved to `+_write+` just before the `rest` field would be written.
+Here, `rest` is a byte array whose declared length is given by the expression `+_io.size - _io.pos+` (which calculates the number of remaining bytes in the stream). For the data to be consistent, the actual length of `rest` must match this value.
+
+Because the expression depends on `+_io+`, it cannot be evaluated in `+_check+`. Instead, the generated code performs the check immediately before `rest` is written:
+
+[tabs]
+======
+Java::
++
+[source,java,highlight=3]
+----
+    public void _write_Seq() {
+        _assertNotDirty();
+        if (this.rest.length != _io().size() - _io().pos())
+            throw new ConsistencyError("rest", _io().size() - _io().pos(), this.rest.length);
+        this._io.writeBytes(this.rest);
+    }
+----
+
+Python::
++
+[source,python,highlight=3]
+----
+    def _write__seq(self, io=None):
+        super(ChecksInWrite, self)._write__seq(io)
+        if len(self.rest) != self._io.size() - self._io.pos():
+            raise kaitaistruct.ConsistencyError(u"rest", self._io.size() - self._io.pos(), len(self.rest))
+        self._io.write_bytes(self.rest)
+----
+======
+
+This placement in `+_write_Seq+` / `+_write__seq+` mirrors the point in the `+_read+` method where the consistency property emerges:
+
+[tabs]
+======
+Java::
++
+[source,java,highlight=2]
+----
+    public void _read() {
+        this.rest = this._io.readBytes(_io().size() - _io().pos());
+        _dirty = false;
+    }
+----
+
+Python::
++
+[source,python,highlight=2]
+----
+    def _read(self):
+        self.rest = self._io.read_bytes(self._io.size() - self._io.pos())
+        self._dirty = False
+----
+======
+
+During parsing, the expression `+_io.size - _io.pos+` is evaluated immediately before reading `rest` and determines the exact number of bytes to consume. If the read succeeds (i.e. no EOF error occurs), `rest` will necessarily contain exactly `+_io.size - _io.pos+` bytes, with this expression interpreted in the stream state just before the field.
+
+This explains how this consistency property emerged and why the placement of the consistency check during writing is semantically correct.
+
+[[checks-with-inherent-io]]
+==== Checks that inherently access the stream
+
+The example in <<checks-with-io-exprs>> effectively defines a field that spans from the current position to the end of stream, but does so in a non-idiomatic way. In practice, it's recommended to use the built-in `size-eos: true` syntax instead:
+
+[source,yaml]
+----
+seq:
+  - id: rest
+    size-eos: true
+----
+
+This definition is fully equivalent in terms of both reading and writing. The difference lies in how consistency checking is implemented in the generated code:
+
+[tabs]
+======
+Java::
++
+[source,java,highlight=4]
+----
+    public void _write_Seq() {
+        _assertNotDirty();
+        this._io.writeBytes(this.rest);
+        if (!(this._io.isEof()))
+            throw new ConsistencyError("rest", 0, this._io.size() - this._io.pos());
+    }
+----
+
+Python::
++
+[source,python,highlight=4]
+----
+    def _write__seq(self, io=None):
+        super(ChecksInWrite, self)._write__seq(io)
+        self._io.write_bytes(self.rest)
+        if not self._io.is_eof():
+            raise kaitaistruct.ConsistencyError(u"rest", 0, self._io.size() - self._io.pos())
+----
+======
+
+The set of accepted and rejected values for the `rest` field is identical to the version using `+size: _io.size - _io.pos+` shown in <<checks-with-io-exprs>>.
+
+However, instead of checking up front that `rest` has the exact expected length and raising a `ConsistencyError` if not, this variant explicitly enforces only the implied consistency property that the stream must be at end-of-stream after the field. This is done by checking that `+_io.eof+` is true once `rest` has been written.
+
+If `rest` is too short, the end-of-stream condition is not met and a `ConsistencyError` is raised. If `rest` is too long to fit into the fixed-length stream, the write operation itself fails with an EOF error: a `BufferOverflowException` or `EOFException` in Java (depending on the `KaitaiStream` implementation), or an `EndOfStreamError` in Python.
+
+In other words, the consistency property implied by `size-eos: true` is enforced partly by an explicit consistency check and partly by the underlying I/O stream.
