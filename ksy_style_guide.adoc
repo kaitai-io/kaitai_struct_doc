@@ -214,6 +214,73 @@ TODO: documentation contents, what should and should no be included
 
 TODO
 
+[[encoding-name]]
+== Encoding name (`encoding`)
+
+The `encoding` key (used in `meta/encoding` for the default encoding and
+in individual attributes to override it) specifies the character
+encoding for string values. The KS compiler recognizes a set of
+canonical encoding names and common aliases, and will emit warnings if a
+non-canonical form is used.
+
+One MUST use the canonical (exact) spelling of the encoding name. The
+match is *case-sensitive*: for example, `UTF-8` is correct, but `utf-8`
+or `Utf-8` will trigger a warning.
+
+The following canonical names are recognized by the compiler:
+
+[cols="1,3", options="header"]
+|====
+| Canonical name | Common aliases (accepted but produce a warning)
+
+| `ASCII`
+| US-ASCII, US_ASCII, IBM367, cp367
+
+| `UTF-8`
+| UTF8, UTF_8, cp65001
+
+| `UTF-16BE`
+| UTF16BE, UTF16-BE, UTF-16-BE, UTF_16BE
+
+| `UTF-16LE`
+| UTF16LE, UTF16-LE, UTF-16-LE, UTF_16LE
+
+| `UTF-32BE`
+| UTF32BE, UTF32-BE, UTF-32-BE, UTF_32BE
+
+| `UTF-32LE`
+| UTF32LE, UTF32-LE, UTF-32-LE, UTF_32LE
+
+| `ISO-8859-1`
+| ISO8859-1, ISO_8859_1, latin1, cp819, windows-28591
+
+| `ISO-8859-2` ... `ISO-8859-16`
+| Same pattern of aliases (e.g. latin2, latin3, ..., latin10)
+
+| `windows-1250` ... `windows-1258`
+| cp1250 ... cp1258
+
+| `IBM437`
+| cp437, 437
+
+| `IBM866`
+| cp866, 866
+
+| `Shift_JIS`
+| Shift-JIS, ShiftJIS, S-JIS, SJIS, PCK
+
+| `Big5`
+| csBig5
+
+| `EUC-KR`
+| EUCKR, EUC_KR, korean
+|====
+
+The list above is included just for demonstration purposes. The master
+list is maintained in the compiler source code (see
+https://github.com/kaitai-io/kaitai_struct_compiler/blob/master/shared/src/main/scala/io/kaitai/struct/EncodingList.scala[EncodingList.scala])
+— if in doubt, follow the list in the source code.
+
 [[seq-attr]]
 == Sequence attributes
 
