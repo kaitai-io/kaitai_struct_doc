@@ -217,15 +217,22 @@ TODO
 [[encoding-name]]
 == Encoding name (`encoding`)
 
-The `encoding` key (used in `meta/encoding` for the default encoding and
-in individual attributes to override it) specifies the character
-encoding for string values. The KS compiler recognizes a set of
-canonical encoding names and common aliases, and will emit warnings if a
-non-canonical form is used.
+The `encoding` key (used in `meta/encoding` for the default encoding and in
+individual attributes to override it) specifies the character encoding for
+string values. The KS compiler recognizes a set of canonical encoding names and
+common aliases, and will emit warnings if a non-canonical form is used.
 
-One MUST use the canonical (exact) spelling of the encoding name. The
-match is *case-sensitive*: for example, `UTF-8` is correct, but `utf-8`
-or `Utf-8` will trigger a warning.
+One MUST use the canonical (exact) spelling of the encoding name. The match is
+*case-sensitive*: for example, `UTF-8` is correct, but `utf-8` or `Utf-8` will
+trigger a warning.
+
+NOTE: KS canonical encoding names are mostly based on the
+https://www.iana.org/assignments/character-sets/character-sets.xhtml[IANA
+Character Sets registry] ("Preferred MIME Name" column where available,
+otherwise "Name"), with a few deliberate exceptions (like `ASCII` instead of
+`US-ASCII`). IANA also states that encoding names are case-insensitive — KS,
+however, enforces case-sensitive names to encourage a single consistent
+spelling across all .ksy files.
 
 The following canonical names are recognized by the compiler:
 
@@ -280,6 +287,19 @@ The list above is included just for demonstration purposes. The master
 list is maintained in the compiler source code (see
 https://github.com/kaitai-io/kaitai_struct_compiler/blob/master/shared/src/main/scala/io/kaitai/struct/EncodingList.scala[EncodingList.scala])
 — if in doubt, follow the list in the source code.
+
+`UTF-16` and `UTF-32` (without an explicit byte order suffix) are deliberately
+*not* accepted. One MUST use the byte-order-explicit variants instead:
+
+* `UTF-16BE` or `UTF-16LE` (instead of `UTF-16`)
+* `UTF-32BE` or `UTF-32LE` (instead of `UTF-32`)
+
+The rationale is that .ksy format specifications must be fully deterministic
+and portable: they should describe the byte layout of a format unambiguously.
+Bare `UTF-16` / `UTF-32` rely on a BOM (byte order mark) at the start of the
+string, or worse, fall back to the host platform's native byte order — both of
+which make the spec ambiguous. By requiring an explicit `BE` or `LE` suffix,
+the byte order is always clear from the spec alone.
 
 [[seq-attr]]
 == Sequence attributes
