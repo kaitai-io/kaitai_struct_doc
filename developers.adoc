@@ -240,8 +240,10 @@ TODO
 [[java]]
 === Java
 
+> Maven GPG signing key https://maven.apache.org/plugins/maven-gpg-plugin/usage.html[configuration guide]
+
 * Pump version, set version to `$VERSION`, without `-SNAPSHOT`
-* `mvn deploy`
+* `mvn -DperformRelease=true deploy`
 * Go to https://oss.sonatype.org/#stagingRepositories
 * Scroll to the very end of list, seek `iokaitai-...` repositories
 * Select our staging repository
