@@ -107,7 +107,7 @@ sbt publishLocal
 ----
 
 after that, one can invoke it using
-https://github.com/kaitai-io/kaitai_struct_tests/blob/master/spec_kst_to_all[spec_kst_to_all]
+https://github.com/kaitai-io/kaitai_struct_tests/blob/master/build-tests[build-tests]
 script in tests:
 
 ----
@@ -126,7 +126,7 @@ in the all relevant dirs for one KST spec "foo_bar", one can run:
 [source,shell]
 ----
 cd ../tests
-./spec_kst_to_all -f foo_bar
+./build-tests -f foo_bar
 ----
 
 == Developing KST translator
