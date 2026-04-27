@@ -52,6 +52,23 @@ several ways:
 ** not packaged, used as a source JS file on a website
 ** packaged as https://www.npmjs.com/[npm] package
 
+=== Development loop
+
+The general process of making and testing a change once you have the
+prerequistes and sources ready:
+
+* Making changes in the `compiler` repo:
+** Perform a "stage build" with SBT: `sbt compilerJVM/stage`
+** Use your new compiler directly: `./jvm/target/universal/stage/bin/kaitai-struct-compiler <args>`
+*** Adding `./jvm/target/universal/stage/bin/` to your `PATH` is helpful here
+* Tests are run from the `tests` repo. After building the compiler:
+** When needed (e.g. you added a test), build new tests with <<kst.adoc#_invoking_kst_translator,KST translator>>:
+*** `./spec_kst_to_all [-f <test_name>] [-t lang]`
+** If `.ksy` files changed, regenerate compiled outputs:
+*** `./build-formats`
+** Compile (if needed) and run the tests
+*** `./run-<lang>`
+
 === Prerequisites
 
 To build the compiler, one generally needs just these two things:
